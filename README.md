@@ -48,3 +48,6 @@ How to use:
 	...
 	
 6. To switch between Keyboard and Pointer modes pass a boolean value to enyo.Spotlight.setPointerMode(true|false).
+
+7. To change appearance of a spotlighted component, modify css class .spotlight (that is being added to the outmost node of spotlighted component)
+	The class is defined in Spotlight/kind.Spotlight.css
