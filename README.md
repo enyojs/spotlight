@@ -1,7 +1,7 @@
 Spotlight
 =========
 
-Spotlight package for Moonraker project
+Spotlight package for Moonraker project.
 Author: Lex Podgorny
 
 Used for keyboard/pointer navigation through components of an enyo application.
