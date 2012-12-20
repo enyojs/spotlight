@@ -47,7 +47,7 @@ enyo.kind({
 		},
 	
 		getControlById: function(sId) {
-			return eval(sId.replace('_', '.$.'));
+			return enyo.$[sId];
 		},
 		
 		hasClass: function(o, s) {
