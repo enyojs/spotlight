@@ -189,18 +189,23 @@ enyo.kind({
 					if (!this.getPointerMode()) {
 						switch (oEvent.keyCode) {
 							case 13:
+							case 53: // TODO - hack to support old system
 								this._dispatchEvent('onSpotlightSelect', oEvent);
 								break;
 							case 37:
+							case 52: // TODO - hack to support old system
 								this._dispatchEvent('onSpotlightLeft', oEvent);
 								break;
 							case 38:
+							case 50: // TODO - hack to support old system
 								this._dispatchEvent('onSpotlightUp', oEvent);
 								break;
 							case 39:
+							case 54: // TODO - hack to support old system
 								this._dispatchEvent('onSpotlightRight', oEvent);
 								break;
 							case 40:
+							case 56: // TODO - hack to support old system
 								this._dispatchEvent('onSpotlightDown', oEvent);
 								break;
 							default:
@@ -250,9 +255,9 @@ enyo.kind({
 		onMoveTo: function(sDirection) {
 			var oControlLeft = this._getAdjacentControl(sDirection);
 			if (oControlLeft) {
-				this.spot(oControlLeft);
+				this.spot(oControlLeft, sDirection);
 			} else {
-				this.spot(this.getParent());
+				this.spot(this.getParent(), sDirection);
 			}
 		},
 		
@@ -351,7 +356,7 @@ enyo.kind({
 		},
 		
 		// Dispatches focus event to the control or it's first spottable child
-		spot: function(oControl) {
+		spot: function(oControl, sDirection) {
 			if (this._oCurrent && oControl !== this._oCurrent) {
 				this._dispatchEvent('onSpotlightBlur', null, this._oCurrent);
 			}
@@ -363,7 +368,7 @@ enyo.kind({
 			
 			if (oControl) {
 				oControl.addClass('spotlight');
-				this._dispatchEvent('onSpotlightFocus', null, oControl);
+				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl, sDirection);
 				return true;
 			}
 			
