@@ -66,9 +66,18 @@ enyo.kind({
 				oDecorator,
 				oSender = oEvent.originator;
 				
+			if (oSender.spotlight == 'container') {
+				oDecorator = enyo.Spotlight.Decorator['Container'];
+				console.log('Found container', enyo.Spotlight.Decorator);
+				if (typeof oDecorator[oEvent.type] == 'function') {
+					return oDecorator[oEvent.type](oSender, oEvent);
+				}
+				return true;
+			}
+
 			for (var s in enyo.Spotlight.Decorator) {		// TODO: optimize using hash
 				oDecorator = enyo.Spotlight.Decorator[s];
-				if (oSender instanceof oDecorator.decorates) {
+				if (typeof oDecorator.decorates == 'function' && oSender instanceof oDecorator.decorates) {
 					if (typeof oDecorator[oEvent.type] == 'function') {
 						return oDecorator[oEvent.type](oSender, oEvent);
 					}
@@ -157,14 +166,14 @@ enyo.kind({
 		
 		/********************* PUBLIC *********************/
 		
-		initialize: function(oOwner, oDefaultControl) {
+		initialize: function(oOwner, sDefaultControl) {
 			this._oCurrent = null;
 			this._oOwner   = oOwner;
 			
 			this._interceptEvents();
 			
-			if (oDefaultControl) {
-				this.spot(this._oOwner.$[oDefaultControl]);
+			if (sDefaultControl && typeof this._oOwner.$[sDefaultControl] != 'undefined') {
+				this.spot(this._oOwner.$[sDefaultControl]);
 			} else {
 				this.spot(this._oOwner);
 			}
@@ -292,16 +301,14 @@ enyo.kind({
 		
 		/************************************************************/
 		
-		setPointerMode	: function(bPointerMode)	{ this._bPointerMode = bPointerMode; },
-		getPointerMode	: function() 				{ return this._bPointerMode; },
-		getCurrent		: function() 				{ return this._oCurrent; },
+		setPointerMode	: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
+		getPointerMode	: function() 				{ return this._bPointerMode; 			},
+		getCurrent		: function() 				{ return this._oCurrent; 				},
+		setCurrent		: function(oControl)		{ return this._setCurrent(oControl); 	}
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
-			return (
-				typeof oControl.spotlight != 'undefined' && 
-				oControl.spotlight
-			);
+			return (typeof oControl.spotlight != 'undefined' && oControl.spotlight);
 		},
 		
 		// Returns spottable chldren along with position of self 

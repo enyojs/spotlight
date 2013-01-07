@@ -52,19 +52,18 @@ enyo.kind({
 		
 		hasClass: function(o, s) {
 			if (!o || !o.className) { return; }
-			return (' ' + o.className + ' ')
-			.indexOf(' ' + s + ' ') >= 0;
+			return (' ' + o.className + ' ').indexOf(' ' + s + ' ') >= 0;
 		},
 		
 		addClass: function(o, s) {
-			if (!this.hasClass(o, s)) {
+			if (o && !this.hasClass(o, s)) {
 				var ss = o.className;
 				o.className = (ss + (ss ? ' ' : '') + s);
 			}
 		},
 		
 		removeClass: function(o, s) {
-			if (this.hasClass(o, s)) {
+			if (o && this.hasClass(o, s)) {
 				var ss = o.className;
 				o.className = (' ' + ss + ' ').replace(' ' + s + ' ', ' ').slice(1, -1);
 			}
