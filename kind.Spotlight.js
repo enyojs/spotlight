@@ -22,13 +22,13 @@ enyo.kind({
 		_bPointerMode	: false,
 		_oCurrent		: null,		// Currently spotlighted element
 		_oOwner			: null,		// Component owner, usually application
+		_oDecorators	: {},		// For further optimization
 		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
 		},
 		
 		_setCurrent: function(oControl) {
-			//console.log('Setting CURRENT', oControl.name);
 			this._oCurrent = oControl;
 			return true;
 		},
@@ -40,13 +40,12 @@ enyo.kind({
 			oData.type 		 = sEvent;
 			oData.originator = oControl;
 			
-			//console.log('Dispatching', sEvent, oControl.name);
 			oControl.dispatchBubble(sEvent, oData, oControl);
 		},
 		
 		_interceptEvents: function() {
 			var oThis = this;
-			var f 	  = this._oOwner.dispatchEvent;
+			var f = this._oOwner.dispatchEvent;
 
 			// Event hook to the App to catch Spotlight Events
 			this._oOwner.dispatchEvent = function(sEventName, oEvent, oSender) {
@@ -59,6 +58,23 @@ enyo.kind({
 				oThis.onEvent(oEvent);
 			});
 			
+		},
+		
+		_delegateSpotlightEvent: function(oEvent) {
+			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return true; }
+			var s,
+				oDecorator,
+				oSender = oEvent.originator;
+				
+			for (var s in enyo.Spotlight.Decorator) {		// TODO: optimize using hash
+				oDecorator = enyo.Spotlight.Decorator[s];
+				if (oSender instanceof oDecorator.decorates) {
+					if (typeof oDecorator[oEvent.type] == 'function') {
+						return oDecorator[oEvent.type](oSender, oEvent);
+					}
+				}
+			}
+			return true;
 		},
 
 		_isInHalfPlane: function(sDirection, oBounds1, oBounds2) {
@@ -76,8 +92,8 @@ enyo.kind({
 		},
 		
 		_getAdjacentControlPrecedence: function(sDirection, oBounds1, oBounds2) {
-			var nXCenter1 = oBounds1.left + oBounds1.width / 2,
-				nXCenter2 = oBounds2.left + oBounds2.width / 2,
+			var nXCenter1 = oBounds1.left + oBounds1.width,// / 2,
+				nXCenter2 = oBounds2.left + oBounds2.width,// / 2,
 				nDx = Math.abs(nXCenter2 - nXCenter1) || 0.001,
 				nDy = Math.abs(oBounds2.top - oBounds1.top),
 				nSlope,
@@ -197,6 +213,10 @@ enyo.kind({
 		
 		// Spotlight events bubbled back up to the App
 		onSpotlightEvent: function(oEvent) {
+			
+			// If decorator onSpotlight<Event> function return false - preventDefault)
+			if (!this._delegateSpotlightEvent(oEvent)) { return; }	
+
 			switch (oEvent.type) {
 				case 'onSpotlightFocus':
 					this.onFocus(oEvent);
@@ -323,6 +343,7 @@ enyo.kind({
 				oControl = oControl.parent;
 				if (this.isSpottable(oControl)) {
 					oSpottableParent = oControl;
+					break;
 				}
 			}
 			oSpottableParent = oSpottableParent || oControl;

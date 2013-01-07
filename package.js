@@ -1,6 +1,6 @@
 enyo.depends(
 	'kind.Spotlight.js',
 	'kind.Spotlight.Util.js',
-	'kind.Spotlight.ListDecorator.js',
+	'Decorators',
 	'kind.Spotlight.css'
 );

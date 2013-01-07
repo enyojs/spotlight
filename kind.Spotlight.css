@@ -1,9 +1,3 @@
-.spotlight {
-}
-
-body {
-	font-family: Arial, Helvetica, 'Helvetica Neue', Verdana, sans-serif !important;
-}
 
 	@-webkit-keyframes pulse {
 		from {  }
@@ -18,6 +12,7 @@ body {
 	}
 
 	button {
+		font-family: Arial, Helvetica, 'Helvetica Neue', Verdana, sans-serif !important;
 		border-radius: 5px;
 		color: #FFF;
 		background-color: #2DAEBF;
@@ -28,6 +23,7 @@ body {
 	}
 
 	.spotlight {
+		border: 2px solid yellow;
 		box-shadow: -2px -2px 18px #f9fca2;
 		background-color: #CCC;
 		-webkit-animation-name: pulse;
@@ -37,6 +33,7 @@ body {
 
 	button.spotlight {
 		background-color: #A6014A;
+		border: 0;
 		-webkit-animation-name: pulseButton;
 		-webkit-animation-duration: 2s;
 		-webkit-animation-iteration-count: infinite;
