@@ -304,7 +304,7 @@ enyo.kind({
 		setPointerMode	: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
 		getPointerMode	: function() 				{ return this._bPointerMode; 			},
 		getCurrent		: function() 				{ return this._oCurrent; 				},
-		setCurrent		: function(oControl)		{ return this._setCurrent(oControl); 	}
+		setCurrent		: function(oControl)		{ return this._setCurrent(oControl); 	},
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
