@@ -44,7 +44,7 @@ enyo.kind({
 						node	: this._getNode(oSender, n)
 					}, false);
 				}
-				enyo.Spotlight._dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
+				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 		},
@@ -66,7 +66,7 @@ enyo.kind({
 	
 		onSpotlightSelect: function(oSender, oEvent) {
 			if (this._getCurrent(oSender) !== null) {
-				enyo.Spotlight._dispatchEvent('ontap', {index: this._getCurrent(oSender)}, oSender.$.item);
+				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this._getCurrent(oSender)}, oSender.children[0]);
 			} else {
 				this._setCurrent(oSender, 0, true);
 			}

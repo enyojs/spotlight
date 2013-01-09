@@ -9,48 +9,45 @@ enyo.kind({
 	statics: {
 		decorates: null,
 		
+		// Creates oSender._spotlight object
+		_initComponent: function(oSender) {
+			console.log('Initializing container', oSender.name);
+			if (typeof oSender._spotlight == 'undefined') {
+				oSender._spotlight = {
+					hasFocus	 	 : false,
+					lastFocusedChild : enyo.Spotlight.getFirstChild(oSender)
+				}
+			}
+		},
+		
+		_getFocus: function(oSender) {
+			return oSender._spotlight.hasFocus;
+		},
+		
+		_setFocus: function(oSender, bIsFocused) {
+			oSender._spotlight.hasFocus = bIsFocused;
+		},
+		
+		_getLastFocusedChild: function(oSender) {
+			return oSender._spotlight.lastFocusedChild;
+		},
+		
 		/******************************/
 	
-		onSpotlightFocus: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			var oChild = enyo.Spotlight.getFirstChild(oSender);
-			enyo.Spotlight.spot(oChild);
-			console.log(oSender.name, oChild.name);
-			return true;
-		},
-	
-		onSpotlightBlur: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			return true;
-		},
-	
-		onSpotlightSelect: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			return true;
-		},
-	
-		onSpotlightDown: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			return true;
-		},
-	
-		onSpotlightUp: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			return true;
-		},
-	
-		onSpotlightLeft: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			return true;
-		},
-	
-		onSpotlightRight: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
-			return true;
-		},
-	
-		onSpotlightPoint: function(oSender, oEvent) {
-			console.log('Container', oEvent.type);
+		onSpotlightFocused: function(oSender, oEvent) {
+			this._initComponent(oSender);
+			if (this._getFocus(oSender)) {					// Focus came from within
+				enyo.Spotlight.Util.dispatchEvent(
+					enyo.Spotlight.getLast5WayEvent().type,
+					null,
+					oSender
+				);
+				this._setFocus(oSender, false);
+			} else {										// Focus came from without
+				enyo.Spotlight.Util.dispatchEvent('onSpotlightSelect', null, oSender);
+				this._setFocus(oSender, true);
+			}
+			
 			return true;
 		}
 	}

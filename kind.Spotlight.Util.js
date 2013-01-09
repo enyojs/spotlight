@@ -9,6 +9,14 @@ enyo.kind({
 		
 		/************ PUBLIC *************/
 		
+		dispatchEvent: function(sEvent, oData, oControl) {
+			oData 			 = oData ? enyo.clone(oData) : {};
+			oData.type 		 = sEvent;
+			oData.originator = oControl;
+
+			oControl.dispatchBubble(sEvent, oData, oControl);
+		},
+		
 		getAbsoluteBounds: function(oControl) {
 			var oLeft 			= 0,
 				oTop 			= 0,

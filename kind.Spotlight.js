@@ -23,6 +23,8 @@ enyo.kind({
 		_oCurrent		: null,		// Currently spotlighted element
 		_oOwner			: null,		// Component owner, usually application
 		_oDecorators	: {},		// For further optimization
+		_oLastEvent		: null,
+		_oLast5WayEvent	: null,
 		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
@@ -30,17 +32,15 @@ enyo.kind({
 		
 		_setCurrent: function(oControl) {
 			this._oCurrent = oControl;
+			console.log('CURRENT:', this._oCurrent.name ? this._oCurrent.name : this._oCurrent.kind);
+			this._dispatchEvent('onSpotlightFocused');
 			return true;
 		},
 		
 		// Artificially trigger events on current control, like click
 		_dispatchEvent: function(sEvent, oData, oControl) {
 			oControl 		 = oControl || this.getCurrent();
-			oData 			 = oData ? enyo.clone(oData) : {};
-			oData.type 		 = sEvent;
-			oData.originator = oControl;
-			
-			oControl.dispatchBubble(sEvent, oData, oControl);
+			enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl);
 		},
 		
 		_interceptEvents: function() {
@@ -60,21 +60,24 @@ enyo.kind({
 			
 		},
 		
+		// If decorator present, delegate event to it's corresponding method
+		// Return values: if found method to delegate, return it's return value otherwise return true
 		_delegateSpotlightEvent: function(oEvent) {
 			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return true; }
 			var s,
 				oDecorator,
 				oSender = oEvent.originator;
-				
+
+			// Process containers
 			if (oSender.spotlight == 'container') {
 				oDecorator = enyo.Spotlight.Decorator['Container'];
-				console.log('Found container', enyo.Spotlight.Decorator);
 				if (typeof oDecorator[oEvent.type] == 'function') {
 					return oDecorator[oEvent.type](oSender, oEvent);
 				}
 				return true;
 			}
 
+			// Process non-containers
 			for (var s in enyo.Spotlight.Decorator) {		// TODO: optimize using hash
 				oDecorator = enyo.Spotlight.Decorator[s];
 				if (typeof oDecorator.decorates == 'function' && oSender instanceof oDecorator.decorates) {
@@ -228,6 +231,8 @@ enyo.kind({
 		// Spotlight events bubbled back up to the App
 		onSpotlightEvent: function(oEvent) {
 			
+			this._oLastEvent = oEvent;
+			
 			// If decorator onSpotlight<Event> function return false - preventDefault)
 			if (!this._delegateSpotlightEvent(oEvent)) { return; }	
 
@@ -235,22 +240,30 @@ enyo.kind({
 				case 'onSpotlightFocus':
 					this.onFocus(oEvent);
 					break;
+				case 'onSpotlightFocused':
+					this.onFocused(oEvent);
+					break;
 				case 'onSpotlightBlur':
 					this.onBlur(oEvent);
 					break;
 				case 'onSpotlightLeft':
+					this._oLast5WayEvent = oEvent;
 					this.onLeft(oEvent);
 					break;
 				case 'onSpotlightRight':
+					this._oLast5WayEvent = oEvent;
 					this.onRight(oEvent);
 					break;
 				case 'onSpotlightUp':
+					this._oLast5WayEvent = oEvent;
 					this.onUp(oEvent);
 					break;
 				case 'onSpotlightDown':
+					this._oLast5WayEvent = oEvent;
 					this.onDown(oEvent);
 					break;
 				case 'onSpotlightSelect':
+					this._oLast5WayEvent = oEvent;
 					this.onSelect(oEvent);
 					break;
 				case 'onSpotlightPoint':
@@ -289,6 +302,9 @@ enyo.kind({
 			this._setCurrent(oEvent.originator);
 		},
 		
+		onFocused: function(oEvent) {
+		},
+		
 		onBlur: function(oEvent) {
 			if (this._oCurrent) {
 				oEvent.originator.removeClass('spotlight');
@@ -304,7 +320,7 @@ enyo.kind({
 		setPointerMode	: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
 		getPointerMode	: function() 				{ return this._bPointerMode; 			},
 		getCurrent		: function() 				{ return this._oCurrent; 				},
-		setCurrent		: function(oControl)		{ return this._setCurrent(oControl); 	}
+		setCurrent		: function(oControl)		{ return this._setCurrent(oControl); 	},
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
@@ -385,6 +401,14 @@ enyo.kind({
 		getFirstChild: function(oControl) {
 			oControl = oControl || this.getCurrent();
 			return this.getChildren(oControl)[0];
-		}
+		},
+		
+		getLastEvent: function() {
+			return this._oLastEvent;
+		},
+		
+		getLast5WayEvent: function() {
+			return this._oLast5WayEvent;
+		},
 	}
 });
