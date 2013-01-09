@@ -19,12 +19,12 @@ enyo.kind({
 	/************************************************************/
 	
 	statics: {
-		_bPointerMode	: false,
-		_oCurrent		: null,		// Currently spotlighted element
-		_oOwner			: null,		// Component owner, usually application
-		_oDecorators	: {},		// For further optimization
-		_oLastEvent		: null,
-		_oLast5WayEvent	: null,
+		_bPointerMode		: false,
+		_oCurrent			: null,		// Currently spotlighted element
+		_oOwner				: null,		// Component owner, usually application
+		_oDecorators		: {},		// For further optimization
+		_oLastEvent			: null,
+		_oLast5WayEvent		: null,
 		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
@@ -317,10 +317,12 @@ enyo.kind({
 		
 		/************************************************************/
 		
-		setPointerMode	: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
-		getPointerMode	: function() 				{ return this._bPointerMode; 			},
-		getCurrent		: function() 				{ return this._oCurrent; 				},
-		setCurrent		: function(oControl)		{ return this._setCurrent(oControl); 	},
+		setPointerMode		: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
+		getPointerMode		: function() 				{ return this._bPointerMode; 			},
+		getCurrent			: function() 				{ return this._oCurrent; 				},
+		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 	},
+		getLastEvent	 	: function() 				{ return this._oLastEvent; 	 			},
+		getLast5WayEvent 	: function() 				{ return this._oLast5WayEvent;  		},
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
@@ -401,14 +403,6 @@ enyo.kind({
 		getFirstChild: function(oControl) {
 			oControl = oControl || this.getCurrent();
 			return this.getChildren(oControl)[0];
-		},
-		
-		getLastEvent: function() {
-			return this._oLastEvent;
-		},
-		
-		getLast5WayEvent: function() {
-			return this._oLast5WayEvent;
-		},
+		}
 	}
 });
