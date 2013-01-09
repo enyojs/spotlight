@@ -3,17 +3,21 @@
  * @author: Lex Podgorny
  */
 
-enyo.kind({
-	name: 'enyo.Spotlight.Decorator.Checkbox',
+if (typeof onyx.Checkbox != 'undefined') {
+
+	enyo.kind({
+		name: 'enyo.Spotlight.Decorator.Checkbox',
 	
-	statics: {
-		decorates: onyx.Checkbox,
+		statics: {
+			decorates: onyx.Checkbox,
 	
-		/******************************/
+			/******************************/
 	
-		onSpotlightSelect: function(oSender, oEvent) {
-			oSender.setChecked(!oSender.getChecked());
-			return true;
+			onSpotlightSelect: function(oSender, oEvent) {
+				oSender.setChecked(!oSender.getChecked());
+				return true;
+			}
 		}
-	}
-});
+	});
+	
+}
