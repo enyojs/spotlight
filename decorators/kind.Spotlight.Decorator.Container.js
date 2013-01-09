@@ -11,11 +11,9 @@ enyo.kind({
 		
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {
-			console.log('Initializing container', oSender.name);
 			if (typeof oSender._spotlight == 'undefined') {
 				oSender._spotlight = {
-					hasFocus	 	 : false,
-					lastFocusedChild : enyo.Spotlight.getFirstChild(oSender)
+					hasFocus : false,
 				}
 			}
 		},
@@ -26,10 +24,6 @@ enyo.kind({
 		
 		_setFocus: function(oSender, bIsFocused) {
 			oSender._spotlight.hasFocus = bIsFocused;
-		},
-		
-		_getLastFocusedChild: function(oSender) {
-			return oSender._spotlight.lastFocusedChild;
 		},
 		
 		/******************************/

@@ -32,7 +32,7 @@ enyo.kind({
 		
 		_setCurrent: function(oControl) {
 			this._oCurrent = oControl;
-			console.log('CURRENT:', this._oCurrent.name ? this._oCurrent.name : this._oCurrent.kind);
+			//console.log('CURRENT:', this._oCurrent.name ? this._oCurrent.name : this._oCurrent.kind);
 			this._dispatchEvent('onSpotlightFocused');
 			return true;
 		},

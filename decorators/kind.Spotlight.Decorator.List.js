@@ -52,7 +52,6 @@ enyo.kind({
 		/******************************/
 	
 		onSpotlightFocus: function(oSender, oEvent) {
-			console.log('Focus');
 			this._setCurrent(oSender, this._getCurrent(oSender), false);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 			return true;
