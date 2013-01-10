@@ -14,6 +14,7 @@ if (typeof onyx.Checkbox != 'undefined') {
 			/******************************/
 	
 			onSpotlightSelect: function(oSender, oEvent) {
+				console.log('select');
 				oSender.setChecked(!oSender.getChecked());
 				return true;
 			}
