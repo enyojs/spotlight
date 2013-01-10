@@ -3,7 +3,6 @@ enyo.depends(
 	'kind.Spotlight.Decorator.List.js',
 	'kind.Spotlight.Decorator.Checkbox.js',
 	'kind.Spotlight.Decorator.Slider.js',
-	'kind.Spotlight.Decorator.RangeSlider.js',
 	'kind.Spotlight.Decorator.Picker.js',
 	'kind.Spotlight.Decorator.Input.js'
 );
