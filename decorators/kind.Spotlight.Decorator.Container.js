@@ -37,6 +37,7 @@ enyo.kind({
 		
 		// Set last focused child
 		_setLastFocusedChild: function(oSender, oChild) {
+		//	console.log('LFC', oSender.name, '->', oChild.name);
 			oSender._spotlight.lastFocusedChild = oChild;
 		},
 		
@@ -44,8 +45,9 @@ enyo.kind({
 		_handleEvent: function(oSender, oEvent) {
 			switch (oEvent.type) {
 				case 'onSpotlightFocus':
-					if (oEvent.originator !== oSender) {
+					if (oEvent.originator !== oSender && !oEvent._spotlight_container_handled) {
 						this._setLastFocusedChild(oSender, oEvent.originator);
+						oEvent._spotlight_container_handled = true;
 					}
 					break;
 			}
@@ -57,26 +59,23 @@ enyo.kind({
 			var f = oSender.dispatchEvent;
 
 			oSender.dispatchEvent = function(sEventName, oEvent, oEventSender) {
-				f.apply(oSender, [sEventName, oEvent, oEventSender]);
 				if (oThis._getFocus(oSender)) {
 					oThis._handleEvent(oSender, oEvent);
 				}
+				f.apply(oSender, [sEventName, oEvent, oEventSender]);
 			}
 		},
 		
 		/******************************/
 	
 		onSpotlightFocused: function(oSender, oEvent) {
+			if (enyo.Spotlight.getPointerMode()) { return; }
 			this._initComponent(oSender);
-			if (this._getFocus(oSender)) {					// Focus came from within
-				enyo.Spotlight.Util.dispatchEvent(
-					enyo.Spotlight.getLast5WayEvent().type,
-					null,
-					oSender
-				);
+			if (this._getFocus(oSender)) {												// Focus came from within
+				var s5WayEventType = enyo.Spotlight.getLast5WayEvent().type;
+				enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				this._setFocus(oSender, false);
-			} else {										// Focus came from without
-				enyo.Spotlight.Util.dispatchEvent('onSpotlightSelect', null, oSender);
+			} else {																	// Focus came from without
 				enyo.Spotlight.spot(this._getLastFocusedChild(oSender));
 				this._setFocus(oSender, true);
 			}

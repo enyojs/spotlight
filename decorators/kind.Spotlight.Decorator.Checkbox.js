@@ -3,7 +3,7 @@
  * @author: Lex Podgorny
  */
 
-if (onyx && onyx.Checkbox) {
+if (window.onyx && onyx.Checkbox) {
 
 	enyo.kind({
 		name: 'enyo.Spotlight.Decorator.Checkbox',
@@ -14,7 +14,7 @@ if (onyx && onyx.Checkbox) {
 			/******************************/
 	
 			onSpotlightSelect: function(oSender, oEvent) {
-				console.log('select');
+				console.log('select', oSender.getChecked());
 				oSender.setChecked(!oSender.getChecked());
 				return true;
 			}

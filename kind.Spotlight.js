@@ -263,7 +263,6 @@ enyo.kind({
 					this.onDown(oEvent);
 					break;
 				case 'onSpotlightSelect':
-					this._oLast5WayEvent = oEvent;
 					this.onSelect(oEvent);
 					break;
 				case 'onSpotlightPoint':

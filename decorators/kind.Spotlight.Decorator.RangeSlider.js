@@ -1,15 +1,15 @@
 /**
- * enyo.Spotlight.Decorator.Slider kind definition
+ * enyo.Spotlight.Decorator.RangeSlider kind definition
  * @author: Lex Podgorny
  */
 
-if (window.onyx && onyx.Slider) {
+if (window.onyx && onyx.RangeSlider) {
 
 	enyo.kind({
-		name: 'enyo.Spotlight.Decorator.Slider',
+		name: 'enyo.Spotlight.Decorator.RangeSlider',
 	
 		statics: {
-			decorates: onyx.Slider,
+			decorates: onyx.RangeSlider,
 		
 			_setSelected: function(oSender, bSelected) {
 				oSender._bSpotlightSelected = bSelected;
