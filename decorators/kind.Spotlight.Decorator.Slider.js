@@ -3,7 +3,7 @@
  * @author: Lex Podgorny
  */
 
-if (typeof onyx.Slider != 'undefined') {
+if (window.onyx && onyx.Slider) {
 
 	enyo.kind({
 		name: 'enyo.Spotlight.Decorator.Slider',
