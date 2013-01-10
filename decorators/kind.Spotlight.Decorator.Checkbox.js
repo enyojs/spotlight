@@ -3,7 +3,7 @@
  * @author: Lex Podgorny
  */
 
-if (window.onyx && onyx.Checkbox) {
+if (onyx && onyx.Checkbox) {
 
 	enyo.kind({
 		name: 'enyo.Spotlight.Decorator.Checkbox',

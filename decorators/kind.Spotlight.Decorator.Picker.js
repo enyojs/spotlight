@@ -3,7 +3,7 @@
  * @author: Lex Podgorny
  */
 
-if (window.onyx && onyx.Picker) {
+if (onyx && onyx.Picker) {
 
 	enyo.kind({
 		name: 'enyo.Spotlight.Decorator.Picker',
