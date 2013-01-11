@@ -293,7 +293,6 @@ enyo.kind({
 				this._dispatchEvent('ontap', null, oEvent.originator);
 			} else {
 				this.spot(aChildren[0]);
-				//this._setCurrent(aChildren[0]);
 			}
 		},
 		
@@ -311,7 +310,9 @@ enyo.kind({
 		},
 		
 		onPoint: function(oEvent) {
-			this.spot(oEvent.originator);
+			if (oEvent.originator.spotlight != 'container') {
+				this.spot(oEvent.originator);
+			}
 		},
 		
 		/************************************************************/
