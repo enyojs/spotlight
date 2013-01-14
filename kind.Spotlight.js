@@ -200,7 +200,7 @@ enyo.kind({
 						}
 					}
 					break;
-				case 'keyup':
+				case 'keydown':
 					this.setPointerMode(false);
 					if (!this.getPointerMode()) {
 						switch (oEvent.keyCode) {
