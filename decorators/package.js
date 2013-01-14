@@ -4,5 +4,6 @@ enyo.depends(
 	'kind.Spotlight.Decorator.Checkbox.js',
 	'kind.Spotlight.Decorator.Slider.js',
 	'kind.Spotlight.Decorator.Picker.js',
+	'kind.Spotlight.Decorator.DatePicker.js',
 	'kind.Spotlight.Decorator.Input.js'
 );
