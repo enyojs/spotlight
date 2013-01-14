@@ -11,11 +11,9 @@ enyo.kind({
 		
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {
-			if (typeof oSender._spotlight == 'undefined') {
-				oSender._spotlight = {
-					hasFocus	 	 : false,
-					lastFocusedChild : enyo.Spotlight.getFirstChild(oSender)
-				}
+			if (typeof oSender._spotlight.hasFocus == 'undefined') {
+				oSender._spotlight.hasFocus 		= false
+				oSender._spotlight.lastFocusedChild = enyo.Spotlight.getFirstChild(oSender);
 				this._interceptEvents(oSender);
 			}
 		},

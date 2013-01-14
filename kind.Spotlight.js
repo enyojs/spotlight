@@ -31,6 +31,10 @@ enyo.kind({
 		},
 		
 		_setCurrent: function(oControl) {
+			// Create control-specific spotlight state storage
+			if (typeof oControl._spotlight == 'undefined') {
+				oControl._spotlight = {};
+			}
 			this._oCurrent = oControl;
 			//console.log('CURRENT:', this._oCurrent.name ? this._oCurrent.name : this._oCurrent.kind);
 			this._dispatchEvent('onSpotlightFocused');
@@ -188,7 +192,7 @@ enyo.kind({
 			
 			switch (oEvent.type) {
 				case 'mousemove':
-					this.setPointerMode(true);
+					//this.setPointerMode(true);
 					if (this.getPointerMode()) {
 						oTarget = this._getTarget(oEvent.target.id);
 						if (oTarget) {

@@ -76,5 +76,9 @@ enyo.kind({
 				o.className = (' ' + ss + ' ').replace(' ' + s + ' ', ' ').slice(1, -1);
 			}
 		},
+		
+		stringEndsWith: function(s, sSuffix) {
+		    return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
+		}
 	}
 });

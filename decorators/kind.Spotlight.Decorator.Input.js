@@ -14,46 +14,14 @@ if (window.onyx && onyx.Slider) {
 			/******************************/
 	
 			onSpotlightFocus: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				oSender.updateFocus(true);
+				oSender.children[0].focus();
 				return true;
 			},
 	
 			onSpotlightBlur: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
 				oSender.updateFocus(false);
 				return true;
-			},
-	
-			onSpotlightSelect: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				return true;
-			},
-	
-			onSpotlightDown: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				return true;
-			},
-	
-			onSpotlightUp: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				return true;
-			},
-	
-			onSpotlightLeft: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				return true;
-			},
-	
-			onSpotlightRight: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				return true;
-			},
-	
-			onSpotlightPoint: function(oSender, oEvent) {
-				console.log(oEvent.type.replace('onSpotlight', '').toUpperCase(), 'at', oSender.name);
-				return true;
-			},
+			}
 		}
 	});
 }
