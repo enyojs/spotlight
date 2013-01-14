@@ -43,7 +43,6 @@ if (window.onyx && onyx.Picker) {
 			// Poor architecture of Popup and Menu makes this implementation
 			// Shaky at best
 			_findMenuItems: function(oSender) {
-				console.log(oSender.children);
 				this._open(oSender);
 				this._close(oSender);
 				if (typeof oSender._spotlight.aItems == 'undefined' || !oSender._spotlight.aItems[0]) {
@@ -127,6 +126,9 @@ if (window.onyx && onyx.Picker) {
 			},
 	
 			onSpotlightBlur: function(oSender, oEvent) {
+				if (!this._getOpen(oSender)) { 
+					enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
+				}
 				return true;
 			},
 	

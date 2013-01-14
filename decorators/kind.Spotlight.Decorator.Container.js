@@ -35,7 +35,6 @@ enyo.kind({
 		
 		// Set last focused child
 		_setLastFocusedChild: function(oSender, oChild) {
-		//	console.log('LFC', oSender.name, '->', oChild.name);
 			oSender._spotlight.lastFocusedChild = oChild;
 		},
 		
