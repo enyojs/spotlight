@@ -25,6 +25,7 @@ enyo.kind({
 		_oDecorators		: {},		// For further optimization
 		_oLastEvent			: null,
 		_oLast5WayEvent		: null,
+		_nLastKey			: null,
 		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
@@ -197,35 +198,41 @@ enyo.kind({
 						if (oTarget) {
 							this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 						}
+						enyo.Spotlight.Dispatcher.stop();
 					}
 					break;
 				case 'keydown':
-					this.setPointerMode(false);
-					if (!this.getPointerMode()) {
-						switch (oEvent.keyCode) {
-							case 13:
-							case 53: // TODO - hack to support old system
-								this._dispatchEvent('onSpotlightSelect', oEvent);
-								break;
-							case 37:
-							case 52: // TODO - hack to support old system
-								this._dispatchEvent('onSpotlightLeft', oEvent);
-								break;
-							case 38:
-							case 50: // TODO - hack to support old system
-								this._dispatchEvent('onSpotlightUp', oEvent);
-								break;
-							case 39:
-							case 54: // TODO - hack to support old system
-								this._dispatchEvent('onSpotlightRight', oEvent);
-								break;
-							case 40:
-							case 56: // TODO - hack to support old system
-								this._dispatchEvent('onSpotlightDown', oEvent);
-								break;
-							default:
-								break;
-						}
+				case 'keyup':
+					enyo.Spotlight.Dispatcher.processKey(oEvent);
+					break;
+			}
+		},
+		
+		onKeyEvent: function(oEvent) {
+			this.setPointerMode(false);
+			if (!this.getPointerMode()) {
+				switch (oEvent.keyCode) {
+					case 13:
+					case 53: // TODO - hack to support old system
+						this._dispatchEvent('onSpotlightSelect', oEvent);
+						break;
+					case 37:
+					case 52: // TODO - hack to support old system
+						this._dispatchEvent('onSpotlightLeft', oEvent);
+						break;
+					case 38:
+					case 50: // TODO - hack to support old system
+						this._dispatchEvent('onSpotlightUp', oEvent);
+						break;
+					case 39:
+					case 54: // TODO - hack to support old system
+						this._dispatchEvent('onSpotlightRight', oEvent);
+						break;
+					case 40:
+					case 56: // TODO - hack to support old system
+						this._dispatchEvent('onSpotlightDown', oEvent);
+						break;
+					default:
 						break;
 				}
 			}
