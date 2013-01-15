@@ -214,7 +214,6 @@ enyo.kind({
 						if (oTarget) {
 							this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 						}
-						enyo.Spotlight.Dispatcher.stop();
 					}
 					break;
 				case 'keydown':
