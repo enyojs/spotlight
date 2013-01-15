@@ -64,32 +64,48 @@ enyo.kind({
 			
 		},
 		
+		_getDecorator: function(oSender) {
+			if (typeof this._oDecorators[oSender.kind] != 'undefined') {
+				return this._oDecorators[oSender.kind]; 
+			}
+			
+			var oDecorator = null,
+				o;
+				
+			if (oSender.spotlight == 'container') {							// Process containers
+				oDecorator = enyo.Spotlight.Decorator['Container'];
+			} else {														// Process non-containers
+				for (var s in enyo.Spotlight.Decorator) {						// Loop through decorators namespace
+					o = enyo.Spotlight.Decorator[s];
+					if (o.decorates && oSender instanceof o.decorates) {			// If decorator applies to oSender
+						if (!oDecorator) {												// If decorator was NOT set in previous iteration
+							oDecorator = o;													// Set it to the first value
+						} else {														// If decorator WAS set in previous iteration
+							if (o.decorates.prototype instanceof oDecorator.decorates) {	// IF o.decorates is closer to oSender in lineage
+								oDecorator = o;													// Set it as optimal decorator
+							}
+						}
+					}
+				}
+			}
+			
+			this._oDecorators[oSender.kind] = oDecorator;					// Hash decorator by sender kind
+			return oDecorator;
+		},
+		
 		// If decorator present, delegate event to it's corresponding method
 		// Return values: if found method to delegate, return it's return value otherwise return true
 		_delegateSpotlightEvent: function(oEvent) {
 			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return true; }
+			
 			var s,
-				oDecorator,
-				oSender = oEvent.originator;
-
-			// Process containers
-			if (oSender.spotlight == 'container') {
-				oDecorator = enyo.Spotlight.Decorator['Container'];
-				if (typeof oDecorator[oEvent.type] == 'function') {
-					return oDecorator[oEvent.type](oSender, oEvent);
-				}
-				return true;
+				oSender 	= oEvent.originator
+				oDecorator 	= this._getDecorator(oSender);
+							
+			if (oDecorator && typeof oDecorator[oEvent.type] == 'function') {
+				return oDecorator[oEvent.type](oSender, oEvent);
 			}
-
-			// Process non-containers
-			for (var s in enyo.Spotlight.Decorator) {		// TODO: optimize using hash
-				oDecorator = enyo.Spotlight.Decorator[s];
-				if (typeof oDecorator.decorates == 'function' && oSender instanceof oDecorator.decorates) {
-					if (typeof oDecorator[oEvent.type] == 'function') {
-						return oDecorator[oEvent.type](oSender, oEvent);
-					}
-				}
-			}
+			
 			return true;
 		},
 

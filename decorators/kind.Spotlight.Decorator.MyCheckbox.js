@@ -3,18 +3,18 @@
  * @author: Lex Podgorny
  */
 
-if (window.onyx && onyx.Checkbox) {
+if (window.onyx && onyx.MyCheckbox) {
 
 	enyo.kind({
-		name: 'enyo.Spotlight.Decorator.Checkbox',
+		name: 'enyo.Spotlight.Decorator.MyCheckbox',
 	
 		statics: {
-			decorates: onyx.Checkbox,
+			decorates: onyx.MyCheckbox,
 	
 			/******************************/
 	
 			onSpotlightSelect: function(oSender, oEvent) {
-				console.log('Checkbox!!');
+				console.log('MyCheckbox!!');
 				oSender.setChecked(!!oSender.getChecked()); // Weird, when passing "false" it gets checked, "true" unchecked, (was the other way around)
 				return true;
 			}
