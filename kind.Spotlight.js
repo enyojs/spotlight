@@ -209,11 +209,9 @@ enyo.kind({
 			switch (oEvent.type) {
 				case 'mousemove':
 					this.setPointerMode(true);
-					break;
-				case 'enter':
 					if (this.getPointerMode()) {
 						oTarget = this._getTarget(oEvent.target.id);
-						if (oTarget && oTarget != this.getCurrent()) {
+						if (oTarget) {
 							this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 						}
 						enyo.Spotlight.Dispatcher.stop();
@@ -414,13 +412,12 @@ enyo.kind({
 			if (this._oCurrent && oControl !== this._oCurrent) {
 				this._dispatchEvent('onSpotlightBlur', null, this._oCurrent);
 			}
-			
 			oControl = oControl || this.getCurrent();
 			if (!this.isSpottable(oControl)) {
 				oControl = this.getFirstChild(oControl);
 			}
 			
-			if (oControl && oControl != this.getCurrent()) {
+			if (oControl) {
 				oControl.addClass('spotlight');
 				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl, sDirection);
 				return true;
