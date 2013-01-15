@@ -208,6 +208,7 @@ enyo.kind({
 			}
 		},
 		
+		// Called from enyo.Spotlight.Dispatcher which handles accelerated keyboard event
 		onKeyEvent: function(oEvent) {
 			this.setPointerMode(false);
 			if (!this.getPointerMode()) {
