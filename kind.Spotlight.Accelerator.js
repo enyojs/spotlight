@@ -1,10 +1,10 @@
 /**
- * enyo.Spotlight.Dispatcher kind definition
+ * enyo.Spotlight.Accelerator kind definition
  * @author: Lex Podgorny
  */
 
 enyo.kind({
-	name: 'enyo.Spotlight.Dispatcher',
+	name: 'enyo.Spotlight.Accelerator',
 
 	statics: {
 		_aFrequency	: [3, 3, 3, 2, 2, 2, 1],	// At n-th second use every _aFrequency[n] subsequent keydown event
@@ -30,6 +30,7 @@ enyo.kind({
 							: nSeconds;
 							
 						nToSkip = this._aFrequency[nSeconds] - 1;
+						if (nToSkip < 0) { nToSkip = 0; }
 						
 					//	console.log('Seconds:', nSeconds, 'Need to skip:', nToSkip);
 							

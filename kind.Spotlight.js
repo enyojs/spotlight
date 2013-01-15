@@ -218,12 +218,12 @@ enyo.kind({
 					break;
 				case 'keydown':
 				case 'keyup':
-					enyo.Spotlight.Dispatcher.processKey(oEvent);
+					enyo.Spotlight.Accelerator.processKey(oEvent);
 					break;
 			}
 		},
 		
-		// Called from enyo.Spotlight.Dispatcher which handles accelerated keyboard event
+		// Called from enyo.Spotlight.Accelerator which handles accelerated keyboard event
 		onKeyEvent: function(oEvent) {
 			this.setPointerMode(false);
 			if (!this.getPointerMode()) {
