@@ -13,7 +13,12 @@ enyo.kind({
 	
 	rendered: function() {
 		this.inherited(arguments);
-		enyo.Spotlight.initialize(this.owner, this.defaultControl)
+		enyo.Spotlight.initialize(this.owner, this.defaultControl);
+	},
+
+	destroy: function() {
+		enyo.Spotlight.deregister(this.owner);
+		this.inherited(arguments);
 	},
 	
 	/************************************************************/
@@ -43,30 +48,24 @@ enyo.kind({
 		
 		// Artificially trigger events on current control, like click
 		_dispatchEvent: function(sEvent, oData, oControl) {
-			oControl 		 = oControl || this.getCurrent();
+			oControl = oControl || this.getCurrent();
 			enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl);
 		},
 		
 		_interceptEvents: function() {
 			var oThis = this;
-			var f = this._oOwner.dispatchEvent;
 
-			// Event hook to the App to catch Spotlight Events
+			// Event hook to the owner to catch Spotlight Events
+			this.ownerDispatchFn = this._oOwner.dispatchEvent;
 			this._oOwner.dispatchEvent = function(sEventName, oEvent, oSender) {
-				f.apply(oThis._oOwner, [sEventName, oEvent, oSender]);
+				oThis.ownerDispatchFn.apply(oThis._oOwner, [sEventName, oEvent, oSender]);
 				oThis.onSpotlightEvent(oEvent);
-			}
-			
-			// Event hook to all system events to catch KEYPRESS
-			enyo.dispatcher.features.push(function(oEvent) {
-				oThis.onEvent(oEvent);
-			});
-			
+			};			
 		},
 		
 		_getDecorator: function(oSender) {
 			if (typeof this._oDecorators[oSender.kind] != 'undefined') {
-				return this._oDecorators[oSender.kind]; 
+				return this._oDecorators[oSender.kind];
 			}
 			
 			var oDecorator = null,
@@ -190,6 +189,10 @@ enyo.kind({
 		/********************* PUBLIC *********************/
 		
 		initialize: function(oOwner, sDefaultControl) {
+			if (this._oOwner) {
+				enyo.warn("enyo.Spotlight initialized before previous owner deregistered");
+				this.deregister(this._oOwner);
+			}
 			this._oCurrent = null;
 			this._oOwner   = oOwner;
 			
@@ -200,6 +203,11 @@ enyo.kind({
 			} else {
 				this.spot(this._oOwner);
 			}
+		},
+
+		deregister: function(oOwner) {
+			oOwner.dispatchEvent = this.ownerDispatchFn;
+			this._oOwner = null;
 		},
 
 		// Events dispatched to the spotlighted controls
@@ -430,4 +438,9 @@ enyo.kind({
 			return this.getChildren(oControl)[0];
 		}
 	}
+});
+
+// Event hook to all system events to catch KEYPRESS
+enyo.dispatcher.features.push(function(oEvent) {
+	enyo.Spotlight.onEvent(oEvent);
 });
