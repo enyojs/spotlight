@@ -123,30 +123,64 @@ enyo.kind({
 		},
 		
 		_getAdjacentControlPrecedence: function(sDirection, oBounds1, oBounds2) {
-			var nXCenter1 = oBounds1.left + oBounds1.width,// / 2,
-				nXCenter2 = oBounds2.left + oBounds2.width,// / 2,
-				nDx = Math.abs(nXCenter2 - nXCenter1) || 0.001,
-				nDy = Math.abs(oBounds2.top - oBounds1.top),
-				nSlope,
-				nAngle,
-				nDistance;
+			var yCenter1 = oBounds1.top + oBounds1.height/2,
+				yCenter2 = oBounds2.top + oBounds2.height/2,
+				
+				centerPoints = [
+					{x: oBounds1.left + oBounds1.width/2, y: yCenter1},
+					{x: oBounds2.left + oBounds2.width/2, y: yCenter2}
+				],
+				leftPoints = [
+					{x: oBounds1.left, y: yCenter1},
+					{x: oBounds2.left, y: yCenter2}
+				],
+				rightPoints = [
+					{x: oBounds1.right, y: yCenter1},
+					{x: oBounds2.right, y: yCenter2}
+				],
+				
+				centerPrecedence = this._getPrecedenceValue(centerPoints),
+				leftPrecedence = this._getPrecedenceValue(leftPoints),
+				rightPrecedence = this._getPrecedenceValue(rightPoints);
 			
+			return Math.min(centerPrecedence, leftPrecedence, rightPrecedence);
+		},
+		
+		_getPrecedenceValue: function(points) {
+			var delta = this._getAdjacentControlDelta(points[0], points[1]),
+				slope = this._getAdjacentControlSlope(points[0], points[1]),
+				angle = this._getAdjacentControlAngle(slope),
+				distance = this._getAdjacentControlDistance(delta);
+			
+			return angle > 89 ? 0 : 1/(angle * Math.pow(distance, 4));
+		},
+		
+		_getAdjacentControlDelta: function(point1, point2) {
+			return {
+				dx: Math.abs(point2.x - point1.x),
+				dy: Math.abs(point2.y - point1.y)
+			};
+		},
+		
+		_getAdjacentControlSlope: function(delta, sDirection) {
 			switch (sDirection) {
 				case 'UP'	:
 				case 'DOWN'	:
-					nSlope = nDx/nDy;
+					return delta.dx/delta.dy;
 					break;
 				case 'LEFT'	:
 				case 'RIGHT':
-					nSlope = nDy/nDx;
+					return delta.dy/delta.dx;
 					break;
 			}
-			
-			nAngle 		= Math.atan(nSlope) * 180/Math.PI 	|| 0.1;
-			nDistance	= Math.pow(nDx*nDx + nDy*nDy, 0.5)  || 0.1;
-			
-			if (nAngle > 89) { return 0 };
-			return 1/(nAngle * Math.pow(nDistance, 4));
+		},
+		
+		_getAdjacentControlDistance: function(delta) {
+			return Math.pow(delta.dx*delta.dx + delta.dy*delta.dy, 0.5) || 0.1;
+		},
+		
+		_getAdjacentControlAngle: function(nSlope) {
+			return Math.atan(nSlope) * 180/Math.PI || 0.1;
 		},
 		
 		_getAdjacentControl: function(sDirection, oControl) {
