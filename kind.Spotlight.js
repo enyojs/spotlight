@@ -118,11 +118,32 @@ enyo.kind({
 					return oBounds1.left > oBounds2.left;
 				case 'RIGHT':
 					return oBounds1.left < oBounds2.left;
-					
 			}
 		},
 		
 		_getAdjacentControlPrecedence: function(sDirection, oBounds1, oBounds2) {
+			var points = this._getAdjacentControlPoints(sDirection, oBounds1, oBounds2),
+				p1 = this._getPrecedenceValue(points[0], sDirection),
+				p2 = this._getPrecedenceValue(points[1], sDirection),
+				p3 = this._getPrecedenceValue(points[2], sDirection);
+
+			return Math.max(p1, p2, p3);
+		},
+		
+		_getAdjacentControlPoints: function(sDirection, oBounds1, oBounds2) {
+			switch (sDirection) {
+				case 'UP'	:
+				case 'DOWN'	:
+					return this._getXAxisPoints(oBounds1, oBounds2);
+					break;
+				case 'LEFT'	:
+				case 'RIGHT':
+					return this._getYAxisPoints(oBounds1, oBounds2);
+					break;
+			}
+		},
+		
+		_getXAxisPoints: function(oBounds1, oBounds2) {
 			var yCenter1 = oBounds1.top + oBounds1.height/2,
 				yCenter2 = oBounds2.top + oBounds2.height/2,
 				
@@ -137,18 +158,34 @@ enyo.kind({
 				rightPoints = [
 					{x: oBounds1.right, y: yCenter1},
 					{x: oBounds2.right, y: yCenter2}
-				],
-				
-				centerPrecedence = this._getPrecedenceValue(centerPoints),
-				leftPrecedence = this._getPrecedenceValue(leftPoints),
-				rightPrecedence = this._getPrecedenceValue(rightPoints);
+				];
 			
-			return Math.min(centerPrecedence, leftPrecedence, rightPrecedence);
+			return [centerPoints,leftPoints,rightPoints];
 		},
 		
-		_getPrecedenceValue: function(points) {
+		_getYAxisPoints: function(oBounds1, oBounds2) {
+			var xCenter1 = oBounds1.left + oBounds1.width/2,
+				xCenter2 = oBounds2.left + oBounds2.width/2,
+				
+				centerPoints = [
+					{x: xCenter1, y: oBounds1.top + oBounds1.height/2},
+					{x: xCenter2, y: oBounds2.top + oBounds2.height/2}
+				],
+				topPoints = [
+					{x: xCenter1, y: oBounds1.top},
+					{x: xCenter2, y: oBounds2.top}
+				],
+				bottomPoints = [
+					{x: xCenter1, y: oBounds1.bottom},
+					{x: xCenter2, y: oBounds2.bottom}
+				];
+			
+			return [centerPoints,topPoints,bottomPoints];
+		},
+		
+		_getPrecedenceValue: function(points, sDirection) {
 			var delta = this._getAdjacentControlDelta(points[0], points[1]),
-				slope = this._getAdjacentControlSlope(points[0], points[1]),
+				slope = this._getAdjacentControlSlope(delta, sDirection),
 				angle = this._getAdjacentControlAngle(slope),
 				distance = this._getAdjacentControlDistance(delta);
 			
@@ -195,7 +232,7 @@ enyo.kind({
 				o 			= this.getSiblings(oControl),
 				nLen 		= o.siblings.length,
 				nPrecedence;
-				
+			
 			for (n=0; n<nLen; n++) {
 				oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(o.siblings[n]);
 				if (this._isInHalfPlane(sDirection, oBounds1, oBounds2) && o.siblings[n] !== oControl) {
@@ -206,6 +243,7 @@ enyo.kind({
 					}
 				}
 			}
+			
 			return oBestMatch;
 		},
 		
@@ -450,6 +488,9 @@ enyo.kind({
 		
 		// Dispatches focus event to the control or it's first spottable child
 		spot: function(oControl, sDirection) {
+			if (this._oCurrent && !this.isSpottable(oControl)) {
+				return false;
+			}
 			if (this._oCurrent && oControl !== this._oCurrent) {
 				this._dispatchEvent('onSpotlightBlur', null, this._oCurrent);
 			}
