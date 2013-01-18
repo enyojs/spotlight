@@ -32,6 +32,9 @@ enyo.kind({
 		_oLast5WayEvent		: null,
 		_nLastKey			: null,
 		
+		_testMode: false,
+		_testModeHighlightNodes: [],
+		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
 		},
@@ -43,6 +46,11 @@ enyo.kind({
 			}
 			this._oCurrent = oControl;
 			this._dispatchEvent('onSpotlightFocused');
+			
+			if(this.testModeEnabled()) {
+				this._doTestModeHighlighting();
+			}
+			
 			return true;
 		},
 		
@@ -269,6 +277,127 @@ enyo.kind({
 				}
 			}
 		},
+		
+		/************************* TEST MODE *************************/
+		
+		/********************* PUBLIC *********************/
+		
+		enableTestMode: function() {
+			this._testMode = true;
+			this._doTestModeHighlighting();
+		},
+		
+		disableTestMode: function() {
+			this._testMode = false;
+			this._destroyExistingHighlightNodes();
+		},
+		
+		testModeEnabled: function() {
+			return this._testMode === true;
+		},
+		
+		/********************* PRIVATE *********************/
+		
+		_doTestModeHighlighting: function() {
+			enyo.log("BEGIN SPOTLIGHT HIGHLIGHTING ------------------- ");
+			this._destroyExistingHighlightNodes();
+			this._highlightCurrentControl();
+			this._highlightAdjacentControls();
+			enyo.log("END SPOTLIGHT HIGHLIGHTING --------------------- ");
+		},
+		
+		_destroyExistingHighlightNodes: function() {
+			for(var i=0;i<this._testModeHighlightNodes.length;i++) {
+				if(this._testModeHighlightNodes[i]) {
+					document.getElementById(this._testModeHighlightNodes[i].id).parentNode.removeChild(this._testModeHighlightNodes[i])
+				}
+			}
+			this._testModeHighlightNodes = [];
+		},
+		
+		_highlightCurrentControl: function() {
+			this._testModeHighlightNodes.push(this._addConrolHighlightNode({control: this.getCurrent(), str: "C"}));
+			enyo.log("Current Node:",this.getCurrent().name);
+		},
+		
+		_highlightAdjacentControls: function() {
+			var controls = this._removeDuplicateHighlightNodes([
+				{
+					control: this._getAdjacentControl("UP", this.getCurrent()),
+					str: "U"
+				},
+				{
+					control: this._getAdjacentControl("DOWN", this.getCurrent()),
+					str: "D"
+				},
+				{
+					control: this._getAdjacentControl("LEFT", this.getCurrent()),
+					str: "L"
+				},
+				{
+					control: this._getAdjacentControl("RIGHT", this.getCurrent()),
+					str: "R"
+				}
+			]);
+			
+			enyo.log("Adjacent Nodes:");
+			for(var i=0;i<controls.length;i++) {
+				if(!controls[i]) {
+					continue;
+				}
+				this._testModeHighlightNodes.push(this._addConrolHighlightNode(controls[i]));
+				enyo.log(controls[i].str,":", (controls[i].control) ? controls[i].control.name : null);
+			}
+		},
+		
+		_removeDuplicateHighlightNodes: function(inControls) {
+			var returnControls = [],
+				dupeOf = -1;
+			
+			for(var i=0;i<inControls.length;i++) {
+				dupeOf = -1;
+				
+				for(var j=0;j<inControls.length;j++) {
+					if(inControls[i].control === inControls[j].control && inControls[i].str !== inControls[j].str) {
+						dupeOf = j;
+						break;
+					}
+				}
+				
+				if(dupeOf > -1) {
+					inControls[i].str += "," + inControls[dupeOf].str
+					inControls.splice(dupeOf,1);
+				}
+				
+				returnControls.push(inControls[i]);
+			}
+			
+			return returnControls;
+		},
+		
+		_addConrolHighlightNode: function(inObj) {
+			if(!inObj || !inObj.control || !inObj.control.hasNode()) {
+				return null;
+			}
+			
+			var bounds = enyo.Spotlight.Util.getAbsoluteBounds(inObj.control),
+				div = document.createElement("div");
+			
+			div.innerHTML = inObj.str;
+			div.id = "spotlight-"+inObj.str+"-highlight-node";
+			div.className = "spotlight-highlight ";
+			div.className += (inObj.str === "C") ? "spotlight-current-item" : "spotlight-adjacent-item";
+			div.style.height = bounds.height+"px";
+			div.style.width = bounds.width+"px";
+			div.style.top = bounds.top+"px";
+			div.style.left = bounds.left+"px";
+			div.style.lineHeight = bounds.height+"px";
+			document.body.appendChild(div);
+			
+			return div;
+		},
+		
+		/************************* END TEST MODE *************************/
 		
 		/********************* PUBLIC *********************/
 		
