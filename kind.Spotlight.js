@@ -214,20 +214,23 @@ enyo.kind({
 		onEvent: function(oEvent) {
 			var oTarget = null;
 			
-			switch (oEvent.type) {
-				case 'mousemove':
-					this.setPointerMode(true);
-					if (this.getPointerMode()) {
-						oTarget = this._getTarget(oEvent.target.id);
-						if (oTarget) {
-							this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+			// Events only processed when Spotlight initialized with an owner
+			if (this._oOwner) {
+				switch (oEvent.type) {
+					case 'mousemove':
+						this.setPointerMode(true);
+						if (this.getPointerMode()) {
+							oTarget = this._getTarget(oEvent.target.id);
+							if (oTarget) {
+								this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+							}
 						}
-					}
-					break;
-				case 'keydown':
-				case 'keyup':
-					enyo.Spotlight.Accelerator.processKey(oEvent);
-					break;
+						break;
+					case 'keydown':
+					case 'keyup':
+						enyo.Spotlight.Accelerator.processKey(oEvent);
+						break;
+				}
 			}
 		},
 		
