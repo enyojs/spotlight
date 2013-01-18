@@ -32,7 +32,7 @@ enyo.kind({
 		_oLast5WayEvent		: null,
 		_nLastKey			: null,
 		
-		_testMode: true,
+		_testMode: false,
 		_testModeHighlightNodes: [],
 		
 		_error: function(s) {
@@ -130,9 +130,7 @@ enyo.kind({
 		},
 		
 		_getAdjacentControlPrecedence: function(sDirection, oBounds1, oBounds2) {
-			var points = this._getAdjacentControlPoints(sDirection, oBounds1, oBounds2);
-			var precedence = this._getPrecedenceValue(points, sDirection)
-			return precedence;
+			return this._getPrecedenceValue(this._getAdjacentControlPoints(sDirection, oBounds1, oBounds2), sDirection);
 		},
 		
 		_isBeyondXBounds: function(oBounds1, oBounds2) {
@@ -147,25 +145,23 @@ enyo.kind({
 			switch (sDirection) {
 				case 'UP'	:
 				case 'DOWN'	:
-					return this._getXAxisPoints(sDirection, oBounds1, oBounds2);
+					return this._getYAxisPoints(sDirection, oBounds1, oBounds2);
 				case 'LEFT'	:
 				case 'RIGHT':
-					return this._getYAxisPoints(sDirection, oBounds1, oBounds2);
+					return this._getXAxisPoints(sDirection, oBounds1, oBounds2);
 			}
 		},
 		
-		_getXAxisPoints: function(sDirection, oBounds1, oBounds2) {
+		_getYAxisPoints: function(sDirection, oBounds1, oBounds2) {
+			var x1, x2, y1, y2;
 			
-			var y1 = (sDirection === "UP")
+			y1 = (sDirection === "UP")
 				?	oBounds1.top
-				:	oBounds1.top + oBounds1.height,
+				:	oBounds1.top + oBounds1.height;
 			
-				y2 = (sDirection === "UP")
+			y2 = (sDirection === "UP")
 				?	oBounds2.top + oBounds2.height
-				:	oBounds2.top,
-				
-				x1,
-				x2;
+				:	oBounds2.top;
 				
 			if(oBounds1.left < oBounds2.left) {
 				if(oBounds1.left + oBounds1.width < oBounds2.left) {
@@ -186,47 +182,18 @@ enyo.kind({
 			}
 			
 			return [{x: x1, y: y1}, {x: x2, y: y2}];
-
-/*
-			var xCenter1 = oBounds1.left + oBounds1.width/2,
-				xCenter2 = oBounds2.left + oBounds2.width/2,
-				
-				yCenter1 = (sDirection === "DOWN") ? oBounds1.top + oBounds1.height : oBounds1.top,
-				yCenter2 = (sDirection === "DOWN") ? oBounds2.top : oBounds2.top + oBounds2.height,
-				
-				// If we have a case where one control's bounds are both larger than the other's, adjust center point
-				xCenter1 = (oBounds1.left < oBounds2.left && oBounds1.right < oBounds2.right) ? xCenter2 : xCenter1,
-				xCenter2 = (oBounds2.left < oBounds1.left && oBounds2.right < oBounds1.right) ? xCenter1 : xCenter2,
-				
-				centerPoints = [
-					{x: xCenter1, y: yCenter1},
-					{x: xCenter2, y: yCenter2}
-				],
-				leftPoints = [
-					{x: oBounds1.left, y: yCenter1},
-					{x: oBounds2.left, y: yCenter2}
-				],
-				rightPoints = [
-					{x: oBounds1.right, y: yCenter1},
-					{x: oBounds2.right, y: yCenter2}
-				];
-			
-			return [centerPoints,leftPoints,rightPoints];
-*/
 		},
 		
-		_getYAxisPoints: function(sDirection, oBounds1, oBounds2) {
+		_getXAxisPoints: function(sDirection, oBounds1, oBounds2) {
+			var x1, x2, y1, y2;
 			
-			var x1 = (sDirection === "LEFT")
+			x1 = (sDirection === "LEFT")
 				?	oBounds1.left
-				:	oBounds1.left + oBounds1.width,
+				:	oBounds1.left + oBounds1.width;
 			
-				x2 = (sDirection === "LEFT")
+			x2 = (sDirection === "LEFT")
 				?	oBounds2.left + oBounds2.width
-				:	oBounds2.left,
-				
-				y1,
-				y2;
+				:	oBounds2.left;
 				
 			if(oBounds1.top < oBounds2.top) {
 				if(oBounds1.top + oBounds1.height < oBounds2.top) {
@@ -247,33 +214,6 @@ enyo.kind({
 			}
 			
 			return [{x: x1, y: y1}, {x: x2, y: y2}];
-
-/*			
-			var xCenter1 = oBounds1.left + oBounds1.width/2,
-				xCenter2 = oBounds2.left + oBounds2.width/2,
-				
-				yCenter1 = oBounds1.top + oBounds1.height/2,
-				yCenter2 = oBounds2.top + oBounds2.height/2,
-				
-				// If we have a case where one control's bounds are both larger than the other's, adjust center point
-				yCenter1 = (oBounds1.top < oBounds2.top && oBounds1.bottom < oBounds2.bottom) ? yCenter2 : yCenter1,
-				yCenter2 = (oBounds2.top < oBounds1.top && oBounds2.bottom < oBounds1.bottom) ? yCenter1 : yCenter2,
-				
-				centerPoints = [
-					{x: xCenter1, y: yCenter1},
-					{x: xCenter2, y: yCenter2}
-				],
-				topPoints = [
-					{x: xCenter1, y: oBounds1.top},
-					{x: xCenter2, y: oBounds2.top}
-				],
-				bottomPoints = [
-					{x: xCenter1, y: oBounds1.bottom},
-					{x: xCenter2, y: oBounds2.bottom}
-				];
-			
-			return [centerPoints,topPoints,bottomPoints];
-*/
 		},
 		
 		_getPrecedenceValue: function(points, sDirection) {
