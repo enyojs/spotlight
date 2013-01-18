@@ -32,7 +32,7 @@ enyo.kind({
 		_oLast5WayEvent		: null,
 		_nLastKey			: null,
 		
-		_testMode: false,
+		_testMode: true,
 		_testModeHighlightNodes: [],
 		
 		_error: function(s) {
@@ -119,42 +119,80 @@ enyo.kind({
 		_isInHalfPlane: function(sDirection, oBounds1, oBounds2) {
 			switch (sDirection) {
 				case 'UP':
-					return oBounds1.top > oBounds2.top;
+					return oBounds1.top >= oBounds2.top + oBounds2.height;
 				case 'DOWN':
-					return oBounds1.top < oBounds2.top;
+					return oBounds1.top + oBounds1.height <= oBounds2.top;
 				case 'LEFT':
-					return oBounds1.left > oBounds2.left;
+					return oBounds1.left >= oBounds2.left + oBounds2.width;
 				case 'RIGHT':
-					return oBounds1.left < oBounds2.left;
+					return oBounds1.left + oBounds1.width <= oBounds2.left;
 			}
 		},
 		
 		_getAdjacentControlPrecedence: function(sDirection, oBounds1, oBounds2) {
-			var points = this._getAdjacentControlPoints(sDirection, oBounds1, oBounds2),
-				p1 = this._getPrecedenceValue(points[0], sDirection),
-				p2 = this._getPrecedenceValue(points[1], sDirection),
-				p3 = this._getPrecedenceValue(points[2], sDirection);
-			
-			return Math.max(p1, p2, p3);
+			var points = this._getAdjacentControlPoints(sDirection, oBounds1, oBounds2);
+			var precedence = this._getPrecedenceValue(points, sDirection)
+			return precedence;
+		},
+		
+		_isBeyondXBounds: function(oBounds1, oBounds2) {
+			return oBounds1.left < oBounds2.left && oBounds1.right < oBounds2.right;
+		},
+		
+		_isBeyondYBounds: function(oBounds1, oBounds2) {
+			return oBounds1.top < oBounds2.top && oBounds1.bottom < oBounds2.bottom;
 		},
 		
 		_getAdjacentControlPoints: function(sDirection, oBounds1, oBounds2) {
 			switch (sDirection) {
 				case 'UP'	:
 				case 'DOWN'	:
-					return this._getXAxisPoints(oBounds1, oBounds2);
+					return this._getXAxisPoints(sDirection, oBounds1, oBounds2);
 				case 'LEFT'	:
 				case 'RIGHT':
-					return this._getYAxisPoints(oBounds1, oBounds2);
+					return this._getYAxisPoints(sDirection, oBounds1, oBounds2);
 			}
 		},
 		
-		_getXAxisPoints: function(oBounds1, oBounds2) {
+		_getXAxisPoints: function(sDirection, oBounds1, oBounds2) {
+			
+			var y1 = (sDirection === "UP")
+				?	oBounds1.top
+				:	oBounds1.top + oBounds1.height,
+			
+				y2 = (sDirection === "UP")
+				?	oBounds2.top + oBounds2.height
+				:	oBounds2.top,
+				
+				x1,
+				x2;
+				
+			if(oBounds1.left < oBounds2.left) {
+				if(oBounds1.left + oBounds1.width < oBounds2.left) {
+					x1 = oBounds1.left + oBounds1.width;
+					x2 = oBounds2.left;
+				} else {
+					x1 = oBounds2.left;
+					x2 = oBounds2.left;
+				}
+			} else {
+				if(oBounds1.left > oBounds2.left + oBounds2.width) {
+					x1 = oBounds1.left;
+					x2 = oBounds2.left + oBounds2.left;
+				} else {
+					x1 = oBounds1.left;
+					x2 = oBounds1.left;
+				}
+			}
+			
+			return [{x: x1, y: y1}, {x: x2, y: y2}];
+
+/*
 			var xCenter1 = oBounds1.left + oBounds1.width/2,
 				xCenter2 = oBounds2.left + oBounds2.width/2,
 				
-				yCenter1 = oBounds1.top + oBounds1.height/2,
-				yCenter2 = oBounds2.top + oBounds2.height/2,
+				yCenter1 = (sDirection === "DOWN") ? oBounds1.top + oBounds1.height : oBounds1.top,
+				yCenter2 = (sDirection === "DOWN") ? oBounds2.top : oBounds2.top + oBounds2.height,
 				
 				// If we have a case where one control's bounds are both larger than the other's, adjust center point
 				xCenter1 = (oBounds1.left < oBounds2.left && oBounds1.right < oBounds2.right) ? xCenter2 : xCenter1,
@@ -174,9 +212,43 @@ enyo.kind({
 				];
 			
 			return [centerPoints,leftPoints,rightPoints];
+*/
 		},
 		
-		_getYAxisPoints: function(oBounds1, oBounds2) {
+		_getYAxisPoints: function(sDirection, oBounds1, oBounds2) {
+			
+			var x1 = (sDirection === "LEFT")
+				?	oBounds1.left
+				:	oBounds1.left + oBounds1.width,
+			
+				x2 = (sDirection === "LEFT")
+				?	oBounds2.left + oBounds2.width
+				:	oBounds2.left,
+				
+				y1,
+				y2;
+				
+			if(oBounds1.top < oBounds2.top) {
+				if(oBounds1.top + oBounds1.height < oBounds2.top) {
+					y1 = oBounds1.top + oBounds1.height;
+					y2 = oBounds2.top;
+				} else {
+					y1 = oBounds2.top;
+					y2 = oBounds2.top;
+				}
+			} else {
+				if(oBounds1.top > oBounds2.top + oBounds2.height) {
+					y1 = oBounds1.top;
+					y2 = oBounds2.top + oBounds2.height;
+				} else {
+					y1 = oBounds1.top;
+					y2 = oBounds1.top;
+				}
+			}
+			
+			return [{x: x1, y: y1}, {x: x2, y: y2}];
+
+/*			
 			var xCenter1 = oBounds1.left + oBounds1.width/2,
 				xCenter2 = oBounds2.left + oBounds2.width/2,
 				
@@ -201,6 +273,7 @@ enyo.kind({
 				];
 			
 			return [centerPoints,topPoints,bottomPoints];
+*/
 		},
 		
 		_getPrecedenceValue: function(points, sDirection) {
@@ -426,7 +499,6 @@ enyo.kind({
 		// Events dispatched to the spotlighted controls
 		onEvent: function(oEvent) {
 			var oTarget = null;
-			
 			switch (oEvent.type) {
 				case 'mousemove':
 					this.setPointerMode(true);
@@ -446,38 +518,48 @@ enyo.kind({
 		
 		// Called from enyo.Spotlight.Accelerator which handles accelerated keyboard event
 		onKeyEvent: function(oEvent) {
+			var validKey = false;
 			this.setPointerMode(false);
 			if (!this.getPointerMode()) {
 				switch (oEvent.keyCode) {
 					case 13:
 					case 53: // TODO - hack to support old system
+						validKey = true
 						this._dispatchEvent('onSpotlightSelect', oEvent);
 						break;
 					case 37:
 					case 52: // TODO - hack to support old system
+						validKey = true
 						this._dispatchEvent('onSpotlightLeft', oEvent);
 						break;
 					case 38:
 					case 50: // TODO - hack to support old system
+						validKey = true
 						this._dispatchEvent('onSpotlightUp', oEvent);
 						break;
 					case 39:
 					case 54: // TODO - hack to support old system
+						validKey = true
 						this._dispatchEvent('onSpotlightRight', oEvent);
 						break;
 					case 40:
 					case 56: // TODO - hack to support old system
+						validKey = true
 						this._dispatchEvent('onSpotlightDown', oEvent);
 						break;
 					default:
 						break;
 				}
 			}
+			if(validKey) {
+				// If the key pressed was used by Spotlight, prevent default to keep the
+				// browser from scrolling the page, etc.
+				oEvent.preventDefault();
+			}
 		},
 		
 		// Spotlight events bubbled back up to the App
 		onSpotlightEvent: function(oEvent) {
-			
 			this._oLastEvent = oEvent;
 			
 			// If decorator onSpotlight<Event> function return false - preventDefault)
