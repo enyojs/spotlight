@@ -354,7 +354,12 @@ enyo.kind({
 		
 		/************************************************************/
 		
-		setPointerMode		: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
+		setPointerMode		: function(bPointerMode)	{ 
+			this._bPointerMode != bPointerMode
+				? enyo.Signals.send("onSpotlightModeChanged", {pointerMode: bPointerMode}) 
+				: enyo.noop;
+			this._bPointerMode = bPointerMode; 	
+		},
 		getPointerMode		: function() 				{ return this._bPointerMode; 			},
 		getCurrent			: function() 				{ return this._oCurrent; 				},
 		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 	},
