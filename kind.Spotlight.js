@@ -245,8 +245,6 @@ enyo.kind({
 				nLen 		= o.siblings.length,
 				nPrecedence;
 			
-			var now = enyo.now();
-			
 			for (n=0; n<nLen; n++) {
 				oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(o.siblings[n]);
 				if (this._isInHalfPlane(sDirection, oBounds1, oBounds2) && o.siblings[n] !== oControl) {
@@ -257,8 +255,6 @@ enyo.kind({
 					}
 				}
 			}
-			
-			console.log("---- done checking: ", enyo.now() - now+"ms");
 			
 			return oBestMatch;
 		},
