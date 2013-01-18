@@ -126,7 +126,7 @@ enyo.kind({
 				p1 = this._getPrecedenceValue(points[0], sDirection),
 				p2 = this._getPrecedenceValue(points[1], sDirection),
 				p3 = this._getPrecedenceValue(points[2], sDirection);
-
+			
 			return Math.max(p1, p2, p3);
 		},
 		
@@ -135,21 +135,26 @@ enyo.kind({
 				case 'UP'	:
 				case 'DOWN'	:
 					return this._getXAxisPoints(oBounds1, oBounds2);
-					break;
 				case 'LEFT'	:
 				case 'RIGHT':
 					return this._getYAxisPoints(oBounds1, oBounds2);
-					break;
 			}
 		},
 		
 		_getXAxisPoints: function(oBounds1, oBounds2) {
-			var yCenter1 = oBounds1.top + oBounds1.height/2,
+			var xCenter1 = oBounds1.left + oBounds1.width/2,
+				xCenter2 = oBounds2.left + oBounds2.width/2,
+				
+				yCenter1 = oBounds1.top + oBounds1.height/2,
 				yCenter2 = oBounds2.top + oBounds2.height/2,
 				
+				// If we have a case where one control's bounds are both larger than the other's, adjust center point
+				xCenter1 = (oBounds1.left < oBounds2.left && oBounds1.right < oBounds2.right) ? xCenter2 : xCenter1,
+				xCenter2 = (oBounds2.left < oBounds1.left && oBounds2.right < oBounds1.right) ? xCenter1 : xCenter2,
+				
 				centerPoints = [
-					{x: oBounds1.left + oBounds1.width/2, y: yCenter1},
-					{x: oBounds2.left + oBounds2.width/2, y: yCenter2}
+					{x: xCenter1, y: yCenter1},
+					{x: xCenter2, y: yCenter2}
 				],
 				leftPoints = [
 					{x: oBounds1.left, y: yCenter1},
@@ -167,9 +172,16 @@ enyo.kind({
 			var xCenter1 = oBounds1.left + oBounds1.width/2,
 				xCenter2 = oBounds2.left + oBounds2.width/2,
 				
+				yCenter1 = oBounds1.top + oBounds1.height/2,
+				yCenter2 = oBounds2.top + oBounds2.height/2,
+				
+				// If we have a case where one control's bounds are both larger than the other's, adjust center point
+				yCenter1 = (oBounds1.top < oBounds2.top && oBounds1.bottom < oBounds2.bottom) ? yCenter2 : yCenter1,
+				yCenter2 = (oBounds2.top < oBounds1.top && oBounds2.bottom < oBounds1.bottom) ? yCenter1 : yCenter2,
+				
 				centerPoints = [
-					{x: xCenter1, y: oBounds1.top + oBounds1.height/2},
-					{x: xCenter2, y: oBounds2.top + oBounds2.height/2}
+					{x: xCenter1, y: yCenter1},
+					{x: xCenter2, y: yCenter2}
 				],
 				topPoints = [
 					{x: xCenter1, y: oBounds1.top},
@@ -233,6 +245,8 @@ enyo.kind({
 				nLen 		= o.siblings.length,
 				nPrecedence;
 			
+			var now = enyo.now();
+			
 			for (n=0; n<nLen; n++) {
 				oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(o.siblings[n]);
 				if (this._isInHalfPlane(sDirection, oBounds1, oBounds2) && o.siblings[n] !== oControl) {
@@ -243,6 +257,8 @@ enyo.kind({
 					}
 				}
 			}
+			
+			console.log("---- done checking: ", enyo.now() - now+"ms");
 			
 			return oBestMatch;
 		},
