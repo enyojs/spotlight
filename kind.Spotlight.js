@@ -312,11 +312,9 @@ enyo.kind({
 		/********************* PRIVATE *********************/
 		
 		_doTestModeHighlighting: function() {
-			enyo.log("BEGIN SPOTLIGHT HIGHLIGHTING ------------------- ");
 			this._destroyExistingHighlightNodes();
 			this._highlightCurrentControl();
 			this._highlightAdjacentControls();
-			enyo.log("END SPOTLIGHT HIGHLIGHTING --------------------- ");
 		},
 		
 		_destroyExistingHighlightNodes: function() {
@@ -330,7 +328,6 @@ enyo.kind({
 		
 		_highlightCurrentControl: function() {
 			this._testModeHighlightNodes.push(this._addConrolHighlightNode({control: this.getCurrent(), str: "C"}));
-			enyo.log("Current Node:",this.getCurrent().name);
 		},
 		
 		_highlightAdjacentControls: function() {
@@ -353,13 +350,11 @@ enyo.kind({
 				}
 			]);
 			
-			enyo.log("Adjacent Nodes:");
 			for(var i=0;i<controls.length;i++) {
 				if(!controls[i]) {
 					continue;
 				}
 				this._testModeHighlightNodes.push(this._addConrolHighlightNode(controls[i]));
-				enyo.log(controls[i].str,":", (controls[i].control) ? controls[i].control.name : null);
 			}
 		},
 		
