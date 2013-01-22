@@ -318,20 +318,23 @@ enyo.kind({
 		// Events dispatched to the spotlighted controls
 		onEvent: function(oEvent) {
 			var oTarget = null;
-			switch (oEvent.type) {
-				case 'mousemove':
-					this.setPointerMode(true);
-					if (this.getPointerMode()) {
-						oTarget = this._getTarget(oEvent.target.id);
-						if (oTarget) {
-							this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+			// Events only processed when Spotlight initialized with an owner
+			if (this._oOwner) {
+				switch (oEvent.type) {
+					case 'mousemove':
+						this.setPointerMode(true);
+						if (this.getPointerMode()) {
+							oTarget = this._getTarget(oEvent.target.id);
+							if (oTarget) {
+								this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+							}
 						}
-					}
-					break;
-				case 'keydown':
-				case 'keyup':
-					enyo.Spotlight.Accelerator.processKey(oEvent);
-					break;
+						break;
+					case 'keydown':
+					case 'keyup':
+						enyo.Spotlight.Accelerator.processKey(oEvent);
+						break;
+				}
 			}
 		},
 		
@@ -465,7 +468,12 @@ enyo.kind({
 		
 		/************************************************************/
 		
-		setPointerMode		: function(bPointerMode)	{ this._bPointerMode = bPointerMode; 	},
+		setPointerMode		: function(bPointerMode)	{ 
+			this._bPointerMode != bPointerMode
+				? enyo.Signals.send("onSpotlightModeChanged", {pointerMode: bPointerMode}) 
+				: enyo.noop;
+			this._bPointerMode = bPointerMode; 	
+		},
 		getPointerMode		: function() 				{ return this._bPointerMode; 			},
 		getCurrent			: function() 				{ return this._oCurrent; 				},
 		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 	},
