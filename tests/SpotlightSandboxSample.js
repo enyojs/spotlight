@@ -1,11 +1,11 @@
 enyo.kind({
-	name: 'moon.sample.SpotlightSample',
+	name: 'moon.sample.SpotlightSandboxSample',
 	classes: "moon",
 	fit: false,
 	components:[
 		{kind: 'enyo.Spotlight'},
-		{kind: "onyx.Toolbar", components: [
-			{kind: "moon.Button", content: "Add Control", spotlight:false, style: "position:aboslute; top:20px; left:20px; width:300px; background:#ccc;", ontap: "addBarracuda"}
+		{style: "height:50px;background:#444;border-bottom:1px solid #111;", components: [
+			{kind: "enyo.Button", content: "Add Control", style: "margin:10px 20px; width:300px; background:#ccc;", ontap: "addBarracuda"}
 		]},
 		{name: "container", style: "position:relative;"}
 	],
