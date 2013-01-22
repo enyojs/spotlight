@@ -35,6 +35,9 @@ enyo.kind({
 		_testMode: false,
 		_testModeHighlightNodes: [],
 		
+		_prevClientX: null,
+		_prevClientY: null,
+		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
 		},
@@ -322,11 +325,15 @@ enyo.kind({
 			if (this._oOwner) {
 				switch (oEvent.type) {
 					case 'mousemove':
-						this.setPointerMode(true);
-						if (this.getPointerMode()) {
-							oTarget = this._getTarget(oEvent.target.id);
-							if (oTarget) {
-								this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+						// Only register mousemove events if the clientx/y actually changed (avoid mousemove
+						// events thrown by scrolling, etc).
+						if(this.clientXYChanged(oEvent)) {
+							this.setPointerMode(true);
+							if (this.getPointerMode()) {
+								oTarget = this._getTarget(oEvent.target.id);
+								if (oTarget) {
+									this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+								}
 							}
 						}
 						break;
@@ -561,6 +568,13 @@ enyo.kind({
 		getFirstChild: function(oControl) {
 			oControl = oControl || this.getCurrent();
 			return this.getChildren(oControl)[0];
+		},
+		
+		clientXYChanged: function(oEvent) {
+			var returnValue = (this._prevClientX !== oEvent.clientX || this._prevClientY !== oEvent.clientY);
+			this._prevClientX = oEvent.clientX;
+			this._prevClientY = oEvent.clientY;
+			return returnValue;
 		},
 		
 		/************************* TEST MODE *************************/
