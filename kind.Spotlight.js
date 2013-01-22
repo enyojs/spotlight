@@ -47,7 +47,7 @@ enyo.kind({
 			this._oCurrent = oControl;
 			this._dispatchEvent('onSpotlightFocused');
 			
-			if(this.testModeEnabled()) {
+			if(this.getTestMode()) {
 				this._doTestModeHighlighting();
 			}
 			
@@ -216,8 +216,8 @@ enyo.kind({
 			return [{x: x1, y: y1}, {x: x2, y: y2}];
 		},
 		
-		_getPrecedenceValue: function(points, sDirection) {
-			var delta = this._getAdjacentControlDelta(points[0], points[1]),
+		_getPrecedenceValue: function(oPoints, sDirection) {
+			var delta = this._getAdjacentControlDelta(oPoints[0], oPoints[1]),
 				slope = this._getAdjacentControlSlope(delta, sDirection),
 				angle = this._getAdjacentControlAngle(slope),
 				distance = this._getAdjacentControlDistance(delta);
@@ -290,122 +290,6 @@ enyo.kind({
 				}
 			}
 		},
-		
-		/************************* TEST MODE *************************/
-		
-		/********************* PUBLIC *********************/
-		
-		enableTestMode: function() {
-			this._testMode = true;
-			this._doTestModeHighlighting();
-		},
-		
-		disableTestMode: function() {
-			this._testMode = false;
-			this._destroyExistingHighlightNodes();
-		},
-		
-		testModeEnabled: function() {
-			return this._testMode === true;
-		},
-		
-		/********************* PRIVATE *********************/
-		
-		_doTestModeHighlighting: function() {
-			this._destroyExistingHighlightNodes();
-			this._highlightCurrentControl();
-			this._highlightAdjacentControls();
-		},
-		
-		_destroyExistingHighlightNodes: function() {
-			for(var i=0;i<this._testModeHighlightNodes.length;i++) {
-				if(this._testModeHighlightNodes[i]) {
-					document.getElementById(this._testModeHighlightNodes[i].id).parentNode.removeChild(this._testModeHighlightNodes[i])
-				}
-			}
-			this._testModeHighlightNodes = [];
-		},
-		
-		_highlightCurrentControl: function() {
-			this._testModeHighlightNodes.push(this._addConrolHighlightNode({control: this.getCurrent(), str: "C"}));
-		},
-		
-		_highlightAdjacentControls: function() {
-			var controls = this._removeDuplicateHighlightNodes([
-				{
-					control: this._getAdjacentControl("UP", this.getCurrent()),
-					str: "U"
-				},
-				{
-					control: this._getAdjacentControl("DOWN", this.getCurrent()),
-					str: "D"
-				},
-				{
-					control: this._getAdjacentControl("LEFT", this.getCurrent()),
-					str: "L"
-				},
-				{
-					control: this._getAdjacentControl("RIGHT", this.getCurrent()),
-					str: "R"
-				}
-			]);
-			
-			for(var i=0;i<controls.length;i++) {
-				if(!controls[i]) {
-					continue;
-				}
-				this._testModeHighlightNodes.push(this._addConrolHighlightNode(controls[i]));
-			}
-		},
-		
-		_removeDuplicateHighlightNodes: function(inControls) {
-			var returnControls = [],
-				dupeOf = -1;
-			
-			for(var i=0;i<inControls.length;i++) {
-				dupeOf = -1;
-				
-				for(var j=0;j<inControls.length;j++) {
-					if(inControls[i].control === inControls[j].control && inControls[i].str !== inControls[j].str) {
-						dupeOf = j;
-						break;
-					}
-				}
-				
-				if(dupeOf > -1) {
-					inControls[i].str += "," + inControls[dupeOf].str
-					inControls.splice(dupeOf,1);
-				}
-				
-				returnControls.push(inControls[i]);
-			}
-			
-			return returnControls;
-		},
-		
-		_addConrolHighlightNode: function(inObj) {
-			if(!inObj || !inObj.control || !inObj.control.hasNode()) {
-				return null;
-			}
-			
-			var bounds = enyo.Spotlight.Util.getAbsoluteBounds(inObj.control),
-				div = document.createElement("div");
-			
-			div.innerHTML = inObj.str;
-			div.id = "spotlight-"+inObj.str+"-highlight-node";
-			div.className = "spotlight-highlight ";
-			div.className += (inObj.str === "C") ? "spotlight-current-item" : "spotlight-adjacent-item";
-			div.style.height = bounds.height+"px";
-			div.style.width = bounds.width+"px";
-			div.style.top = bounds.top+"px";
-			div.style.left = bounds.left+"px";
-			div.style.lineHeight = bounds.height+"px";
-			document.body.appendChild(div);
-			
-			return div;
-		},
-		
-		/************************* END TEST MODE *************************/
 		
 		/********************* PUBLIC *********************/
 		
@@ -669,7 +553,134 @@ enyo.kind({
 		getFirstChild: function(oControl) {
 			oControl = oControl || this.getCurrent();
 			return this.getChildren(oControl)[0];
-		}
+		},
+		
+		/************************* TEST MODE *************************/
+		
+		/********************* PUBLIC *********************/
+		
+		//* Enable/disable test mode
+		setTestMode: function(bEnabled) {
+			this._testMode = (bEnabled === true);
+			this.testModeChanged();
+		},
+		
+		//* When _this._testMode_ changes, either do highlighting or destroy highlight nodes
+		testModeChanged: function() {
+			if(this._testMode === true) {
+				this._doTestModeHighlighting();
+			} else {
+				this._destroyExistingHighlightNodes();
+			}
+		},
+		
+		//* Return true if test mode is enabled
+		getTestMode: function() {
+			return this._testMode === true;
+		},
+		
+		/********************* PRIVATE ********************/
+		
+		//* Destroy existing highlight nodes, and highlight current and adjacent spotlight controls
+		_doTestModeHighlighting: function() {
+			this._destroyExistingHighlightNodes();
+			this._highlightCurrentControl();
+			this._highlightAdjacentControls();
+		},
+		
+		//* Destroy all highlight elements
+		_destroyExistingHighlightNodes: function() {
+			for(var i=0;i<this._testModeHighlightNodes.length;i++) {
+				if(this._testModeHighlightNodes[i]) {
+					this._testModeHighlightNodes[i].destroy();
+				}
+			}
+			this._testModeHighlightNodes = [];
+		},
+		
+		//* Highlight the current spotlighted control and add it to _this._testModeHighlightNodes_
+		_highlightCurrentControl: function() {
+			this._testModeHighlightNodes.push(this._addConrolHighlightNode({control: this.getCurrent(), str: "C"}));
+		},
+		
+		//* Highlight controls adjacent to the current spotlighted controls and add them to _this._testModeHighlightNodes_
+		_highlightAdjacentControls: function() {
+			var controls = this._removeDuplicateHighlightNodes([
+				{
+					control: this._getAdjacentControl("UP", this.getCurrent()),
+					str: "U"
+				},
+				{
+					control: this._getAdjacentControl("DOWN", this.getCurrent()),
+					str: "D"
+				},
+				{
+					control: this._getAdjacentControl("LEFT", this.getCurrent()),
+					str: "L"
+				},
+				{
+					control: this._getAdjacentControl("RIGHT", this.getCurrent()),
+					str: "R"
+				}
+			]);
+			
+			for(var i=0;i<controls.length;i++) {
+				if(!controls[i]) {
+					continue;
+				}
+				this._testModeHighlightNodes.push(this._addConrolHighlightNode(controls[i]));
+			}	
+		},
+		
+		/**
+			Combine duplicated highlight nodes (created for the same control). This happens when a given
+			control can be reached via more than one five-way direction (e.g. up and left).
+		**/
+		_removeDuplicateHighlightNodes: function(inControls) {
+			var returnControls = [],
+				dupeOf = -1;
+			
+			for(var i=0;i<inControls.length;i++) {
+				dupeOf = -1;
+				
+				for(var j=0;j<inControls.length;j++) {
+					if(inControls[i].control === inControls[j].control && inControls[i].str !== inControls[j].str) {
+						dupeOf = j;
+						break;
+					}
+				}
+				
+				if(dupeOf > -1) {
+					inControls[i].str += "," + inControls[dupeOf].str
+					inControls.splice(dupeOf,1);
+				}
+				
+				returnControls.push(inControls[i]);
+			}
+			
+			return returnControls;
+		},
+		
+		//* Create a new control with styling to highlight current or adjacent spotlight nodes.
+		_addConrolHighlightNode: function(inObj) {
+			if(!inObj || !inObj.control || !inObj.control.hasNode()) {
+				return null;
+			}
+			
+			var bounds = enyo.Spotlight.Util.getAbsoluteBounds(inObj.control),
+				className = (inObj.str === "C") ? "spotlight-current-item" : "spotlight-adjacent-item",
+				highlightNode = this._oOwner.createComponent({
+					classes: "spotlight-highlight "+className,
+					style: "height:"+bounds.height+"px;width:"+bounds.width+"px;top:"+bounds.top+"px;left:"+bounds.left+"px;line-height:"+bounds.height+"px;",
+					content: inObj.str
+				});
+			
+			highlightNode.render();
+			
+			return highlightNode;
+		},
+		
+		/************************* END TEST MODE *************************/
 	}
 });
 
