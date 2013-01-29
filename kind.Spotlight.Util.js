@@ -39,7 +39,7 @@ enyo.kind({
 						}
 						oMatch = oNode.style[sTransformProp].match(oYRegEx);
 						if (oMatch && typeof oMatch[1] != 'undefined' && oMatch[1]) {
-							oLeft += parseInt(oMatch[1], 10);
+							oTop += parseInt(oMatch[1], 10);
 						}
 					}
 				} while (oNode = oNode.offsetParent);
