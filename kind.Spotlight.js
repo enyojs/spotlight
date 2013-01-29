@@ -481,6 +481,7 @@ enyo.kind({
 				: enyo.noop;
 			this._bPointerMode = bPointerMode; 	
 		},
+		
 		getPointerMode		: function() 				{ return this._bPointerMode; 			},
 		getCurrent			: function() 				{ return this._oCurrent; 				},
 		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 	},
@@ -489,7 +490,7 @@ enyo.kind({
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
-			return (typeof oControl.spotlight != 'undefined' && oControl.spotlight);
+			return (typeof oControl.spotlight != 'undefined' && oControl.spotlight && oControl.getAbsoluteShowing() && !(oControl.disabled));
 		},
 		
 		// Returns spottable chldren along with position of self 

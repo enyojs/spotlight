@@ -59,7 +59,7 @@ enyo.kind({
 		}
 	},
 	isResizing: function(inEvent) {
-		var bounds = enyo.Spotlight.Util.getAbsoluteBounds(this),
+		var bounds = this.getAbsoluteBounds(),
 			relativeTop = inEvent.clientY - bounds.top,
 			relativeLeft = inEvent.clientX - bounds.left,
 			relativeBottom = bounds.height - relativeTop,
