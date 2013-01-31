@@ -129,9 +129,7 @@ enyo.kind({
 					break;
 				
 			}
-			console.log('Near exiting panels');
 			if (typeof oEvent.direction != 'undefined') {
-				console.log('PANELS EXITING:', oSender.name);
 				this._setFocus(oSender, false);
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightBlur', null, enyo.Spotlight.getCurrent());
 				enyo.Spotlight.setCurrent(oSender.parent)

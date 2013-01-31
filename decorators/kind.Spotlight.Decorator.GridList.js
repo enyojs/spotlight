@@ -27,6 +27,9 @@ enyo.kind({
 		},
 
 		_getCurrent: function(oSender) {
+			if (typeof oSender._nCurrentSpotlightItem == 'undefined') {
+				return 0;
+			}
 			return oSender._nCurrentSpotlightItem;
 		},
 		
@@ -67,7 +70,8 @@ enyo.kind({
 	
 		onSpotlightSelect: function(oSender, oEvent) {
 			if (this._getCurrent(oSender) !== null) {
-				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this._getCurrent(oSender)}, oSender.children[0]);
+				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this._getCurrent(oSender)}, oSender.$.generator.$.selection);
+				this._setCurrent(oSender, this._getCurrent(oSender), true);
 			} else {
 				this._setCurrent(oSender, 0, true);
 			}
@@ -107,6 +111,7 @@ enyo.kind({
 			this._setCurrent(oSender, null, true);
 			return true;
 		},
+
 		onSpotlightRight: function(oSender, oEvent) {
 			var nCurrent = this._getCurrent(oSender);
 			if (nCurrent === null) { return; }

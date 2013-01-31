@@ -82,8 +82,10 @@ enyo.kind({
 				
 				this._setFocus(oSender, false);
 				if (!(oSender.parent instanceof enyo.Panels)) {
+					console.log('case1');
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				} else if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
+					console.log('case2');
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
