@@ -340,7 +340,7 @@ enyo.kind({
 						// Only register mousemove events if the clientx/y actually changed (avoid mousemove
 						// events thrown by scrolling, etc).
 						if(this.clientXYChanged(oEvent)) {
-							//this.setPointerMode(true);
+							this.setPointerMode(true);
 							if (this.getPointerMode()) {
 								oTarget = this._getTarget(oEvent.target.id);
 								if (oTarget) {
