@@ -17,6 +17,34 @@ enyo.kind({
 			oControl.dispatchBubble(sEvent, oData, oControl);
 		},
 		
+		// Attach event hook to capture events coming from within the container
+		interceptEvents: function(oControl, fHandler) {
+			var oThis = this;
+			var f = oControl.dispatchEvent;
+
+			oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
+				if (fHandler(oControl, oEvent)) {
+					f.apply(oControl, [sEventName, oEvent, oEventSender]);
+				} else {
+					oEvent.type = null;
+				}
+			}
+		},
+		
+		getNearestSpottableChild: function(oAncestor, oDescendant) {
+			var oChild = oDescendant,
+				oSpottableChild = oChild;
+				
+			while (oChild.parent && oChild.parent !== oAncestor) {
+				if (enyo.Spotlight.isSpottable(oChild)) {
+					oSpottableChild = oChild;
+				}
+				oChild = oChild.parent;
+			}
+			
+			return oSpottableChild;
+		},
+		
 		getAbsoluteBounds: function(oControl) {
 			var oLeft 			= 0,
 				oTop 			= 0,

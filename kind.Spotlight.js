@@ -41,6 +41,7 @@ enyo.kind({
 			if (typeof oControl._spotlight == 'undefined') {
 				oControl._spotlight = {};
 			}
+			console.log('CURRENT:', oControl.name);
 			this._oCurrent = oControl;
 			this._dispatchEvent('onSpotlightFocused');
 			return true;
@@ -64,6 +65,10 @@ enyo.kind({
 		},
 		
 		_getDecorator: function(oSender) {
+			if (oSender.spotlight == 'container') {							// Process containers
+				return enyo.Spotlight.Decorator['Container'];
+			}
+			
 			if (typeof this._oDecorators[oSender.kind] != 'undefined') {
 				return this._oDecorators[oSender.kind];
 			}
@@ -71,23 +76,20 @@ enyo.kind({
 			var oDecorator = null,
 				o;
 				
-			if (oSender.spotlight == 'container') {							// Process containers
-				oDecorator = enyo.Spotlight.Decorator['Container'];
-			} else {														// Process non-containers
-				for (var s in enyo.Spotlight.Decorator) {						// Loop through decorators namespace
-					o = enyo.Spotlight.Decorator[s];
-					if (o.decorates && oSender instanceof o.decorates) {			// If decorator applies to oSender
-						if (!oDecorator) {												// If decorator was NOT set in previous iteration
-							oDecorator = o;													// Set it to the first value
-						} else {														// If decorator WAS set in previous iteration
-							if (o.decorates.prototype instanceof oDecorator.decorates) {	// IF o.decorates is closer to oSender in lineage
-								oDecorator = o;													// Set it as optimal decorator
-							}
+			// Process non-containers
+			for (var s in enyo.Spotlight.Decorator) {						// Loop through decorators namespace
+				o = enyo.Spotlight.Decorator[s];
+				if (o.decorates && oSender instanceof o.decorates) {			// If decorator applies to oSender
+					if (!oDecorator) {												// If decorator was NOT set in previous iteration
+						oDecorator = o;													// Set it to the first value
+					} else {														// If decorator WAS set in previous iteration
+						if (o.decorates.prototype instanceof oDecorator.decorates) {	// IF o.decorates is closer to oSender in lineage
+							oDecorator = o;													// Set it as optimal decorator
 						}
 					}
 				}
 			}
-			
+
 			this._oDecorators[oSender.kind] = oDecorator;					// Hash decorator by sender kind
 			return oDecorator;
 		},
@@ -218,7 +220,7 @@ enyo.kind({
 			if (this._oOwner) {
 				switch (oEvent.type) {
 					case 'mousemove':
-						this.setPointerMode(true);
+						//this.setPointerMode(true);
 						if (this.getPointerMode()) {
 							oTarget = this._getTarget(oEvent.target.id);
 							if (oTarget) {
@@ -241,22 +243,27 @@ enyo.kind({
 				switch (oEvent.keyCode) {
 					case 13:
 					case 53: // TODO - hack to support old system
+						console.log('ENTER');
 						this._dispatchEvent('onSpotlightSelect', oEvent);
 						break;
 					case 37:
 					case 52: // TODO - hack to support old system
+						console.log('LEFT');
 						this._dispatchEvent('onSpotlightLeft', oEvent);
 						break;
 					case 38:
 					case 50: // TODO - hack to support old system
+						console.log('UP');
 						this._dispatchEvent('onSpotlightUp', oEvent);
 						break;
 					case 39:
 					case 54: // TODO - hack to support old system
+						console.log('RIGHT');
 						this._dispatchEvent('onSpotlightRight', oEvent);
 						break;
 					case 40:
 					case 56: // TODO - hack to support old system
+						console.log('DOWN');
 						this._dispatchEvent('onSpotlightDown', oEvent);
 						break;
 					default:
@@ -311,11 +318,12 @@ enyo.kind({
 		/************************************************************/
 		
 		onMoveTo: function(sDirection) {
-			var oControlLeft = this._getAdjacentControl(sDirection);
-			if (oControlLeft) {
-				this.spot(oControlLeft, sDirection);
+			var oControl = this._getAdjacentControl(sDirection);
+			//console.log('*MOVE', sDirection);
+			if (oControl) {
+				this.spot(oControl, sDirection); // here!!!!
 			} else {
-				this.spot(this.getParent(), sDirection);
+				this.spot(this.getParent(), sDirection); // not here
 			}
 		},
 		
@@ -329,7 +337,7 @@ enyo.kind({
 			if (aChildren.length == 0) {
 				this._dispatchEvent('ontap', null, oEvent.originator);
 			} else {
-				this.spot(aChildren[0]);
+				this.spot(aChildren[0]); // not here
 			}
 		},
 		
@@ -348,7 +356,7 @@ enyo.kind({
 		
 		onPoint: function(oEvent) {
 			if (oEvent.originator.spotlight != 'container') {
-				this.spot(oEvent.originator);
+				this.spot(oEvent.originator); // not here
 			}
 		},
 		
