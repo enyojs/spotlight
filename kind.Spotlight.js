@@ -24,13 +24,14 @@ enyo.kind({
 	/************************************************************/
 	
 	statics: {
-		_bPointerMode		: false,
-		_oCurrent			: null,		// Currently spotlighted element
-		_oOwner				: null,		// Component owner, usually application
-		_oDecorators		: {},		// For further optimization
-		_oLastEvent			: null,
-		_oLast5WayEvent		: null,
-		_nLastKey			: null,
+		_bPointerMode				: false,
+		_oCurrent					: null,		// Currently spotlighted element
+		_oOwner						: null,		// Component owner, usually application
+		_oDecorators				: {},		// For further optimization
+		_oLastEvent					: null,
+		_oLast5WayEvent				: null,
+		_nLastKey					: null,
+		_oLastSpotlightTrueControl 	: null,
 		
 		_testMode: false,
 		_testModeHighlightNodes: [],
@@ -47,8 +48,11 @@ enyo.kind({
 			if (typeof oControl._spotlight == 'undefined') {
 				oControl._spotlight = {};
 			}
-			console.log('CURRENT:', oControl.name);
+			//console.log('CURRENT:', oControl.name);
 			this._oCurrent = oControl;
+			if (oControl.spotlight === true) {
+				this._oLastSpotlightTrueControl = oControl;
+			}
 			this._dispatchEvent('onSpotlightFocused');
 			
 			if(this.getTestMode()) {
@@ -126,7 +130,6 @@ enyo.kind({
 				case 'UP':
 					return oBounds1.top >= oBounds2.top + oBounds2.height;
 				case 'DOWN':
-					console.log(oBounds1.top, ' + ', oBounds1.height, 'VS', oBounds2.top);
 					return oBounds1.top + oBounds1.height <= oBounds2.top;
 				case 'LEFT':
 					return oBounds1.left >= oBounds2.left + oBounds2.width;
@@ -280,8 +283,6 @@ enyo.kind({
 						nBestMatch = nPrecedence;
 						oBestMatch = o.siblings[n];
 					}
-				} else {
-					console.log('SKIP ADJACENT CONTROL:', o.siblings[n].name);
 				}
 			}
 			
@@ -330,13 +331,6 @@ enyo.kind({
 			if (this._oOwner) {
 				switch (oEvent.type) {
 					case 'mousemove':
-// <<<<<<< HEAD
-// 						//this.setPointerMode(true);
-// 						if (this.getPointerMode()) {
-// 							oTarget = this._getTarget(oEvent.target.id);
-// 							if (oTarget) {
-// 								this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-// =======
 						// Only register mousemove events if the clientx/y actually changed (avoid mousemove
 						// events thrown by scrolling, etc).
 						if(this.clientXYChanged(oEvent)) {
@@ -346,7 +340,6 @@ enyo.kind({
 								if (oTarget) {
 									this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 								}
-//>>>>>>> 1d424af2f59ead9aab9af1d508b3895ebcaaa200
 							}
 						}
 						break;
@@ -404,7 +397,7 @@ enyo.kind({
 		onSpotlightEvent: function(oEvent) {
 			this._oLastEvent = oEvent;
 			
-			// If decorator onSpotlight<Event> function return false - preventDefault)
+			// If decorator onSpotlight<Event> function return false - preventDefault 
 			if (!this._delegateSpotlightEvent(oEvent)) { return; }	
 
 			switch (oEvent.type) {
@@ -446,11 +439,16 @@ enyo.kind({
 		
 		onMoveTo: function(sDirection) {
 			var oControl = this._getAdjacentControl(sDirection);
-			//console.log('*MOVE', sDirection);
 			if (oControl) {
-				this.spot(oControl, sDirection); // here!!!!
+				this.spot(oControl, sDirection);
 			} else {
-				this.spot(this.getParent(), sDirection); // not here
+				var oParent = this.getParent();
+				if (typeof oParent.spotlight == 'undefined') { // App level
+					console.log('End of the world as we can spot it');
+					this.spot(this._oLastSpotlightTrueControl);
+				} else {
+					this.spot(this.getParent(), sDirection);
+				}
 			}
 		},
 		
@@ -464,7 +462,7 @@ enyo.kind({
 			if (aChildren.length == 0) {
 				this._dispatchEvent('ontap', null, oEvent.originator);
 			} else {
-				this.spot(aChildren[0]); // not here
+				this.spot(aChildren[0]);
 			}
 		},
 		
@@ -483,7 +481,7 @@ enyo.kind({
 		
 		onPoint: function(oEvent) {
 			if (oEvent.originator.spotlight != 'container') {
-				this.spot(oEvent.originator); // not here
+				this.spot(oEvent.originator);
 			}
 		},
 		
@@ -572,9 +570,7 @@ enyo.kind({
 			}
 			
 			if (oControl) {
-				//if (oControl.spotlight != 'container') {
-					oControl.addClass('spotlight');
-				//}
+				oControl.addClass('spotlight');
 				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl, sDirection);
 				return true;
 			}
@@ -594,6 +590,8 @@ enyo.kind({
 			return returnValue;
 		},
 		
+	
+	
 		/************************* TEST MODE *************************/
 		
 		/********************* PUBLIC *********************/

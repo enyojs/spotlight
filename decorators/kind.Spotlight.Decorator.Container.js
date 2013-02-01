@@ -76,25 +76,20 @@ enyo.kind({
 			this._initComponent(oSender);
 			
 			if (this._getFocus(oSender)) {												// Focus came from within
-				console.log('CONTAINER FOCUSEDDDDDD: (from within) ' , oSender.name);
 				var s5WayEventType	= enyo.Spotlight.getLast5WayEvent().type,
 					sDirection		= s5WayEventType.replace('onSpotlight','').toUpperCase();
 				
 				this._setFocus(oSender, false);
 				if (!(oSender.parent instanceof enyo.Panels)) {
-					console.log('case1');
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				} else if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
-					console.log('case2');
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
 			} else {																	// Focus came from without
-				console.log('CONTAINER FOCUSEDDDDDD: (from without)' , oSender.name);
 				var oLastFocusedChild = this._getLastFocusedChild(oSender);
-				console.log('CONTAINER:', oSender.name, 'LAST CHILD:', oLastFocusedChild.name);
 				if (oLastFocusedChild) {
-					enyo.Spotlight.spot(oLastFocusedChild); // not here
+					enyo.Spotlight.spot(oLastFocusedChild);
 				}
 				this._setFocus(oSender, true);
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);

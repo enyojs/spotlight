@@ -29,7 +29,8 @@ enyo.kind({
 		},
 		
 		_setCurrent: function(oSender, n, bScrollIntoView) {
-			var nCurrent = this._getCurrent(oSender);
+			var nCurrent = this._getCurrent(oSender),
+				node;
 			
 			if (nCurrent !== null) {
 				this._blurNode(oSender, nCurrent);
@@ -38,11 +39,17 @@ enyo.kind({
 			if (n !== null) {
 				this._focusNode(oSender, n);
 				oSender._nCurrentSpotlightItem = n;
-				if (bScrollIntoView) {
-					oSender.scrollIntoView({
-						hasNode	: function() { return true; },
-						node	: this._getNode(oSender, n)
-					}, false);
+				node = this._getNode(oSender, n);
+				if (node && !oSender.getStrategy().isInView(node)) {
+					if(oSender.animateToNode) {
+						oSender.animateToNode(node, true);
+					} else {
+						oSender.scrollIntoView({
+							hasNode : function() { return true; },
+							node    : this._getNode(oSender, n)
+						}, false);
+						
+					}
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
@@ -74,34 +81,38 @@ enyo.kind({
 		},
 	
 		onSpotlightDown: function(oSender, oEvent) {
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
-			if (nCurrent < oSender.getCount() - 1) {
-				this._setCurrent(oSender, nCurrent + 1, true);
-				return false;
+			if(oSender.orient && oSender.getOrient() === "h") {
+				this._setCurrent(oSender, null, true);
+			} else {
+				this._spotNextListItem(oSender, oEvent);
 			}
-			this._setCurrent(oSender, null, true);
 			return true;
 		},
 	
 		onSpotlightUp: function(oSender, oEvent) {
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
-			if (nCurrent > 0) {
-				this._setCurrent(oSender, nCurrent - 1, true);
-				return false;
+			if(oSender.orient && oSender.getOrient() === "h") {
+				this._setCurrent(oSender, null, true);
+			} else {
+				this._spotPreviousListItem(oSender, oEvent);
 			}
-			this._setCurrent(oSender, null, true);
 			return true;
 		},
 	
 		onSpotlightLeft: function(oSender, oEvent) {
-			this._setCurrent(oSender, null, true);
+			if(oSender.orient && oSender.getOrient() === "h") {
+				this._spotPreviousListItem(oSender, oEvent);
+			} else {
+				this._setCurrent(oSender, null, true);
+			}
 			return true;
 		},
 	
 		onSpotlightRight: function(oSender, oEvent) {
-			this._setCurrent(oSender, null, true);
+			if(oSender.orient && oSender.getOrient() === "h") {
+				this._spotNextListItem(oSender, oEvent);
+			} else {
+				this._setCurrent(oSender, null, true);
+			}
 			return true;
 		},
 	
@@ -109,5 +120,25 @@ enyo.kind({
 			this._setCurrent(oSender, oEvent.index);
 			return true;
 		},
+		
+		_spotNextListItem: function(oSender, oEvent) {
+			var nCurrent = this._getCurrent(oSender);
+			if (nCurrent === null) { return; }
+			if (nCurrent < oSender.getCount() - 1) {
+				this._setCurrent(oSender, nCurrent + 1, true);
+				return false;
+			}
+			this._setCurrent(oSender, null, true);
+		},
+		
+		_spotPreviousListItem: function(oSender, oEvent) {
+			var nCurrent = this._getCurrent(oSender);
+			if (nCurrent === null) { return; }
+			if (nCurrent > 0) {
+				this._setCurrent(oSender, nCurrent - 1, true);
+				return false;
+			}
+			this._setCurrent(oSender, null, true);
+		}
 	}
 });

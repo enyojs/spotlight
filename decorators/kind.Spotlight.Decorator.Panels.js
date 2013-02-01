@@ -12,7 +12,6 @@ enyo.kind({
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {
 			if (!this._isInitialized(oSender)) {
-				console.log('INIT', oSender.name);
 				this._setFocus(oSender, false);
 				this._initChildren(oSender);
 				enyo.Spotlight.Util.interceptEvents(oSender, this._handleChildEvents);
@@ -67,8 +66,7 @@ enyo.kind({
 		_setCurrent: function(oSender, n) {
 			oSender._spotlight.nCurrent = n;
 			oSender.setIndex(n);
-			console.log('PANELS: Setting current', n);
-			enyo.Spotlight.spot(oSender.children[n]); // not here
+			enyo.Spotlight.spot(oSender.children[n]);
 		},
 		
 		_getCurrent: function(oSender) {
@@ -106,7 +104,6 @@ enyo.kind({
 			
 			switch (oEvent.direction) {
 				case 'LEFT':
-					console.log('PANEL LEAVE -> LEFT');
 					if (this._handleLeft(oSender)) {
 						this._setFocus(oSender, false);
 						return false;
@@ -114,7 +111,6 @@ enyo.kind({
 					sEvent = 'onSpotlightLeft';
 					break;
 				case 'RIGHT':
-					console.log('PANEL LEAVE -> RIGHT');
 					if (this._handleRight(oSender)) {
 						this._setFocus(oSender, false);
 						return false;
@@ -143,14 +139,10 @@ enyo.kind({
 			this._initComponent(oSender);
 			
 			if (this._getFocus(oSender)) {												// Focus came from within
-				console.log('PANELS: FOCUSED', oSender.name, '(from within)');
 				this._setFocus(oSender, false);
 			} else {																	// Focus came from without
-				console.log('PANELS: FOCUSED', oSender.name, '(from without)');
 				var oLastFocusedChild = this._getLastFocusedChild(oSender);
-				console.log('PANELS:', oSender.name, 'LAST CHILD:', oLastFocusedChild.name);
 				if (oLastFocusedChild) {
-					console.log('SPOTTING', oLastFocusedChild.name);
 					enyo.Spotlight.spot(oLastFocusedChild);
 				}
 				this._setFocus(oSender, true);
