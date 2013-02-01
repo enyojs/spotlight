@@ -1,9 +1,8 @@
 /**
- * enyo.Spotlight.Decorator.GridList kind definition
- * @author: Surya Vakkalanka
- * 
- * ********** TODO: This is a copy of List decorator. 
- * ********** Ideally, we should be able to inherit decorators from parent kinds and simply override functions that are specific to the overridden decorator
+ 	enyo.Spotlight.Decorator.GridList kind definition
+ 	
+ 	TODO: This is a copy of List decorator. 
+	Ideally, we should be able to inherit decorators from parent kinds and simply override functions that are specific to the overridden decorator
  */
 
 enyo.kind({
@@ -12,6 +11,12 @@ enyo.kind({
 	statics: {
 		decorates: enyo.GridList,
 	
+		_getNodeParent: function(oSender, n) {
+			if (oSender.$.generator.hasNode()) {
+				return oSender.$.generator.node.querySelector('[data-enyo-index="' + n + '"]');
+			}
+		},
+
 		_getNode: function(oSender, n) {
 			if (oSender.$.generator.hasNode()) {
 				return oSender.$.generator.node.querySelector('[data-enyo-index="' + n + '"] > .moon-gridlist-item');
@@ -46,7 +51,7 @@ enyo.kind({
 				if (bScrollIntoView) {
 					oSender.scrollIntoView({
 						hasNode	: function() { return true; },
-						node	: this._getNode(oSender, n)
+						node	: this._getNodeParent(oSender, n)
 					}, false);
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
@@ -84,10 +89,12 @@ enyo.kind({
 			var nCurrent = this._getCurrent(oSender);
 			if (nCurrent === null) { return; }
 			var nNew = nCurrent + oSender.itemsPerRow;
-			if (nNew >= oSender.count)
-				nNew = nCurrent;
-			this._setCurrent(oSender, nNew, true);
-			return false;
+			if (nNew < oSender.getCount() - 1) {
+				this._setCurrent(oSender, nNew, true);
+				return false;
+			}
+			this._setCurrent(oSender, null, true);
+			return true;
 		},
 	
 		onSpotlightUp: function(oSender, oEvent) {
@@ -95,10 +102,12 @@ enyo.kind({
 			var nCurrent = this._getCurrent(oSender);
 			if (nCurrent === null) { return; }
 			var nNew = nCurrent - oSender.itemsPerRow;
-			if (nNew < 0)
-				nNew = nCurrent;
-			this._setCurrent(oSender, nNew, true);
-			return false;	
+			if (nNew > 0) {
+				this._setCurrent(oSender, nNew, true);
+				return false;
+			}
+			this._setCurrent(oSender, null, true);
+			return true;
 		},
 	
 		onSpotlightLeft: function(oSender, oEvent) {
