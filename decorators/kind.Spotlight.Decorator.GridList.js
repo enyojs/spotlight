@@ -49,10 +49,13 @@ enyo.kind({
 				this._focusNode(oSender, n);
 				oSender._nCurrentSpotlightItem = n;
 				if (bScrollIntoView) {
-					oSender.scrollIntoView({
-						hasNode	: function() { return true; },
-						node	: this._getNodeParent(oSender, n)
-					}, false);
+					var nd = this._getNodeParent(oSender, n);
+					if (!oSender.$.strategy.isInView(nd)) {
+						oSender.scrollIntoView({
+							hasNode	: function() { return true; },
+							node	: nd
+							}, false);
+					}
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
