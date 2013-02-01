@@ -32,6 +32,8 @@ enyo.kind({
 		_oLast5WayEvent				: null,
 		_nLastKey					: null,
 		_oLastSpotlightTrueControl 	: null,
+		_oLastSpotlightTrueControl5Way : null,
+		_bCanFocus					: true,
 		
 		_testMode: false,
 		_testModeHighlightNodes: [],
@@ -52,10 +54,13 @@ enyo.kind({
 			this._oCurrent = oControl;
 			if (oControl.spotlight === true) {
 				this._oLastSpotlightTrueControl = oControl;
+				if (!this.getPointerMode() || !this._oLastSpotlightTrueControl5Way) {
+					this._oLastSpotlightTrueControl5Way = oControl;
+				}
 			}
 			this._dispatchEvent('onSpotlightFocused');
 			
-			if(this.getTestMode()) {
+			if (this.getTestMode()) {
 				this._doTestModeHighlighting();
 			}
 			
@@ -172,8 +177,8 @@ enyo.kind({
 				?	oBounds2.top + oBounds2.height
 				:	oBounds2.top;
 				
-			if(oBounds1.left < oBounds2.left) {
-				if(oBounds1.left + oBounds1.width < oBounds2.left) {
+			if (oBounds1.left < oBounds2.left) {
+				if (oBounds1.left + oBounds1.width < oBounds2.left) {
 					x1 = oBounds1.left + oBounds1.width;
 					x2 = oBounds2.left;
 				} else {
@@ -181,7 +186,7 @@ enyo.kind({
 					x2 = oBounds2.left;
 				}
 			} else {
-				if(oBounds1.left > oBounds2.left + oBounds2.width) {
+				if (oBounds1.left > oBounds2.left + oBounds2.width) {
 					x1 = oBounds1.left;
 					x2 = oBounds2.left + oBounds2.left;
 				} else {
@@ -204,8 +209,8 @@ enyo.kind({
 				?	oBounds2.left + oBounds2.width
 				:	oBounds2.left;
 				
-			if(oBounds1.top < oBounds2.top) {
-				if(oBounds1.top + oBounds1.height < oBounds2.top) {
+			if (oBounds1.top < oBounds2.top) {
+				if (oBounds1.top + oBounds1.height < oBounds2.top) {
 					y1 = oBounds1.top + oBounds1.height;
 					y2 = oBounds2.top;
 				} else {
@@ -213,7 +218,7 @@ enyo.kind({
 					y2 = oBounds2.top;
 				}
 			} else {
-				if(oBounds1.top > oBounds2.top + oBounds2.height) {
+				if (oBounds1.top > oBounds2.top + oBounds2.height) {
 					y1 = oBounds1.top;
 					y2 = oBounds2.top + oBounds2.height;
 				} else {
@@ -333,12 +338,21 @@ enyo.kind({
 					case 'mousemove':
 						// Only register mousemove events if the clientx/y actually changed (avoid mousemove
 						// events thrown by scrolling, etc).
-						if(this.clientXYChanged(oEvent)) {
+						if (this.clientXYChanged(oEvent)) {
 							this.setPointerMode(true);
 							if (this.getPointerMode()) {
 								oTarget = this._getTarget(oEvent.target.id);
 								if (oTarget) {
 									this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+									if (oTarget.spotlight !== true) {
+										this._bCanFocus = false;
+										this.unspot();
+									} else {
+										this._bCanFocus = true;
+									}
+								} else {
+									this._bCanFocus = false;
+									this.unspot();
 								}
 							}
 						}
@@ -355,6 +369,12 @@ enyo.kind({
 		onKeyEvent: function(oEvent) {
 			var validKey = false;
 			this.setPointerMode(false);
+			
+			if (!this._bCanFocus) {	// Comming back from pointer mode, show control once before continue navigation
+				this._bCanFocus = true;
+				this.spot(this._oLastSpotlightTrueControl5Way);
+				return;
+			}
 			if (!this.getPointerMode()) {
 				switch (oEvent.keyCode) {
 					case 13:
@@ -386,7 +406,7 @@ enyo.kind({
 						break;
 				}
 			}
-			if(validKey) {
+			if (validKey) {
 				// If the key pressed was used by Spotlight, prevent default to keep the
 				// browser from scrolling the page, etc.
 				oEvent.preventDefault();
@@ -444,7 +464,7 @@ enyo.kind({
 			} else {
 				var oParent = this.getParent();
 				if (typeof oParent.spotlight == 'undefined') { // App level
-					console.log('End of the world as we can spot it');
+					//console.log('End of the world as we can spot it');
 					this.spot(this._oLastSpotlightTrueControl);
 				} else {
 					this.spot(this.getParent(), sDirection);
@@ -502,7 +522,12 @@ enyo.kind({
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
-			return (typeof oControl.spotlight != 'undefined' && oControl.spotlight && oControl.getAbsoluteShowing() && !(oControl.disabled));
+			return (
+				typeof oControl.spotlight != 'undefined' 	&& 
+				oControl.spotlight 							&& 
+				oControl.getAbsoluteShowing() 				&& 
+				!(oControl.disabled)
+			);
 		},
 		
 		// Returns spottable chldren along with position of self 
@@ -558,6 +583,9 @@ enyo.kind({
 		
 		// Dispatches focus event to the control or it's first spottable child
 		spot: function(oControl, sDirection) {
+			if (!this._bCanFocus) {
+				return false;
+			}
 			if (this._oCurrent && !this.isSpottable(oControl)) {
 				return false;
 			}
@@ -576,6 +604,12 @@ enyo.kind({
 			}
 			
 			return false;
+		},
+		
+		unspot: function() {
+			if (this._oCurrent) {
+				this._dispatchEvent('onSpotlightBlur', null, this._oCurrent);
+			}
 		},
 		
 		getFirstChild: function(oControl) {
@@ -604,7 +638,7 @@ enyo.kind({
 		
 		//* When _this._testMode_ changes, either do highlighting or destroy highlight nodes
 		testModeChanged: function() {
-			if(this._testMode === true) {
+			if (this._testMode === true) {
 				this._doTestModeHighlighting();
 			} else {
 				this._destroyExistingHighlightNodes();
@@ -627,8 +661,8 @@ enyo.kind({
 		
 		//* Destroy all highlight elements
 		_destroyExistingHighlightNodes: function() {
-			for(var i=0;i<this._testModeHighlightNodes.length;i++) {
-				if(this._testModeHighlightNodes[i]) {
+			for (var i=0;i<this._testModeHighlightNodes.length;i++) {
+				if (this._testModeHighlightNodes[i]) {
 					this._testModeHighlightNodes[i].destroy();
 				}
 			}
@@ -643,22 +677,22 @@ enyo.kind({
 		//* Highlight controls adjacent to the current spotlighted controls and add them to _this._testModeHighlightNodes_
 		_highlightAdjacentControls: function() {
 			var controls = this._removeDuplicateHighlightNodes([{
-					control: this._getAdjacentControl('UP', this.getCurrent()),
-					str: 'U'
+					control	: this._getAdjacentControl('UP', this.getCurrent()),
+					str		: 'U'
 				},{
-					control: this._getAdjacentControl('DOWN', this.getCurrent()),
-					str: 'D'
+					control	: this._getAdjacentControl('DOWN', this.getCurrent()),
+					str		: 'D'
 				},{
-					control: this._getAdjacentControl('LEFT', this.getCurrent()),
-					str: 'L'
+					control	: this._getAdjacentControl('LEFT', this.getCurrent()),
+					str		: 'L'
 				},{
-					control: this._getAdjacentControl('RIGHT', this.getCurrent()),
-					str: 'R'
+					control	: this._getAdjacentControl('RIGHT', this.getCurrent()),
+					str		: 'R'
 				}
 			]);
 			
-			for(var i=0;i<controls.length;i++) {
-				if(!controls[i]) {
+			for (var i=0; i<controls.length; i++) {
+				if (!controls[i]) {
 					continue;
 				}
 				this._testModeHighlightNodes.push(this._addConrolHighlightNode(controls[i]));
@@ -673,17 +707,17 @@ enyo.kind({
 			var returnControls = [],
 				dupeOf = -1;
 			
-			for(var i=0;i<inControls.length;i++) {
+			for (var i=0; i<inControls.length; i++) {
 				dupeOf = -1;
 				
-				for(var j=0;j<inControls.length;j++) {
-					if(inControls[i].control === inControls[j].control && inControls[i].str !== inControls[j].str) {
+				for (var j=0; j<inControls.length; j++) {
+					if (inControls[i].control === inControls[j].control && inControls[i].str !== inControls[j].str) {
 						dupeOf = j;
 						break;
 					}
 				}
 				
-				if(dupeOf > -1) {
+				if (dupeOf > -1) {
 					inControls[i].str += ',' + inControls[dupeOf].str
 					inControls.splice(dupeOf,1);
 				}
@@ -696,7 +730,7 @@ enyo.kind({
 		
 		//* Create a new control with styling to highlight current or adjacent spotlight nodes.
 		_addConrolHighlightNode: function(inObj) {
-			if(!inObj || !inObj.control || !inObj.control.hasNode()) {
+			if (!inObj || !inObj.control || !inObj.control.hasNode()) {
 				return null;
 			}
 			
