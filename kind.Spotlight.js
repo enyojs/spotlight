@@ -38,8 +38,8 @@ enyo.kind({
 		_testMode: false,
 		_testModeHighlightNodes: [],
 		
-		_prevClientX: null,
-		_prevClientY: null,
+		_nPrevClientX: null,
+		_nPrevClientY: null,
 		
 		_error: function(s) {
 			throw 'enyo.Spotlight: ' + s;
@@ -50,12 +50,16 @@ enyo.kind({
 			if (typeof oControl._spotlight == 'undefined') {
 				oControl._spotlight = {};
 			}
+			if (this._oCurrent === oControl) {
+				return true;
+			}
 			//console.log('CURRENT:', oControl.name);
 			this._oCurrent = oControl;
 			if (oControl.spotlight === true) {
 				this._oLastSpotlightTrueControl = oControl;
 				if (!this.getPointerMode() || !this._oLastSpotlightTrueControl5Way) {
 					this._oLastSpotlightTrueControl5Way = oControl;
+					//console.log('Setting LSTC5W:', oControl.name);
 				}
 			}
 			this._dispatchEvent('onSpotlightFocused');
@@ -332,29 +336,11 @@ enyo.kind({
 		// Events dispatched to the spotlighted controls
 		onEvent: function(oEvent) {
 			var oTarget = null;
-			// Events only processed when Spotlight initialized with an owner
-			if (this._oOwner) {
+			if (this._oOwner) {												// Events only processed when Spotlight initialized with an owner
 				switch (oEvent.type) {
 					case 'mousemove':
-						// Only register mousemove events if the clientx/y actually changed (avoid mousemove
-						// events thrown by scrolling, etc).
-						if (this.clientXYChanged(oEvent)) {
-							this.setPointerMode(true);
-							if (this.getPointerMode()) {
-								oTarget = this._getTarget(oEvent.target.id);
-								if (oTarget) {
-									this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-									if (oTarget.spotlight !== true) {
-										this._bCanFocus = false;
-										this.unspot();
-									} else {
-										this._bCanFocus = true;
-									}
-								} else {
-									this._bCanFocus = false;
-									this.unspot();
-								}
-							}
+						if (this.clientXYChanged(oEvent)) {					// Only register mousemove if the x/y actually changed, avoid mousemove while scrolling, etc.
+							this.onMouseMove(oEvent);
 						}
 						break;
 					case 'keydown':
@@ -365,12 +351,31 @@ enyo.kind({
 			}
 		},
 		
+		// Called by onEvent() to process mousemove events
+		onMouseMove: function(oEvent) {
+			this.setPointerMode(true);  								// Preserving explicit setting of mode for future features
+			if (this.getPointerMode()) {
+				oTarget = this._getTarget(oEvent.target.id);
+				if (oTarget) {
+					this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+					if (oTarget.spotlight !== true) {
+						this._bCanFocus = false;
+						this.unspot();
+					} else {
+						this._bCanFocus = true;
+					}
+				} else {
+					this._bCanFocus = false;
+					this.unspot();
+				}
+			}
+		},
+		
 		// Called from enyo.Spotlight.Accelerator which handles accelerated keyboard event
 		onKeyEvent: function(oEvent) {
 			var validKey = false;
-			this.setPointerMode(false);
-			
-			if (!this._bCanFocus) {	// Comming back from pointer mode, show control once before continue navigation
+			this.setPointerMode(false);										// Preserving explicit setting of mode for future features
+			if (!this._bCanFocus) {											// Comming back from pointer mode, show control once before continue navigation
 				this._bCanFocus = true;
 				this.spot(this._oLastSpotlightTrueControl5Way);
 				return;
@@ -618,10 +623,15 @@ enyo.kind({
 		},
 		
 		clientXYChanged: function(oEvent) {
-			var returnValue = (this._prevClientX !== oEvent.clientX || this._prevClientY !== oEvent.clientY);
-			this._prevClientX = oEvent.clientX;
-			this._prevClientY = oEvent.clientY;
-			return returnValue;
+			var bChanged = (
+				this._nPrevClientX !== oEvent.clientX || 
+				this._nPrevClientY !== oEvent.clientY
+			);
+			
+			this._nPrevClientX = oEvent.clientX;
+			this._nPrevClientY = oEvent.clientY;
+			
+			return bChanged;
 		},
 		
 	
