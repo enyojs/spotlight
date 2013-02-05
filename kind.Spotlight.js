@@ -383,27 +383,22 @@ enyo.kind({
 			if (!this.getPointerMode()) {
 				switch (oEvent.keyCode) {
 					case 13:
-					case 53: // TODO - hack to support old system
 						validKey = true
 						this._dispatchEvent('onSpotlightSelect', oEvent);
 						break;
 					case 37:
-					case 52: // TODO - hack to support old system
 						validKey = true
 						this._dispatchEvent('onSpotlightLeft', oEvent);
 						break;
 					case 38:
-					case 50: // TODO - hack to support old system
 						validKey = true
 						this._dispatchEvent('onSpotlightUp', oEvent);
 						break;
 					case 39:
-					case 54: // TODO - hack to support old system
 						validKey = true
 						this._dispatchEvent('onSpotlightRight', oEvent);
 						break;
 					case 40:
-					case 56: // TODO - hack to support old system
 						validKey = true
 						this._dispatchEvent('onSpotlightDown', oEvent);
 						break;
