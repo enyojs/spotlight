@@ -48,7 +48,6 @@ enyo.kind({
 							hasNode : function() { return true; },
 							node    : this._getNode(oSender, n)
 						}, false);
-						
 					}
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
@@ -81,7 +80,7 @@ enyo.kind({
 		},
 	
 		onSpotlightDown: function(oSender, oEvent) {
-			if(oSender.orient && oSender.getOrient() === "h") {
+			if(oSender.getOrient && oSender.getOrient() === "h") {
 				this._setCurrent(oSender, null, true);
 			} else {
 				this._spotNextListItem(oSender, oEvent);
@@ -90,7 +89,7 @@ enyo.kind({
 		},
 	
 		onSpotlightUp: function(oSender, oEvent) {
-			if(oSender.orient && oSender.getOrient() === "h") {
+			if(oSender.getOrient && oSender.getOrient() === "h") {
 				this._setCurrent(oSender, null, true);
 			} else {
 				this._spotPreviousListItem(oSender, oEvent);
@@ -99,7 +98,7 @@ enyo.kind({
 		},
 	
 		onSpotlightLeft: function(oSender, oEvent) {
-			if(oSender.orient && oSender.getOrient() === "h") {
+			if(oSender.getOrient && oSender.getOrient() === "h") {
 				this._spotPreviousListItem(oSender, oEvent);
 			} else {
 				this._setCurrent(oSender, null, true);
@@ -108,7 +107,7 @@ enyo.kind({
 		},
 	
 		onSpotlightRight: function(oSender, oEvent) {
-			if(oSender.orient && oSender.getOrient() === "h") {
+			if(oSender.getOrient && oSender.getOrient() === "h") {
 				this._spotNextListItem(oSender, oEvent);
 			} else {
 				this._setCurrent(oSender, null, true);
