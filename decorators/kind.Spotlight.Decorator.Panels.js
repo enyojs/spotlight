@@ -49,7 +49,7 @@ enyo.kind({
 				case 'onSpotlightLeft':
 					break;
 				case 'tap':
-					enyo.Spotlight.Decorator.Panels._setCurrentByReference(oSender, oEvent.originator);
+					enyo.Spotlight.Decorator.Panels.setCurrentPanel(oSender, oEvent.originator);
 					break;
 			}
 			return true;
@@ -67,59 +67,24 @@ enyo.kind({
 		
 		// What child of container was last focused?
 		_getLastFocusedChild: function(oSender) {
-			return oSender.getPanels()[this._getCurrent(oSender)];
-		},
-		
-		_setCurrentByReference: function(oSender, oCurrent) {
-			var oParent = oCurrent,
-				n		= 0;
-				
-			while (oParent.parent && oParent.parent !== oSender) {
-				oParent = oParent.parent;
-			}
-			
-			for (;n<oSender.getPanels().length; n++) {
-				if (oSender.getPanels()[n] == oParent) {
-					break;
-				}
-			}
-			
-			this._setCurrent(oSender, n);
-			enyo.Spotlight.spot(oCurrent);
-		},
-		
-		_setCurrent: function(oSender, n) {
-			oSender.setIndex(n);
-			oSender.getPanels()[n].spotlight = 'container';
-			enyo.Spotlight.spot(oSender.getPanels()[n]);
-			enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
-		},
-		
-		_getCurrent: function(oSender) {
-			var n = 0;
-			for (; n<oSender.getPanels().length; n++) {
-				if (oSender.getPanels()[n] == enyo.Spotlight.getCurrent()) {
-					return n;
-				}
-			}
-			return 0;
+			return oSender.getPanels()[this.getCurrent(oSender)];
 		},
 		
 		_handleRight: function(oSender) {
-			var nCurrent = this._getCurrent(oSender);
+			var nCurrent = this.getCurrent(oSender);
 			enyo.Spotlight.Util.dispatchEvent('onSpotlightNext', {index: nCurrent + 1}, oSender);
 			if (nCurrent < oSender.getPanels().length - 1) {
-				this._setCurrent(oSender, nCurrent + 1);
+				this.setCurrent(oSender, nCurrent + 1);
 				return true;
 			}
 			return false;
 		},
 		
 		_handleLeft: function(oSender) {
-			var nCurrent = this._getCurrent(oSender);
+			var nCurrent = this.getCurrent(oSender);
 			enyo.Spotlight.Util.dispatchEvent('onSpotlightPrevious', {index: nCurrent - 1}, oSender);
 			if (nCurrent > 0) {
-				this._setCurrent(oSender, nCurrent - 1);
+				this.setCurrent(oSender, nCurrent - 1);
 				return true;
 			}
 			return false;
@@ -180,5 +145,45 @@ enyo.kind({
 			
 			return true;
 		},
+		
+		// Given any spottable element within a panel (2nd arg), sets that panel current
+		setCurrentPanel: function(oSender, oCurrent) {
+			var oParent = oCurrent,
+				n		= 0;
+				
+			while (oParent.parent && oParent.parent !== oSender) {
+				oParent = oParent.parent;
+			}
+			
+			for (;n<oSender.getPanels().length; n++) {
+				if (oSender.getPanels()[n] == oParent) {
+					break;
+				}
+			}
+			
+			this.setCurrent(oSender, n);
+			enyo.Spotlight.spot(oCurrent);
+		},
+		
+		getCurrentPanel: function(oSender) {
+			return oSender.getPanels()[this.getCurrent(oSender)];
+		},
+		
+		setCurrent: function(oSender, n) {
+			oSender.setIndex(n);
+			oSender.getPanels()[n].spotlight = 'container';
+			enyo.Spotlight.spot(oSender.getPanels()[n]);
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
+		},
+		
+		getCurrent: function(oSender) {
+			var n = 0;
+			for (; n<oSender.getPanels().length; n++) {
+				if (oSender.getPanels()[n] == enyo.Spotlight.getCurrent()) {
+					return n;
+				}
+			}
+			return 0;
+		}
 	}
 });
