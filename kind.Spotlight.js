@@ -58,7 +58,7 @@ enyo.kind({
 			if (oControl.spotlight === true) {
 				this._oLastSpotlightTrueControl = oControl;
 				if (!this.getPointerMode() || !this._oLastSpotlightTrueControl5Way) {
-					this._oLastSpotlightTrueControl5Way = oControl;
+					this.setLast5WayControl(oControl);
 					//console.log('Setting LSTC5W:', oControl.name);
 				}
 			}
@@ -524,6 +524,7 @@ enyo.kind({
 		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 	},
 		getLastEvent	 	: function() 				{ return this._oLastEvent; 	 			},
 		getLast5WayEvent 	: function() 				{ return this._oLast5WayEvent;  		},
+		setLast5WayControl	: function(oControl)		{ this._oLastSpotlightTrueControl5Way = oControl; },
 		
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();

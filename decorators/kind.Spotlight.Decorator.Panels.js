@@ -1,6 +1,10 @@
 /**
  * enyo.Spotlight.Decorator.Panels kind definition
  * @author: Lex Podgorny
+ * Dispatches following events:
+ * 	onSpotlightNext 	 {index: attemptedIndex} - fired when keyboard attempts to navigate to the next panel
+ * 	onSpotlightPrevious  {index: attemptedIndex} - fired when keyboard attempts to navigate to the previous panel
+ *	onSpotlightItemFocus {index: currentIndex}   - fired when panel is focused in either 5way or pointer modes
  */
 
 enyo.kind({
@@ -24,11 +28,11 @@ enyo.kind({
 		},
 		
 		_initChildren: function(oSender) {
-			var nLength = oSender.children.length,
+			var nLength = oSender.getPanels().length,
 				n 		= 0;
 				
 			for (;n<nLength; n++) {
-				oSender.children[n].spotlight = 'container';
+				oSender.getPanels()[n].spotlight = 'container';
 			}
 		},
 		
@@ -43,6 +47,9 @@ enyo.kind({
 				case 'onSpotlightFocus':
 					break;
 				case 'onSpotlightLeft':
+					break;
+				case 'tap':
+					enyo.Spotlight.Decorator.Panels._setCurrentByReference(oSender, oEvent.originator);
 					break;
 			}
 			return true;
@@ -60,25 +67,48 @@ enyo.kind({
 		
 		// What child of container was last focused?
 		_getLastFocusedChild: function(oSender) {
-			return oSender.children[this._getCurrent(oSender)];
+			return oSender.getPanels()[this._getCurrent(oSender)];
+		},
+		
+		_setCurrentByReference: function(oSender, oCurrent) {
+			var oParent = oCurrent,
+				n		= 0;
+				
+			while (oParent.parent && oParent.parent !== oSender) {
+				oParent = oParent.parent;
+			}
+			
+			for (;n<oSender.getPanels().length; n++) {
+				if (oSender.getPanels()[n] == oParent) {
+					break;
+				}
+			}
+			
+			this._setCurrent(oSender, n);
+			enyo.Spotlight.spot(oCurrent);
 		},
 		
 		_setCurrent: function(oSender, n) {
-			oSender._spotlight.nCurrent = n;
 			oSender.setIndex(n);
-			enyo.Spotlight.spot(oSender.children[n]);
+			oSender.getPanels()[n].spotlight = 'container';
+			enyo.Spotlight.spot(oSender.getPanels()[n]);
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 		},
 		
 		_getCurrent: function(oSender) {
-			if (typeof oSender._spotlight.nCurrent != 'undefined') {
-				return oSender._spotlight.nCurrent;
+			var n = 0;
+			for (; n<oSender.getPanels().length; n++) {
+				if (oSender.getPanels()[n] == enyo.Spotlight.getCurrent()) {
+					return n;
+				}
 			}
 			return 0;
 		},
 		
 		_handleRight: function(oSender) {
 			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent < oSender.children.length - 1) {
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightNext', {index: nCurrent + 1}, oSender);
+			if (nCurrent < oSender.getPanels().length - 1) {
 				this._setCurrent(oSender, nCurrent + 1);
 				return true;
 			}
@@ -87,6 +117,7 @@ enyo.kind({
 		
 		_handleLeft: function(oSender) {
 			var nCurrent = this._getCurrent(oSender);
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightPrevious', {index: nCurrent - 1}, oSender);
 			if (nCurrent > 0) {
 				this._setCurrent(oSender, nCurrent - 1);
 				return true;
@@ -101,7 +132,6 @@ enyo.kind({
 		
 		onSpotlightPanelLeave: function(oSender, oEvent) {
 			var sEvent;
-			
 			switch (oEvent.direction) {
 				case 'LEFT':
 					if (this._handleLeft(oSender)) {
