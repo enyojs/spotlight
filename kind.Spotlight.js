@@ -93,6 +93,11 @@ enyo.kind({
 				return enyo.Spotlight.Decorator['Container'];
 			}
 			
+			if (oSender.spotlightDecorate == false) {
+				// console.log(oSender.name, 'skipping decoration');
+				return null;
+			}
+			
 			if (typeof this._oDecorators[oSender.kind] != 'undefined') {
 				return this._oDecorators[oSender.kind];
 			}

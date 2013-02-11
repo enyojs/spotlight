@@ -6,7 +6,7 @@
  * 	onSpotlightPrevious  {index: attemptedIndex} - fired when keyboard attempts to navigate to the previous panel
  *	onSpotlightItemFocus {index: currentIndex}   - fired when panel is focused in either 5way or pointer modes
  */
-
+if (false) {
 enyo.kind({
 	name: 'enyo.Spotlight.Decorator.Panels',
 	
@@ -187,3 +187,4 @@ enyo.kind({
 		}
 	}
 });
+}
