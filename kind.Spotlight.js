@@ -393,20 +393,24 @@ enyo.kind({
 						validKey = ret;
 						break;
 					case 37:
-						validKey = true;
+						oEvent.validKey = true;
 						ret = this._dispatchEvent('onSpotlightLeft', oEvent);
+						validKey = oEvent.validKey;
 						break;
 					case 38:
-						validKey = true;
+						oEvent.validKey = true;
 						ret = this._dispatchEvent('onSpotlightUp', oEvent);
+						validKey = oEvent.validKey;
 						break;
 					case 39:
-						validKey = true;
+						oEvent.validKey = true;
 						ret = this._dispatchEvent('onSpotlightRight', oEvent);
+						validKey = oEvent.validKey;
 						break;
 					case 40:
-						validKey = true;
+						oEvent.validKey = true;
 						ret = this._dispatchEvent('onSpotlightDown', oEvent);
+						validKey = oEvent.validKey;
 						break;
 					default:
 						break;

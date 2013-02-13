@@ -10,11 +10,15 @@ enyo.kind({
 		/************ PUBLIC *************/
 
 		dispatchEvent: function(sEvent, oData, oControl) {
-			oData 			 = oData ? enyo.clone(oData) : {};
-			oData.type 		 = sEvent;
-			oData.originator = oControl;
+			var nData		 = oData ? enyo.clone(oData) : {};
+			nData.type 		 = sEvent;
+			nData.originator = oControl;
 
-			return oControl.dispatchBubble(sEvent, oData, oControl);
+			var ret = oControl.dispatchBubble(sEvent, nData, oControl);
+			if (typeof nData.validKey != 'undefined') {
+				oData.validKey = nData.validKey;
+			}			
+			return ret;
 		},
 
 		// Attach event hook to capture events coming from within the container
