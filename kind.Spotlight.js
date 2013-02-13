@@ -24,16 +24,16 @@ enyo.kind({
 	/************************************************************/
 	
 	statics: {
-		_bPointerMode				: false,
-		_oCurrent					: null,		// Currently spotlighted element
-		_oOwner						: null,		// Component owner, usually application
-		_oDecorators				: {},		// For further optimization
-		_oLastEvent					: null,
-		_oLast5WayEvent				: null,
-		_nLastKey					: null,
-		_oLastSpotlightTrueControl 	: null,
-		_oLastSpotlightTrueControl5Way : null,
-		_bCanFocus					: true,
+		_bPointerMode					: false,
+		_oCurrent						: null,		// Currently spotlighted element
+		_oOwner							: null,		// Component owner, usually application
+		_oDecorators					: {},		// For further optimization
+		_oLastEvent						: null,
+		_oLast5WayEvent					: null,
+		_nLastKey						: null,
+		_oLastSpotlightTrueControl 		: null,
+		_oLastSpotlightTrueControl5Way 	: null,
+		_bCanFocus						: true,		// Flag reserved for hiding focus when entering pointer mode
 		
 		_testMode: false,
 		_testModeHighlightNodes: [],
@@ -602,7 +602,6 @@ enyo.kind({
 			if (!this.isSpottable(oControl)) {
 				oControl = this.getFirstChild(oControl);
 			}
-			
 			if (oControl) {
 				oControl.addClass('spotlight');
 				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl, sDirection);
