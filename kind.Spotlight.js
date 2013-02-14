@@ -389,28 +389,24 @@ enyo.kind({
 			if (!this.getPointerMode()) {
 				switch (oEvent.keyCode) {
 					case 13:
+						validKey = true;
 						ret = this._dispatchEvent('onSpotlightSelect', oEvent);
-						validKey = ret;
 						break;
 					case 37:
-						oEvent.validKey = true;
+						validKey = true;
 						ret = this._dispatchEvent('onSpotlightLeft', oEvent);
-						validKey = oEvent.validKey;
 						break;
 					case 38:
-						oEvent.validKey = true;
+						validKey = true;
 						ret = this._dispatchEvent('onSpotlightUp', oEvent);
-						validKey = oEvent.validKey;
 						break;
 					case 39:
-						oEvent.validKey = true;
+						validKey = true;
 						ret = this._dispatchEvent('onSpotlightRight', oEvent);
-						validKey = oEvent.validKey;
 						break;
 					case 40:
-						oEvent.validKey = true;
+						validKey = true;
 						ret = this._dispatchEvent('onSpotlightDown', oEvent);
-						validKey = oEvent.validKey;
 						break;
 					default:
 						break;
