@@ -1,6 +1,7 @@
 /**
  * Spotlight kind definition
  * @author: Lex Podgorny
+ * 
  */
 
 enyo.kind({
@@ -40,10 +41,6 @@ enyo.kind({
 
 		_nPrevClientX: null,
 		_nPrevClientY: null,
-
-		_error: function(s) {
-			throw 'enyo.Spotlight: ' + s;
-		},
 
 		_setCurrent: function(oControl) {
 			// Create control-specific spotlight state storage
@@ -378,92 +375,79 @@ enyo.kind({
 
 		// Called from enyo.Spotlight.Accelerator which handles accelerated keyboard event
 		onKeyEvent: function(oEvent) {
-			var validKey = false;
-			var ret = false;
+			var b5WayKey = false;
+			var bResult  = false;
+			
 			this.setPointerMode(false);										// Preserving explicit setting of mode for future features
+			
 			if (!this._bCanFocus) {											// Comming back from pointer mode, show control once before continue navigation
 				this._bCanFocus = true;
 				this.spot(this._oLastSpotlightTrueControl5Way);
 				return false;
 			}
+			
 			if (!this.getPointerMode()) {
 				switch (oEvent.keyCode) {
 					case 13:
-						validKey = true;
-						ret = this._dispatchEvent('onSpotlightSelect', oEvent);
+						b5WayKey = true;
+						bResult = this._dispatchEvent('onSpotlightSelect', oEvent);
 						break;
 					case 37:
-						validKey = true;
-						ret = this._dispatchEvent('onSpotlightLeft', oEvent);
+						b5WayKey = true;
+						bResult = this._dispatchEvent('onSpotlightLeft', oEvent);
 						break;
 					case 38:
-						validKey = true;
-						ret = this._dispatchEvent('onSpotlightUp', oEvent);
+						b5WayKey = true;
+						bResult = this._dispatchEvent('onSpotlightUp', oEvent);
 						break;
 					case 39:
-						validKey = true;
-						ret = this._dispatchEvent('onSpotlightRight', oEvent);
+						b5WayKey = true;
+						bResult = this._dispatchEvent('onSpotlightRight', oEvent);
 						break;
 					case 40:
-						validKey = true;
-						ret = this._dispatchEvent('onSpotlightDown', oEvent);
-						break;
-					default:
+						b5WayKey = true;
+						bResult = this._dispatchEvent('onSpotlightDown', oEvent);
 						break;
 				}
 			}
-			if (validKey) {
-				// If the key pressed was used by Spotlight, prevent default to keep the
-				// browser from scrolling the page, etc.
-				oEvent.preventDefault();
-			}
+			
+			if (b5WayKey && !oEvent.allowDefault) {							// Prevent default to keep the browser from scrolling the page, etc., 
+				oEvent.preventDefault();									// unless Event.allowDefault is explicitly set to true at control level
+			}																// example: moving cursor within textbox
 
-			return ret;
+			return bResult;
 		},
 
 		// Spotlight events bubbled back up to the App
 		onSpotlightEvent: function(oEvent) {
 			this._oLastEvent = oEvent;
-			var ret = false;
 
-			// If decorator onSpotlight<Event> function return false - preventDefault
-			if (!this._delegateSpotlightEvent(oEvent)) { return false; }
+			if (!this._delegateSpotlightEvent(oEvent)) { return false; }	// If decorator onSpotlight<Event> function return false - preventDefault
 
 			switch (oEvent.type) {
 				case 'onSpotlightFocus':
-					ret = this.onFocus(oEvent);
-					break;
+					return this.onFocus(oEvent);
 				case 'onSpotlightFocused':
-					ret = this.onFocused(oEvent);
-					break;
+					return this.onFocused(oEvent);
 				case 'onSpotlightBlur':
-					ret = this.onBlur(oEvent);
-					break;
+					return this.onBlur(oEvent);
 				case 'onSpotlightLeft':
 					this._oLast5WayEvent = oEvent;
-					ret = this.onLeft(oEvent);
-					break;
+					return this.onLeft(oEvent);
 				case 'onSpotlightRight':
 					this._oLast5WayEvent = oEvent;
-					ret = this.onRight(oEvent);
-					break;
+					return this.onRight(oEvent);
 				case 'onSpotlightUp':
 					this._oLast5WayEvent = oEvent;
-					ret = this.onUp(oEvent);
-					break;
+					return this.onUp(oEvent);
 				case 'onSpotlightDown':
 					this._oLast5WayEvent = oEvent;
-					ret = this.onDown(oEvent);
-					break;
+					return this.onDown(oEvent);
 				case 'onSpotlightSelect':
-					ret = this.onSelect(oEvent);
-					break;
+					return this.onSelect(oEvent);
 				case 'onSpotlightPoint':
-					ret = this.onPoint(oEvent);
-					break;
+					return this.onPoint(oEvent);
 			}
-
-			return ret;
 		},
 
 		/************************************************************/
@@ -770,7 +754,7 @@ enyo.kind({
 	}
 });
 
-// Event hook to all system events to catch KEYPRESS
+// Event hook to all system events to catch KEYPRESS and Mouse Events
 enyo.dispatcher.features.push(function(oEvent) {
 	return enyo.Spotlight.onEvent(oEvent);
 });
