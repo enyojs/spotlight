@@ -40,19 +40,19 @@ enyo.kind({
 			switch (oEvent.type) {
 				case 'onSpotlightContainerEnter':
 					enyo.Spotlight.Decorator.Panels.onSpotlightPanelEnter(oSender, oEvent);
-					break;
+					return true;																// Prevent default
 				case 'onSpotlightContainerLeave':
 					enyo.Spotlight.Decorator.Panels.onSpotlightPanelLeave(oSender, oEvent);
-					break;
+					return true;																// Prevent default
 				case 'onSpotlightFocus':
-					break;
+					return true;																// Prevent default
 				case 'onSpotlightLeft':
-					break;
+					return true;																// Prevent default
 				case 'tap':
 					enyo.Spotlight.Decorator.Panels.setCurrentPanel(oSender, oEvent.originator);
-					break;
+					return true;																// Prevent default
 			}
-			return true;
+			return false;
 		},
 		
 		// Does container contain focused element?

@@ -13,7 +13,7 @@ enyo.kind({
 			oData		 	 = oData ? enyo.clone(oData) : {};
 			oData.type 		 = sEvent;
 			oData.originator = oControl;
-			//console.log('Dispatching:', oData.type, oControl.name);
+			console.log('Dispatching:', oData.type, oControl.name);
 
 			return oControl.dispatchBubble(sEvent, oData, oControl);
 		},
@@ -24,10 +24,10 @@ enyo.kind({
 			var f = oControl.dispatchEvent;
 
 			oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
-				if (fHandler(oControl, oEvent)) {
-					f.apply(oControl, [sEventName, oEvent, oEventSender]);
-				} else {
+				if (fHandler(oControl, oEvent)) {										// If handler returns true - prevent default
 					oEvent.type = null;
+				} else {
+					f.apply(oControl, [sEventName, oEvent, oEventSender]);				// If handler returns false - call original dispatcher and allow bubbling
 				}
 			}
 		},

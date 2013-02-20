@@ -25,13 +25,10 @@ enyo.kind({
 		_handleEvent: function(oSender, oEvent) {
 			switch (oEvent.type) {
 				case 'onSpotlightFocus':
-					if (!oEvent._spotlight_handled) {
-						if (oEvent.originator !== oSender) {
-							enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
-						}
-						oEvent._spotlight_handled = true;
+					if (oEvent.originator !== oSender) {
+						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
 					}
-					break;
+					return true;	// prevent default
 			}
 		},
 		
