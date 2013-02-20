@@ -81,6 +81,7 @@ enyo.kind({
 			this.ownerDispatchFn = this._oOwner.dispatchEvent;
 			this._oOwner.dispatchEvent = function(sEventName, oEvent, oSender) {
 				oThis.ownerDispatchFn.apply(oThis._oOwner, [sEventName, oEvent, oSender]);
+				oEvent.type = sEventName; // TODO remove when event.type bug is resolved
 				return oThis.onSpotlightEvent(oEvent);
 			};
 		},
@@ -91,7 +92,6 @@ enyo.kind({
 			}
 
 			if (oSender.spotlightDecorate == false) {
-				// console.log(oSender.name, 'skipping decoration');
 				return null;
 			}
 
@@ -301,7 +301,7 @@ enyo.kind({
 		},
 
 		_getTarget: function(sId) {
-			var oTarget = enyo.Spotlight.Util.getControlById(sId);
+			var oTarget = enyo.$[sId];
 			if (typeof oTarget != 'undefined') {
 				if (this.isSpottable(oTarget)) {
 					return oTarget;
@@ -509,20 +509,21 @@ enyo.kind({
 			this._bPointerMode = bPointerMode;
 		},
 
-		getPointerMode		: function() 				{ return this._bPointerMode; 			},
-		getCurrent			: function() 				{ return this._oCurrent; 				},
-		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 	},
-		getLastEvent	 	: function() 				{ return this._oLastEvent; 	 			},
-		getLast5WayEvent 	: function() 				{ return this._oLast5WayEvent;  		},
-		setLast5WayControl	: function(oControl)		{ this._oLastSpotlightTrueControl5Way = oControl; },
+		getPointerMode		: function() 				{ return this._bPointerMode; 						},
+		getCurrent			: function() 				{ return this._oCurrent; 							},
+		setCurrent			: function(oControl)		{ return this._setCurrent(oControl); 				},
+		getLastEvent	 	: function() 				{ return this._oLastEvent; 	 						},
+		getLastControl		: function()				{ return this._oLastSpotlightTrueControl			},
+		getLast5WayEvent 	: function() 				{ return this._oLast5WayEvent;  					},
+		setLast5WayControl	: function(oControl)		{ this._oLastSpotlightTrueControl5Way = oControl; 	},
 
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
 			return (
-				typeof oControl.spotlight != 'undefined' 	&&
-				oControl.spotlight 							&&
-				oControl.getAbsoluteShowing() 				&&
-				!(oControl.disabled)
+				typeof oControl.spotlight != 'undefined' 	&&	// Control has spotlight property set
+				oControl.spotlight 							&&	// Control has spotlight=true or 'container'
+				oControl.getAbsoluteShowing() 				&&	// Control is visible
+				!(oControl.disabled)							// Control is not disabled
 			);
 		},
 

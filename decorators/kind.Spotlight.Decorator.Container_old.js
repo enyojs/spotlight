@@ -12,13 +12,14 @@ enyo.kind({
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {
 			if (!this._isInitialized(oSender)) {
+				this.setFocus(oSender, false);
 				this.setLastFocusedChild(oSender, enyo.Spotlight.getFirstChild(oSender));
-				enyo.Spotlight.Util.interceptEvents(oSender, this._handleEvent);
+				this._interceptEvents(oSender);
 			}
 		},
 		
 		_isInitialized: function(oSender) {
-			return typeof oSender._spotlight.lastFocusedChild != 'undefined';
+			return typeof oSender._spotlight.hasFocus != 'undefined';
 		},
 		
 		// Handle events bubbling from within the container
@@ -27,7 +28,7 @@ enyo.kind({
 				case 'onSpotlightFocus':
 					if (!oEvent._spotlight_handled) {
 						if (oEvent.originator !== oSender) {
-							enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
+							this.setLastFocusedChild(oSender, oEvent.originator);
 						}
 						oEvent._spotlight_handled = true;
 					}
@@ -35,22 +36,31 @@ enyo.kind({
 			}
 		},
 		
-		// Was last spotted control the container's child?
-		_hadFocus: function(oSender) {
-			return enyo.Spotlight.Util.isChild(oSender, enyo.Spotlight.getLastControl());
+		// Attach event hook to capture events coming from within the container
+		_interceptEvents: function(oSender) {
+			var oThis = this;
+			var f = oSender.dispatchEvent;
+
+			oSender.dispatchEvent = function(sEventName, oEvent, oEventSender) {
+				if (oThis.getFocus(oSender)) {
+					oThis._handleEvent(oSender, oEvent);
+				}
+				f.apply(oSender, [sEventName, oEvent, oEventSender]);
+			}
 		},
-				
+		
 		/******************************/
 		
 		onSpotlightFocused: function(oSender, oEvent) {
 			if (enyo.Spotlight.getPointerMode()) { return; }
 			this._initComponent(oSender);
 			
-			if (this._hadFocus(oSender)) {												// Focus came from within
-				//console.log('FOCUS LEAVE', oSender.name);
+			if (this.getFocus(oSender)) {												// Focus came from within
+				//console.log('FOCUS FROM INSIDE', oSender.name);
 				var s5WayEventType	= enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '',
 					sDirection		= s5WayEventType.replace('onSpotlight','').toUpperCase();
-					
+				
+				this.setFocus(oSender, false);
 				if (!(oSender.parent instanceof enyo.Panels)) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				} else if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
@@ -58,11 +68,12 @@ enyo.kind({
 				}
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
 			} else {																	// Focus came from without
-				//console.log('FOCUS ENTER', oSender.name);
+				//console.log('FOCUS FROM OUTSIDE', oSender.name);
 				var oLastFocusedChild = this.getLastFocusedChild(oSender);
 				if (oLastFocusedChild) {
 					enyo.Spotlight.spot(oLastFocusedChild);
 				}
+				this.setFocus(oSender, true);
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);
 			}
 			
@@ -80,11 +91,20 @@ enyo.kind({
 		
 		// Set last focused child
 		setLastFocusedChild: function(oSender, oChild) {
-			if (!enyo.Spotlight.isSpottable(oChild)) {
-				enyo.warn('Spotlight Container' + oSender.name + ' has not spottable lastFocusedChild ' + oChild.name);
-			}
 			oSender._spotlight = oSender._spotlight || {};
-			oSender._spotlight.lastFocusedChild = oChild;
+			oSender._spotlight.lastFocusedChild = enyo.Spotlight.Util.getNearestSpottableChild(oSender, oChild);
+		},
+		
+		// Does container contain focused element?
+		getFocus: function(oSender) {
+			oSender._spotlight = oSender._spotlight || {};
+			return oSender._spotlight.hasFocus;
+		},
+		
+		// Specify that container contains focused element
+		setFocus: function(oSender, bIsFocused) {
+			oSender._spotlight = oSender._spotlight || {};
+			oSender._spotlight.hasFocus = bIsFocused;
 		},
 	}
 });

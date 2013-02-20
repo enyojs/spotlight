@@ -13,6 +13,7 @@ enyo.kind({
 			oData		 	 = oData ? enyo.clone(oData) : {};
 			oData.type 		 = sEvent;
 			oData.originator = oControl;
+			//console.log('Dispatching:', oData.type, oControl.name);
 
 			return oControl.dispatchBubble(sEvent, oData, oControl);
 		},
@@ -31,18 +32,14 @@ enyo.kind({
 			}
 		},
 
-		getNearestSpottableChild: function(oAncestor, oDescendant) {
-			var oChild = oDescendant,
-				oSpottableChild = oChild;
-
-			while (oChild.parent && oChild.parent !== oAncestor) {
-				if (enyo.Spotlight.isSpottable(oChild)) {
-					oSpottableChild = oChild;
-				}
+		isChild: function(oParent, oChild) {
+			while (oChild.parent) {
 				oChild = oChild.parent;
+				if (oChild === oParent) {
+					return true;
+				}
 			}
-
-			return oSpottableChild;
+			return false;
 		},
 
 		getAbsoluteBounds: function(oControl) {
@@ -80,10 +77,6 @@ enyo.kind({
 				height	: nHeight,
 				width	: nWidth
 			};
-		},
-
-		getControlById: function(sId) {
-			return enyo.$[sId];
 		},
 
 		hasClass: function(o, s) {
