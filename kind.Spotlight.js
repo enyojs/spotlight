@@ -41,16 +41,30 @@ enyo.kind({
 
 		_nPrevClientX: null,
 		_nPrevClientY: null,
+		
+		_getParentString: function(oControl) {
+			var a = [];
+			
+			while (oControl) {
+				a.push(oControl.kindName + ':' + oControl.name);
+				oControl = oControl.parent;
+			}
+			return a.join('->');
+		},
 
 		_setCurrent: function(oControl) {
 			// Create control-specific spotlight state storage
 			if (typeof oControl._spotlight == 'undefined') {
 				oControl._spotlight = {};
 			}
+			if (!this.isSpottable(oControl)) {
+				throw 'Attempting to spot not-spottable control [' + oControl.kindName + ':' + oControl.name + ']';
+			}
 			if (this._oCurrent === oControl) {
 				return true;
 			}
-			//console.log('CURRENT:', oControl.name);
+			// console.log('SPOTLIGHT at', oControl.name, oControl.spotlight);
+			// console.log('CURRENT:', this._getParentString(oControl));
 			this._oCurrent = oControl;
 			if (oControl.spotlight === true) {
 				this._oLastSpotlightTrueControl = oControl;

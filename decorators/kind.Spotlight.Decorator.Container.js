@@ -34,7 +34,23 @@ enyo.kind({
 		
 		// Was last spotted control the container's child?
 		_hadFocus: function(oSender) {
-			return enyo.Spotlight.Util.isChild(oSender, enyo.Spotlight.getLastControl());
+			var oLastControl = enyo.Spotlight.getLastControl();
+			return enyo.Spotlight.Util.isChild(oSender, oLastControl);
+		},
+		
+		_focusLeave: function(oSender, s5WayEventType) {
+			// console.log('FOCUS LEAVE', oSender.name);
+			var sDirection = s5WayEventType.replace('onSpotlight','').toUpperCase();
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
+		},
+		
+		_focusEnter: function(oSender) {
+			// console.log('FOCUS ENTER', oSender.name);
+			var oLastFocusedChild = this.getLastFocusedChild(oSender);
+			if (oLastFocusedChild) {
+				enyo.Spotlight.spot(oLastFocusedChild);
+			}
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);
 		},
 				
 		/******************************/
@@ -44,26 +60,35 @@ enyo.kind({
 			this._initComponent(oSender);
 			
 			if (this._hadFocus(oSender)) {												// Focus came from within
-				//console.log('FOCUS LEAVE', oSender.name);
-				var s5WayEventType	= enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '',
-					sDirection		= s5WayEventType.replace('onSpotlight','').toUpperCase();
-					
+				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
 				if (!(oSender.parent instanceof enyo.Panels)) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
-				} else if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
+				} else 
+				if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
-				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
+				this._focusLeave(oSender, s5WayEventType);
 			} else {																	// Focus came from without
-				//console.log('FOCUS ENTER', oSender.name);
-				var oLastFocusedChild = this.getLastFocusedChild(oSender);
-				if (oLastFocusedChild) {
-					enyo.Spotlight.spot(oLastFocusedChild);
-				}
-				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);
+				this._focusEnter(oSender);
 			}
 			
 			return true;
+		},
+		
+		onSpotlightLeft: function(oSender, oEvent) {
+			this._focusLeave(oSender, oEvent.type);
+		},
+		
+		onSpotlightRight: function(oSender, oEvent) {
+			this._focusLeave(oSender, oEvent.type);
+		},
+		
+		onSpotlightUp: function(oSender, oEvent) {
+			this._focusLeave(oSender, oEvent.type);
+		},
+		
+		onSpotlightDown: function(oSender, oEvent) {
+			this._focusLeave(oSender, oEvent.type);
 		},
 		
 		// What child of container was last focused?
