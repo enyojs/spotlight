@@ -15,12 +15,10 @@ if(window.moon && moon.InputDecorator) {
 
 			onSpotlightSelect: function(oSender, oEvent) {
 				oSender.children[0].focus();
-				return true;
 			},
 
 			onSpotlightBlur: function(oSender, oEvent) {
 				oSender.children[0].blur();
-				return true;
 			}
 		}
 	});

@@ -137,7 +137,7 @@ enyo.kind({
 		// If decorator present, delegate event to it's corresponding method
 		// Return values: if found method to delegate, return it's return value otherwise return true
 		_delegateSpotlightEvent: function(oEvent) {
-			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return true; }
+			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return false; }
 
 			var s,
 				oSender 	= oEvent.originator
@@ -147,7 +147,7 @@ enyo.kind({
 				return oDecorator[oEvent.type](oSender, oEvent);
 			}
 
-			return true;
+			return false;
 		},
 
 		_isInHalfPlane: function(sDirection, oBounds1, oBounds2) {
@@ -436,7 +436,7 @@ enyo.kind({
 		onSpotlightEvent: function(oEvent) {
 			this._oLastEvent = oEvent;
 
-			if (!this._delegateSpotlightEvent(oEvent)) { return false; }	// If decorator onSpotlight<Event> function return false - preventDefault
+			if (this._delegateSpotlightEvent(oEvent)) { return false; }	// If decorator onSpotlight<Event> function return true - preventDefault
 
 			switch (oEvent.type) {
 				case 'onSpotlightFocus':

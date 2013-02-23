@@ -67,13 +67,11 @@ enyo.kind({
 		onSpotlightFocus: function(oSender, oEvent) {
 			this._setCurrent(oSender, this._getCurrent(oSender), false);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return true;
 		},
 	
 		onSpotlightBlur: function(oSender, oEvent) {
 			this._setCurrent(oSender, null, true);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return true;
 		},
 	
 		onSpotlightSelect: function(oSender, oEvent) {
@@ -84,60 +82,55 @@ enyo.kind({
 				this._setCurrent(oSender, 0, true);
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return false;
+			return true;
 		},
 	
 		onSpotlightDown: function(oSender, oEvent) {
 			//Jump one row down (increment index by itemsPerRow)
 			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
+			if (nCurrent === null) { return true; }
 			var nNew = nCurrent + oSender.itemsPerRow;
 			if (nNew < oSender.getCount() - 1) {
 				this._setCurrent(oSender, nNew, true);
-				return false;
+				return true;
 			}
 			this._setCurrent(oSender, null, true);
-			return true;
 		},
 	
 		onSpotlightUp: function(oSender, oEvent) {
 			//Jump one row up (decrement index by itemsPerRow)
 			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
+			if (nCurrent === null) { return true; }
 			var nNew = nCurrent - oSender.itemsPerRow;
 			if (nNew > 0) {
 				this._setCurrent(oSender, nNew, true);
-				return false;
+				return true;
 			}
 			this._setCurrent(oSender, null, true);
-			return true;
 		},
 	
 		onSpotlightLeft: function(oSender, oEvent) {
 			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
+			if (nCurrent === null) { return true; }
 			if (nCurrent > 0) {
 				this._setCurrent(oSender, nCurrent - 1, true);
-				return false;
+				return true;
 			}
 			this._setCurrent(oSender, null, true);
-			return true;
 		},
 
 		onSpotlightRight: function(oSender, oEvent) {
 			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
+			if (nCurrent === null) { return true; }
 			if (nCurrent < oSender.getCount() - 1) {
 				this._setCurrent(oSender, nCurrent + 1, true);
-				return false;
+				return true;
 			}
 			this._setCurrent(oSender, null, true);
-			return true;
 		},
 	
 		onSpotlightPoint: function(oSender, oEvent) {
 			this._setCurrent(oSender, oEvent.index);
-			return true;
 		}
 	}
 });

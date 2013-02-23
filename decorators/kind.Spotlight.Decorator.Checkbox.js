@@ -16,7 +16,6 @@ if (window.onyx && onyx.Checkbox) {
 			onSpotlightSelect: function(oSender, oEvent) {
 				console.log('Checkbox!!');
 				oSender.setChecked(!!oSender.getChecked()); // Weird, when passing "false" it gets checked, "true" unchecked, (was the other way around)
-				return true;
 			}
 		}
 	});

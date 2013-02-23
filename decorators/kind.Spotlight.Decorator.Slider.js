@@ -22,43 +22,38 @@ if (window.onyx && onyx.Slider) {
 			/******************************/
 	
 			onSpotlightFocus: function(oSender, oEvent) {
-				return true;
 			},
 	
 			onSpotlightBlur: function(oSender, oEvent) {
 				this._setSelected(oSender, false);
-				return true;
 			},
 	
 			onSpotlightSelect: function(oSender, oEvent) {
 				this._setSelected(oSender, true);
-				return false;
+				return true;
 			},
 	
 			onSpotlightDown: function(oSender, oEvent) {
-				return true;
 			},
 	
 			onSpotlightUp: function(oSender, oEvent) {
-				return true;
 			},
 	
 			onSpotlightLeft: function(oSender, oEvent) {
-				if (oSender.value <= oSender.min) { return true; }
-				if (!this._getSelected(oSender, true))  { return true; }
+				if (oSender.value <= oSender.min) { return false; }
+				if (!this._getSelected(oSender, true))  { return false; }
 				oSender.animateTo(oSender.value - oSender.increment);
-				return false;
+				return true;
 			},
 	
 			onSpotlightRight: function(oSender, oEvent) {
-				if (oSender.value >= oSender.max) { return true; }
-				if (!this._getSelected(oSender, true))  { return true; }
+				if (oSender.value >= oSender.max) { return false; }
+				if (!this._getSelected(oSender, true))  { return false; }
 				oSender.animateTo(oSender.value + oSender.increment);
-				return false;
+				return true;
 			},
 	
 			onSpotlightPoint: function(oSender, oEvent) {
-				return true;
 			},
 		}
 	});

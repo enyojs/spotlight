@@ -56,7 +56,8 @@ enyo.kind({
 		/******************************/
 		
 		onSpotlightFocused: function(oSender, oEvent) {
-			if (enyo.Spotlight.getPointerMode()) { return; }
+			// console.log('FOCUSED', oSender.name);
+			if (enyo.Spotlight.getPointerMode()) { return true; }
 			this._initComponent(oSender);
 			
 			if (this._hadFocus(oSender)) {												// Focus came from within
@@ -76,18 +77,22 @@ enyo.kind({
 		},
 		
 		onSpotlightLeft: function(oSender, oEvent) {
+			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
 			this._focusLeave(oSender, oEvent.type);
 		},
 		
 		onSpotlightRight: function(oSender, oEvent) {
+			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
 			this._focusLeave(oSender, oEvent.type);
 		},
 		
 		onSpotlightUp: function(oSender, oEvent) {
+			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
 			this._focusLeave(oSender, oEvent.type);
 		},
 		
 		onSpotlightDown: function(oSender, oEvent) {
+			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
 			this._focusLeave(oSender, oEvent.type);
 		},
 		
