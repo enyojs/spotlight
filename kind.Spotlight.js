@@ -360,7 +360,12 @@ enyo.kind({
 						}
 						break;
 					case 'keydown':
+						return enyo.Spotlight.Accelerator.processKey(oEvent);
+						break;
 					case 'keyup':
+						if (oEvent.keyCode === 13) {
+							this._dispatchEvent('onSpotlightFocused', oEvent);
+						}
 						return enyo.Spotlight.Accelerator.processKey(oEvent);
 						break;
 				}
