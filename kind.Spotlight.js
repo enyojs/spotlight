@@ -361,6 +361,7 @@ enyo.kind({
 						break;
 					case 'keydown':
 					case 'keyup':
+						console.log('KEY EVENT', oEvent.type, oEvent.allowDefault);
 						return enyo.Spotlight.Accelerator.processKey(oEvent);
 						break;
 				}
@@ -389,6 +390,7 @@ enyo.kind({
 
 		// Called from enyo.Spotlight.Accelerator which handles accelerated keyboard event
 		onKeyEvent: function(oEvent) {
+			console.log('SPOTLIGHT onKeyEvent:', oEvent.type, 'allowDefault:', oEvent.allowDefault);
 			var b5WayKey = false;
 			var bResult  = false;
 			
