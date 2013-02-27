@@ -122,14 +122,12 @@ if (window.onyx && onyx.Picker) {
 					enyo.Spotlight.Util.addClass(oButton.hasNode(), 'spotlight');
 					enyo.Spotlight.Util.removeClass(oSender.hasNode(), 'spotlight');
 				}
-				return true;
 			},
 	
 			onSpotlightBlur: function(oSender, oEvent) {
 				if (!this._getOpen(oSender)) { 
 					enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
 				}
-				return true;
 			},
 	
 			onSpotlightSelect: function(oSender, oEvent) {
@@ -142,13 +140,12 @@ if (window.onyx && onyx.Picker) {
 					this._setCurrent(oSender, this._getCurrent(oSender));
 					this._setOpen(oSender, true);
 				}
-				return false;
+				return true;
 			},
 	
 			onSpotlightDown: function(oSender, oEvent) {
 				if (!this._getOpen(oSender)) { 
 					enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
-					return true;
 				}
 				
 				var nCurrent = this._getCurrent(oSender),
@@ -161,13 +158,12 @@ if (window.onyx && onyx.Picker) {
 						this._close(oSender);
 					}
 				}
-				return false;
+				return true;
 			},
 	
 			onSpotlightUp: function(oSender, oEvent) {
 				if (!this._getOpen(oSender)) { 
 					enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
-					return true;
 				}
 				
 				var nCurrent = this._getCurrent(oSender),
@@ -180,29 +176,26 @@ if (window.onyx && onyx.Picker) {
 						this._close(oSender);
 					}
 				}
-				return false;
+				return true;
 			},
 	
 			onSpotlightLeft: function(oSender, oEvent) {
 				if (this._getOpen(oSender)) {
 					this._close(oSender);
-					return false;
+					return true;
 				}
 				enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
-				return true;
 			},
 	
 			onSpotlightRight: function(oSender, oEvent) {
 				if (this._getOpen(oSender)) {
 					this._close(oSender);
-					return false;
+					return true;
 				}
 				enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
-				return true;
 			},
 	
 			onSpotlightPoint: function(oSender, oEvent) {
-				return true;
 			},
 		}
 	});

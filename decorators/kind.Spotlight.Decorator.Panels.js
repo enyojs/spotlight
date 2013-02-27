@@ -101,14 +101,14 @@ enyo.kind({
 				case 'LEFT':
 					if (this._handleLeft(oSender)) {
 						this._setFocus(oSender, false);
-						return false;
+						return true;
 					}
 					sEvent = 'onSpotlightLeft';
 					break;
 				case 'RIGHT':
 					if (this._handleRight(oSender)) {
 						this._setFocus(oSender, false);
-						return false;
+						return true;
 					}
 					sEvent = 'onSpotlightRight';
 					break;
@@ -126,11 +126,10 @@ enyo.kind({
 				enyo.Spotlight.setCurrent(oSender.parent)
 				enyo.Spotlight.Util.dispatchEvent(sEvent, null, oSender.parent);
 			}
-			return true;
 		},
 	
 		onSpotlightFocused: function(oSender, oEvent) {
-			if (enyo.Spotlight.getPointerMode()) { return false; }
+			if (enyo.Spotlight.getPointerMode()) { return true; }
 			this._initComponent(oSender);
 			
 			if (this._getFocus(oSender)) {												// Focus came from within
@@ -142,8 +141,6 @@ enyo.kind({
 				}
 				this._setFocus(oSender, true);
 			}
-			
-			return true;
 		},
 		
 		// Given any spottable element within a panel (2nd arg), sets that panel current

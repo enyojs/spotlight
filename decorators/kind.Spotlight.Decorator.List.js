@@ -60,13 +60,11 @@ enyo.kind({
 		onSpotlightFocus: function(oSender, oEvent) {
 			this._setCurrent(oSender, this._getCurrent(oSender), false);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return true;
 		},
 	
 		onSpotlightBlur: function(oSender, oEvent) {
 			this._setCurrent(oSender, null, true);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return true;
 		},
 	
 		onSpotlightSelect: function(oSender, oEvent) {
@@ -76,7 +74,7 @@ enyo.kind({
 				this._setCurrent(oSender, 0, true);
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return false;
+			return true;
 		},
 	
 		onSpotlightDown: function(oSender, oEvent) {
@@ -85,7 +83,6 @@ enyo.kind({
 			} else {
 				this._spotNextListItem(oSender, oEvent);
 			}
-			return true;
 		},
 	
 		onSpotlightUp: function(oSender, oEvent) {
@@ -94,7 +91,6 @@ enyo.kind({
 			} else {
 				this._spotPreviousListItem(oSender, oEvent);
 			}
-			return true;
 		},
 	
 		onSpotlightLeft: function(oSender, oEvent) {
@@ -103,7 +99,6 @@ enyo.kind({
 			} else {
 				this._setCurrent(oSender, null, true);
 			}
-			return true;
 		},
 	
 		onSpotlightRight: function(oSender, oEvent) {
@@ -112,12 +107,10 @@ enyo.kind({
 			} else {
 				this._setCurrent(oSender, null, true);
 			}
-			return true;
 		},
 	
 		onSpotlightPoint: function(oSender, oEvent) {
 			this._setCurrent(oSender, oEvent.index);
-			return true;
 		},
 		
 		_spotNextListItem: function(oSender, oEvent) {

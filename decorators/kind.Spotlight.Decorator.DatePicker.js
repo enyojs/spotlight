@@ -21,7 +21,7 @@ if (window.onyx && onyx.DatePicker) {
 					}
 					enyo.Spotlight.Util.dispatchEvent(oEvent.type, oEvent, oSender);
 				}
-				return false;
+				return true;
 			}
 		}
 	});
