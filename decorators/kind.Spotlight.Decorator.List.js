@@ -40,7 +40,7 @@ enyo.kind({
 				this._focusNode(oSender, n);
 				oSender._nCurrentSpotlightItem = n;
 				node = this._getNode(oSender, n);
-				if (node && !oSender.getStrategy().isInView(node)) {
+				if (node && !this._isInView(oSender, node)) {
 					if(oSender.animateToNode) {
 						oSender.animateToNode(node, true);
 					} else {
@@ -53,6 +53,16 @@ enyo.kind({
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+		},
+
+		//replacement ScrollStrategy function to address the offsets in List where a paging strategy is used
+		_isInView: function(oSender, inNode) {
+			var sb = oSender.getScrollBounds();
+			var ot = inNode.offsetTop + inNode.offsetParent.offsetTop;
+			var oh = inNode.offsetHeight;
+			var ol = inNode.offsetLeft + inNode.offsetParent.offsetLeft;
+			var ow = inNode.offsetWidth;
+			return (ot >= sb.top && ot + oh <= sb.top + sb.clientHeight) && (ol >= sb.left && ol + ow <= sb.left + sb.clientWidth);
 		},
 	
 		/******************************/
