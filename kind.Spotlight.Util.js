@@ -33,6 +33,9 @@ enyo.kind({
 		},
 
 		isChild: function(oParent, oChild) {
+			if (!oParent) { return false; }
+			if (!oChild)  { return false; }
+			
 			while (oChild.parent) {
 				oChild = oChild.parent;
 				if (oChild === oParent) {
