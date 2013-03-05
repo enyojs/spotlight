@@ -12,14 +12,14 @@ enyo.kind({
 		_nTime		: 0,
 		_nKey		: 0,
 
-		processKey: function(oEvent, fCallback) {
+		processKey: function(oEvent) {
 			switch (oEvent.type) {
 				case 'keydown':
 					if (oEvent.keyCode != this._nKey) {
 						this.reset();
 						this._nTime = (new Date()).getTime();
 						this._nKey = oEvent.keyCode;
-						return fCallback(oEvent);
+						return enyo.Spotlight.onKeyEvent(oEvent);
 					} else {
 						var nElapsedTime = (new Date()).getTime() - this._nTime,
 							nSeconds	 = Math.floor(nElapsedTime / 1000),
@@ -32,19 +32,23 @@ enyo.kind({
 						nToSkip = this._aFrequency[nSeconds] - 1;
 						if (nToSkip < 0) { nToSkip = 0; }
 
+					//	console.log('Seconds:', nSeconds, 'Need to skip:', nToSkip);
+
 						if (this._nSkipped >= nToSkip) {
+						//	console.log('event', this._nSkipped);
 							this._nSkipped = 0;
-							return fCallback(oEvent);
+							return enyo.Spotlight.onKeyEvent(oEvent);
 						} else {
+						//	console.log('skip', this._nSkipped);
 							this._nSkipped ++;
-							oEvent.preventDefault(); // Prevent skipped keydown events from bubbling
 							return true;
 						}
 					}
 					break;
 				case 'keyup':
 					this.reset();
-					return fCallback(oEvent);
+					return true;
+					break;
 			}
 		},
 
