@@ -104,16 +104,6 @@ enyo.kind({
 
 		stringEndsWith: function(s, sSuffix) {
 		    return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
-		},
-		
-		getParentString: function(oControl) {
-			var a = [];
-			
-			while (oControl) {
-				a.push(oControl.kindName + ':' + oControl.name);
-				oControl = oControl.parent;
-			}
-			return a.join('->');
 		}
 	}
 });
