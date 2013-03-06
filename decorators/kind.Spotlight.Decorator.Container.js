@@ -28,7 +28,7 @@ enyo.kind({
 					if (oEvent.originator !== oSender) {
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
 					}
-					return true;	// prevent default
+				//	return true;	// prevent default ???????? Why whould we need to prevent default here? Why? Why? I think not! Lex.
 			}
 		},
 		

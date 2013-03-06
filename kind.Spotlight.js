@@ -59,6 +59,7 @@ enyo.kind({
 				return true;
 			}
 			this._oCurrent = oControl;
+			enyo.log('CURRENT: ', enyo.Spotlight.Util.getParentString(oControl));
 			if (oControl.spotlight === true) {
 				this._oLastSpotlightTrueControl = oControl;
 				if (!this.getPointerMode() || !this._oLastSpotlightTrueControl5Way) {
@@ -120,7 +121,7 @@ enyo.kind({
 		// This is only for 5Way keydown events
 		_preventDomDefault: function(oSpotlightEvent) {
 			if (this._is5WayKeyCode(oSpotlightEvent.keyCode)) {		// Prevent default to keep the browser from scrolling the page, etc., 
-				console.log('Preventing', oSpotlightEvent.domEvent, 'spotlight event:', oSpotlightEvent);
+				enyo.log('Preventing', oSpotlightEvent.domEvent, 'spotlight event:', oSpotlightEvent.type);
 				oSpotlightEvent.domEvent.preventDefault();			// unless Event.allowDomDefault is explicitly called on the event
 			}
 		},
@@ -234,8 +235,8 @@ enyo.kind({
 		onAcceleratedKey: function(oEvent) {
 			oEvent.domEvent = oEvent;
 			oEvent.allowDomDefault = function() {
-				console.log('Setting preventDefault to dummy on', oEvent);
-				oEvent.preventDefault = function() { console.log('Dummy funciton');};
+				enyo.log('Setting preventDefault to dummy on', oEvent);
+				oEvent.preventDefault = function() { enyo.log('Dummy funciton');};
 			};
 			
 			switch (oEvent.type) {
@@ -434,7 +435,7 @@ enyo.kind({
 				return false;
 			}
 			if (this._oCurrent && oControl !== this._oCurrent) {
-				this._dispatchEvent('onSpotlightBlur', null, this._oCurrent);
+				this._dispatchEvent('onSpotlightBlur', null);
 			}
 			oControl = oControl || this.getCurrent();
 			if (!this.isSpottable(oControl)) {
@@ -442,7 +443,7 @@ enyo.kind({
 			}
 			if (oControl) {
 				oControl.addClass('spotlight');
-				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl, sDirection);
+				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 				return true;
 			}
 

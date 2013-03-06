@@ -25,6 +25,7 @@ enyo.kind({
 
 			oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
 				if (fHandler(oControl, oEvent)) {										// If handler returns true - prevent default
+					enyo.log('Setting type to NULL', oEvent);
 					oEvent.type = null;
 				} else {
 					f.apply(oControl, [sEventName, oEvent, oEventSender]);				// If handler returns false - call original dispatcher and allow bubbling
@@ -33,6 +34,9 @@ enyo.kind({
 		},
 
 		isChild: function(oParent, oChild) {
+			if (!oParent) { return false; }
+			if (!oChild)  { return false; }
+			
 			while (oChild.parent) {
 				oChild = oChild.parent;
 				if (oChild === oParent) {

@@ -18,6 +18,7 @@ enyo.kind({
 			if (!this._isInitialized(oSender)) {
 				this._setFocus(oSender, false);
 				this._initChildren(oSender);
+				enyo.log('PANELS: Intercept events in ', oSender.name, ' hander:', this._handleChildEvents);
 				enyo.Spotlight.Util.interceptEvents(oSender, this._handleChildEvents);
 			}
 		},
