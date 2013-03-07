@@ -7,11 +7,22 @@ enyo.kind({
 	name: 'enyo.Spotlight.Accelerator',
 
 	statics: {
-		_aFrequency	: [3, 3, 3, 2, 2, 2, 1],	// At n-th second use every _aFrequency[n] subsequent keydown event
+		
+		//* @protected
+		/*************************************************************/
+		
 		_nSkipped	: 0,
 		_nTime		: 0,
 		_nKey		: 0,
-
+		
+		//* @public
+		/*************************************************************/
+		
+		//* Firing configuration. At n-th second use every frequency[n] subsequent keydown event
+		frequency	: [3, 3, 3, 2, 2, 2, 1],	
+		
+		//* Called from enyo.Spotlight, with current keydown event and Spotlight's callback 
+		//* Which will be called when an event is allowed through
 		processKey: function(oEvent, fCallback) {
 			switch (oEvent.type) {
 				case 'keydown':
@@ -25,11 +36,11 @@ enyo.kind({
 							nSeconds	 = Math.floor(nElapsedTime / 1000),
 							nToSkip		 = 0;
 
-						nSeconds = nSeconds > this._aFrequency.length - 1
-							? this._aFrequency.length - 1
+						nSeconds = nSeconds > this.frequency.length - 1
+							? this.frequency.length - 1
 							: nSeconds;
 
-						nToSkip = this._aFrequency[nSeconds] - 1;
+						nToSkip = this.frequency[nSeconds] - 1;
 						if (nToSkip < 0) { nToSkip = 0; }
 
 						if (this._nSkipped >= nToSkip) {

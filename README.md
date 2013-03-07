@@ -25,6 +25,9 @@ When control is focused, it is assigned a CSS class ".spotlight" which allows to
 In order to make a control focusable with Spotlight ( **Spottable** ), simply set it's "spotlight" property to TRUE, like so:
 
 > `{name: 'mybutton', tag: 'button', spotlight: true}`
+	
+When application loads, spotlight searches for a control name specified by it's **defaultControl** property, 
+if defaultControl is not specified, spotlight focuses on the first available spottable control.
 
 In 5-way mode, spotlight uses Nearest Neighbor algorithm to determine what spottable control is nearest in the direction of navigation. 
 The coordinates of spottable controls are derived from their actual position on the screen.
@@ -32,13 +35,40 @@ The coordinates of spottable controls are derived from their actual position on 
 It's worth noting, that spottable controls don't have to be found on the same hierarchal level of an enyo component tree. 
 Spotlight takes care of allowing seamless navigation between topmost spottable components found in the tree.
 
+
 ## CONTAINERS: ##
 
 In order to organize controls into navigation groups we have created Spotlight containers. 
-A good use case for containers is a set of radio buttons that need to be navigable independently of the rest of controls.
-When Spotlight container is focused it passes the focus to it's own hierarchy of spottable controls, 
-namely to the spottable child, which has been focused last before the focus moved outside of the container.
+A good use case for containers is a set of radio buttons that need to be navigable independently from the rest of controls.
+
+When Spotlight container is focused it passes the focus to it's own hierarchy of spottable child controls, 
+namely to the spottable child, which has been focused last before the focus has moved outside of the container.
 If the container in question has never been focused, it focuses it's first spottable child.
+
+To define a container, set control's `spotlight` property to "container":
+
+> `{name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}`
+	
+In a way, containers are the branches and `spotlight:true` controls are the leaves of Spotlight navigation tree.
+	
+
+## NESTING ##
+
+The containers can be nested. The inner containers can be remembered by outer as their "last focused children", and act as conduits of focus passed by the outer ones.
+
+Nesting `spotlight:true` controls was not found to be useful. 
+As of now, they act as the leaves of the spottable tree and don't conduct focus, however this behavior can be overridden on per-control basis. 
+
+
+## EVENTS ##
+
+
+
+
+## EXTENDING SPOTLIGHT ##
+
+There are two ways to extend spotlight functionality 
+
 
 
 
