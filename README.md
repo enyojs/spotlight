@@ -22,7 +22,7 @@ However, Spotlight API provides a way to explicitly perform the switch by callin
 Spotlight allows navigation between enyo controls by setting spotlight focus to one control at a time. 
 When control is focused, it is assigned a CSS class ".spotlight" which allows to style focused controls on per-kind basis using `.<kindClass>.spotlight` selectors.
 
-In order to make a control focusable with Spotlight (**Spottable**), simply set it's "spotlight" property to TRUE, like so:
+In order to make a control focusable with Spotlight ( **Spottable** ), simply set it's "spotlight" property to TRUE, like so:
 
 > `{name: 'mybutton', tag: 'button', spotlight: true}`
 
