@@ -1,53 +1,45 @@
-Spotlight
-=========
+# SPOTLIGHT DOCUMENTATION #
 
-Spotlight package for Moonraker project.
-Author: Lex Podgorny
 
-Used for keyboard/pointer navigation through components of an enyo application.
-This is accomplished by moving "spotlight", an artificial focus, between them.
-Spotlight works in two modes: Keyboard and Pointer.
 
-How to use:
+## WHAT IS SPOTLIGHT? ##
 
-1. Include Spotlight package into your application
-2. Add enyo.Spotlight component into your application components block:
-	
-	...
-	enyo.kind({
-		name: 'App',
-		components:[
-			{kind: 'enyo.Spotlight', defaultControl: 'button1a'},
-	...
-			
-3. Add "spotlight: true" property to any component that you would like to receive spotlight:
+Spotlight is an enyo package that empowers navigation through an enyo application using only **UP, DOWN, LEFT, RIGHT** and **RETURN** keys. Additionally, it responds to Point-and-Click events.
+TV remote controlling and keyboard navigation are the use cases where Spotlight is an essential tool.
 
-	...
-	{name: 'button1', kind: 'Button', content: 'Button 1', spotlight: true, ontap: 'onButtonTap'}
-	...
-	
-4. To create a navigational hierarchy of spotlight components use set "spotlight: true" on component owners:
 
-	...
-	{kind: 'onyx.Toolbar', spotlight: true, components: [
-		{name: 'button1', kind: 'Button', content: 'Button 1', spotlight: true, ontap: 'onButtonTap'},
-		{name: 'button2', kind: 'Button', content: 'Button 2', spotlight: true, ontap: 'onButtonTap'},
-	]
-	...
-	
-5. With lists, use enyo.Spotlight.ListDecorator to make list items able to receive spotlight
+## MODES: ##
 
-	...
-	{name: 'panel1', components: [
-		{kind: 'enyo.Spotlight.ListDecorator', components: [
-			{name: 'list1', kind: 'List', spotlight: true, count: 10, onSetupItem: 'setupItem', components: [
-				{name: 'item1', classes: 'panels-sample-item'}
-			]}
-		]}
-	]},
-	...
-	
-6. To switch between Keyboard and Pointer modes pass a boolean value to enyo.Spotlight.setPointerMode(true|false).
+Spotlight functions in two mutually exclusive modes: **5-way** and **Pointer** mode.
+Currently it is configured to switch between modes whenever corresponding input is received. I.e. it switches to pointer mode on mousemove, and back to 5-way on keydown.
+However, Spotlight API provides a way to explicitly perform the switch by calling 
 
-7. To change appearance of a spotlighted component, modify css class .spotlight (that is being added to the outmost node of spotlighted component)
-	The class is defined in Spotlight/kind.Spotlight.css
+> `enyo.Spotlight.setPointerMode([BOOLEAN]);`
+
+
+## NAVIGATION: ##
+
+Spotlight allows navigation between enyo controls by setting spotlight focus to one control at a time. 
+When control is focused, it is assigned a CSS class ".spotlight" which allows to style focused controls on per-kind basis using `.<kindClass>.spotlight` selectors.
+
+In order to make a control focusable with Spotlight (**Spottable**), simply set it's "spotlight" property to TRUE, like so:
+
+> `{name: 'mybutton', tag: 'button', spotlight: true}`
+
+In 5-way mode, spotlight uses Nearest Neighbor algorithm to determine what spottable control is nearest in the direction of navigation. 
+The coordinates of spottable controls are derived from their actual position on the screen.
+
+It's worth noting, that spottable controls don't have to be found on the same hierarchal level of an enyo component tree. 
+Spotlight takes care of allowing seamless navigation between topmost spottable components found in the tree.
+
+## CONTAINERS: ##
+
+In order to organize controls into navigation groups we have created Spotlight containers. 
+A good use case for containers is a set of radio buttons that need to be navigable independently of the rest of controls.
+When Spotlight container is focused it passes the focus to it's own hierarchy of spottable controls, 
+namely to the spottable child, which has been focused last before the focus moved outside of the container.
+If the container in question has never been focused, it focuses it's first spottable child.
+
+
+
+
