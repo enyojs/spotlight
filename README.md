@@ -1,13 +1,13 @@
 # SPOTLIGHT DOCUMENTATION #
 
 
-1. [What is Spotlight?](#1-what-is-spotlight-)
-2. [Modes](#2-modes-)
-3. [Navigation](#3-navigation-)
-4. [Containers](#4-containers-)
-5. [Nesting](#5-nesting-)
-6. [Events](#6-events-)
-7. [Extending Spotlight](#7-extending-spotlight-)
+1. [What is Spotlight?](#1-what-is-spotlight)
+2. [Modes](#2-modes)
+3. [Navigation](#3-navigation)
+4. [Containers](#4-containers)
+5. [Nesting](#5-nesting)
+6. [Events](#6-events)
+7. [Extending Spotlight](#7-extending-spotlight)
 
 
 ## 1. WHAT IS SPOTLIGHT? ##
@@ -70,7 +70,7 @@ As of now, they act as the leaves of the spottable tree and don't conduct focus,
 
 ## 6. EVENTS ##
 
-All spotlight events are dispatched directly to the currently spotted control, where they can be prevented from bubbling to define custom behavior. (See [Extending Spotlight](#p7) section)
+All spotlight events are dispatched directly to the currently spotted control, where they can be prevented from bubbling to define custom behavior. (See [Extending Spotlight](#7-extending-spotlight) section)
 
 ![Spotlight keyboard events](docs/chart_spotlight_5way_events.jpg)
 
