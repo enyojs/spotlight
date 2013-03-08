@@ -62,7 +62,7 @@ As of now, they act as the leaves of the spottable tree and don't conduct focus,
 
 ## EVENTS ##
 
-![Spotlight keyboard events](docs/chart_spotlight_5way_events.jpeg "Spotlight 5-way event sequence")
+![Spotlight keyboard events](docs/chart_spotlight_5way_events.jpg)
 
 
 ## EXTENDING SPOTLIGHT ##
