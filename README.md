@@ -4,7 +4,7 @@
 
 ## WHAT IS SPOTLIGHT? ##
 
-Spotlight is an enyo package that empowers navigation through an enyo application using only **UP, DOWN, LEFT, RIGHT** and **RETURN** keys. Additionally, it responds to Point-and-Click events.
+Spotlight is an Enyo package that empowers navigation through an Enyo application using only **UP, DOWN, LEFT, RIGHT** and **RETURN** keys. Additionally, it responds to Point-and-Click events.
 TV remote controlling and keyboard navigation are the use cases where Spotlight is an essential tool.
 
 
@@ -14,12 +14,12 @@ Spotlight functions in two mutually exclusive modes: **5-way** and **Pointer** m
 Currently it is configured to switch between modes whenever corresponding input is received. I.e. it switches to pointer mode on mousemove, and back to 5-way on keydown.
 However, Spotlight API provides a way to explicitly perform the switch by calling 
 
-> `enyo.Spotlight.setPointerMode([BOOLEAN]);`
+> `Enyo.Spotlight.setPointerMode([BOOLEAN]);`
 
 
 ## NAVIGATION: ##
 
-Spotlight allows navigation between enyo controls by setting spotlight focus to one control at a time. 
+Spotlight allows navigation between Enyo controls by setting spotlight focus to one control at a time. 
 When control is focused, it is assigned a CSS class ".spotlight" which allows to style focused controls on per-kind basis using `.<kindClass>.spotlight` selectors.
 
 In order to make a control focusable with Spotlight ( **Spottable** ), simply set it's "spotlight" property to TRUE, like so:
@@ -32,7 +32,7 @@ if defaultControl is not specified, spotlight focuses on the first available spo
 In 5-way mode, spotlight uses Nearest Neighbor algorithm to determine what spottable control is nearest in the direction of navigation. 
 The coordinates of spottable controls are derived from their actual position on the screen.
 
-It's worth noting, that spottable controls don't have to be found on the same hierarchal level of an enyo component tree. 
+It's worth noting, that spottable controls don't have to be found on the same hierarchal level of an Enyo component tree. 
 Spotlight takes care of allowing seamless navigation between topmost spottable components found in the tree.
 
 
@@ -62,7 +62,7 @@ As of now, they act as the leaves of the spottable tree and don't conduct focus,
 
 ## EVENTS ##
 
-
+![Spotlight keyboard events](docs/chart_spotlight_5way_events.jpeg "Spotlight 5-way event sequence")
 
 
 ## EXTENDING SPOTLIGHT ##
