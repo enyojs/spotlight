@@ -27,8 +27,8 @@ In addition, Spotlight includes support for Point-and-Click events, so all bases
 are covered.
 
 To add **[Spotlight](kind.Spotlight.js)** to an application, simply include the
-**Spotlight** package and add a spotlight control as a top-level component in
-the app:
+`Spotlight` package in your `package.js` file and add a Spotlight control as a
+top-level component in the app kind:
 
     enyo.kind({
         name: 'App',
@@ -38,59 +38,78 @@ the app:
             ...
         ],
         ...
-    })
+    });
 
 <a name="2"></a>
-## 2. MODES: ##
+## 2. MODES ##
 
-**[Spotlight](kind.Spotlight.js)** functions in two mutually exclusive modes: **5-way** and **Pointer** mode.
-Currently it is configured to switch between modes whenever corresponding input is received. I.e. it switches to pointer mode on mousemove, and back to 5-way on keydown.
-However, **[Spotlight](kind.Spotlight.js)** API provides a way to explicitly perform the switch by calling 
+Spotlight operates in two mutually exclusive modes: **5-way mode** and **Pointer
+mode**.  By default, it is configured to switch between these modes whenever
+suitable input is received--i.e., it switches to pointer mode on `mousemove`,
+and back to 5-way mode on `keydown`.
 
-> `Enyo.Spotlight.setPointerMode([BOOLEAN]);`
+The Spotlight API also provides a way to explicitly perform the switch:
+
+    `Enyo.Spotlight.setPointerMode([BOOLEAN]);`
 
 <a name="3"></a>
-## 3. NAVIGATION: ##
+## 3. NAVIGATION ##
 
-**[Spotlight](kind.Spotlight.js)** allows navigation between Enyo controls by setting spotlight focus to one control at a time. 
-When control is focused, it is assigned a CSS class ".spotlight" which allows to style focused controls on per-kind basis using `.<kindClass>.spotlight` selectors.
+**[Spotlight](kind.Spotlight.js)** allows navigation between Enyo controls by
+assigning focus to one control at a time.  When a control is focused, it takes
+on the CSS class `.spotlight`, which allows focused controls to be styled on a
+per-kind basis using `.<kindClass>.spotlight` selectors.
 
-In order to make a control focusable with **[Spotlight](kind.Spotlight.js)** ( **Spottable** ), simply set it's "spotlight" property to TRUE, like so:
+In order to make a control focusable (or **"spottable"**) with Spotlight, simply
+set its `spotlight` property to `TRUE`, like so:
 
-> `{name: 'mybutton', tag: 'button', spotlight: true}`
+    {name: 'mybutton', tag: 'button', spotlight: true}
 	
-When application loads, spotlight searches for a control name specified by it's **defaultControl** property, 
-if defaultControl is not specified, spotlight focuses on the first available spottable control.
+When the application loads, Spotlight searches for a control with the name
+specified in its `defaultControl` property; if `defaultControl` is not
+specified, Spotlight assigns focus to the first available spottable control.
 
-In 5-way mode, spotlight uses [Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to determine what spottable control is nearest in the direction of navigation. 
-The coordinates of spottable controls are derived from their actual position on the screen.
+In 5-way mode, Spotlight uses the
+[Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to determine
+which spottable control is the nearest in the direction of navigation.  The
+coordinates of a spottable control are derived from its actual position on the
+screen.
 
-It's worth noting, that spottable controls don't have to be found on the same hierarchal level of an Enyo component tree. 
-**[Spotlight](kind.Spotlight.js)** takes care of allowing seamless navigation between topmost spottable components found in the tree.
+It's worth noting that spottable controls may be found on different hierarchical
+levels of an Enyo component tree.  Spotlight facilitates seamless navigation
+between the topmost spottable components found in the tree.
 
 <a name="4"></a>
-## 4. CONTAINERS: ##
+## 4. CONTAINERS ##
 
-In order to organize controls into navigation groups we have created Spotlight containers. 
-A good use case for containers is a set of radio buttons that need to be navigable independently from the rest of controls.
+In order to organize controls into navigation groups, we have created Spotlight
+containers. 
 
-When Spotlight container is focused it passes the focus to it's own hierarchy of spottable child controls, 
-namely to the spottable child, which has been focused last before the focus has moved outside of the container.
-If the container in question has never been focused, it focuses it's first spottable child.
+A good example use case for containers is a set of radio buttons that must be
+navigable separate from the rest of the app's controls.
 
-To define a container, set control's `spotlight` property to "container":
+When a Spotlight container is focused, it passes the focus to its own hierarchy
+of spottable child controls--namely, to the last spottable child to hold focus
+before the focus moved outside of the container.  If the container in question
+has never been focused, it passes focus to its first spottable child.
 
-> `{name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}`
-	
-In a way, containers are the branches and `spotlight:true` controls are the leaves of **[Spotlight](kind.Spotlight.js)** navigation tree.
-	
+To define a container, set a control's `spotlight` property to `"container"`:
+
+    {name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}
+
+In a way, containers may be thought of as the branches--and `spotlight:true`
+controls as the leaves--of the Spotlight navigation tree.
+
 <a name="5"></a>
 ## 5. NESTING ##
 
-The containers can be nested. The inner containers can be remembered by outer as their "last focused children", and act as conduits of focus passed by the outer ones.
+Spotlight containers may be nested.  The inner containers may be remembered as
+"last focused children" of the outer ones; they act as conduits of focus passed
+by the outer containers.
 
-Nesting `spotlight:true` controls was not found useful. 
-As of now, they act as the leaves of the spottable tree and don't conduct focus, however this behavior can be overridden on per-control basis. 
+We have not found it useful to nest `spotlight:true` controls.  For now, these
+controls act as the leaves of the spottable tree and do not conduct focus;
+however, this behavior may be overridden on a per-control basis.
 
 <a name="6"></a>
 ## 6. EVENTS ##
@@ -255,7 +274,6 @@ If you need to persist a state of control between event handler calls you can us
 
 Please refer to **[existing Spotlight decorators](decorators)** package for samples.
 
-
 <br />
 <a name="7.2"></a>
 ### 7.2. Extending controls ###
@@ -263,9 +281,4 @@ Please refer to **[existing Spotlight decorators](decorators)** package for samp
 Extending enyo controls to use **[Spotlight](kind.Spotlight.js)** functionality does not require any knowledge beyond enyo inheritance patterns and all described above in this document.
 To do so, you simply subkind the kind you want to extend and define event handlers to handle spotlight events.
 Please refer to **[Moonraker](https://github.com/enyojs/moonraker)** package for samples.
-
-
-
-
-
 
