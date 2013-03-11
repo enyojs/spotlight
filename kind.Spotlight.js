@@ -219,6 +219,10 @@ enyo.kind({
 			var oTarget = null;
 			if (this._oOwner) {												// Events only processed when Spotlight initialized with an owner
 				switch (oEvent.type) {
+					case 'scroll':
+						this.onScroll(oEvent);
+					case 'mousewheel':
+						this.onMouseWheel(oEvent);
 					case 'mousemove':
 						if (this.clientXYChanged(oEvent)) {					// Only register mousemove if the x/y actually changed, avoid mousemove while scrolling, etc.
 							this.onMouseMove(oEvent);
@@ -268,6 +272,15 @@ enyo.kind({
 				case 'onSpotlightSelect'	: return this.onSpotlightSelect(oEvent);
 				case 'onSpotlightPoint'		: return this.onSpotlightPoint(oEvent);
 			}
+		},
+		
+		onScroll: function(oEvent) {
+			//enyo.log('Scroll', oEvent);
+		},
+		
+		onMouseWheel: function(oEvent) {
+			//console.clear();
+			enyo.log('Mousewheel', oEvent.wheelDeltaY);
 		},
 		
 		// Called by onEvent() to process mousemove events
