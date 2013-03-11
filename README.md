@@ -1,6 +1,5 @@
 # SPOTLIGHT DOCUMENTATION #
 
-
 1. [What is Spotlight?](#1)
 2. [Modes](#2)
 3. [Navigation](#3)
@@ -15,23 +14,31 @@
 	1. [Spotlight Decorators](#7.1)
 	2. [Extending controls](#7.2)
 
-
 <a name="1"></a>
 ## 1. WHAT IS SPOTLIGHT? ##
 
-Spotlight is an extensible Enyo utility that enables keyboard navigation in Enyo applications. 
-Using exclusively **UP, DOWN, LEFT, RIGHT** and **RETURN** keys you can use application as (if not more) effective as a user-mouse team. 
-In addition, of course, it responds to Point-and-Click events. 
-TV remote controlling and keyboard navigation are the use cases where Spotlight is an essential tool.
+Spotlight is an extensible utility that enables users to navigate Enyo
+applications using a keyboard or television remote control.  Responding to input
+from the **UP**, **DOWN**, **LEFT**, **RIGHT**, and **RETURN** keys, Spotlight
+provides a navigation experience that compares favorably to that of a mouse on a
+computer.
 
-To add **[Spotlight](kind.Spotlight.js)** to the application, simply include the **Spotlight** package and add spotlight control as a top component in your application:
+In addition, Spotlight includes support for Point-and-Click events, so all bases
+are covered.
 
-> `enyo.kind({`   
-&nbsp;&nbsp;`name: 'App',`   
-&nbsp;&nbsp;&nbsp;&nbsp;`kind: 'FittableRows',`   
-&nbsp;&nbsp;&nbsp;&nbsp;`components:[`   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`{kind: 'enyo.Spotlight', defaultControl: 'list1'},`   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`...`
+To add **[Spotlight](kind.Spotlight.js)** to an application, simply include the
+**Spotlight** package and add a spotlight control as a top-level component in
+the app:
+
+    enyo.kind({
+        name: 'App',
+        kind: 'FittableRows',   
+        components:[   
+            {kind: 'enyo.Spotlight', defaultControl: 'list1'},
+            ...
+        ],
+        ...
+    })
 
 <a name="2"></a>
 ## 2. MODES: ##
