@@ -207,11 +207,55 @@ Each of the two has it's own pros and cons. Historically, we needed pros of both
 <a name="7.1"></a>
 ### 7.1. Spotlight Decorators ###
 
-Spotlight decorators is a way to add spotlight functionality 
+Spotlight decorators is a way to add spotlight functionality to a control without altering it's code. 
+This approach is useful when one or more of the following is true:
+
+* You don't have access to alter control's code
+* You prefer not to extend control
+* You want to share same spotlight-related code among multiple kinds
+
+<br />
+**Steps to create and apply a decorator to a kind:**
+
+1. Create a *`kind.Spotlight.Decorator.<My-Decorated-Kind>.js`* file  
+2. Place this file into */decorators* folder inside of *spotlight* package
+3. Add a line with your new filename to */decorators/package.js* file to create a dependency
+4. In the file create a decorator kind:  
+> `name: enyo.Spotlight.Decorator.<My-Decorated-Kind>,`  
+5. Add `statics` block to write the rest of your code in it
+6. Add static property *decorates* :   
+> `decorates: My-Decorated-Kind,`  
+
+7. Add event handler function with exactly the same name as a Spotlight event you wish to handle:
+> `onSpotlightFocused: function(oSender, oEvent) { console.log(oSender, oEvent); },`   
+8. Around your decorator you may add an *if* statement checking for *My-Decorated-Kind* being present in scope to avoid null reference exceptions:
+> `if (window.onyx && onyx.<My-Decorated-Kind>) { /* decorator code */ }`
+
+
+<br /><br />
+When you run your code and focus your desired control, you should see console entries with an instance of the control (oSender) and `onSpotlightFocused` event instance (oEvent)
+
+<a name="C"></a>
+Figure C
+--------
+![Accelerated keydown sequence](docs/chart_spotlight_decorators.jpg)
+
+Having a reference of control inside of event handler's scope allows you to access it's API and change it's state as desired in response to the event.
+Just like in a regular event handler, returning TRUEish values will prevent it's default behavior defined in **[Spotlight](kind.Spotlight.js)**
+
+If you need to persist a state of control between event handler calls you can use `oSender._spotlight` property object which is added by **[Spotlight](kind.Spotlight.js)** to every control it decorates:
+> `oSender._spotlight.focusedTimes ++;`  
+
+Please refer to **[existing Spotlight decorators](decorators)** package for samples.
+
 
 <br />
 <a name="7.2"></a>
 ### 7.2. Extending controls ###
+
+Extending enyo controls to use **[Spotlight](kind.Spotlight.js)** functionality does not require any knowledge beyond enyo inheritance patterns and all described above in this document.
+To do so, you simply subkind the kind you want to extend and define event handlers to handle spotlight events.
+Please refer to **[Moonraker](https://github.com/enyojs/moonraker)** package for samples.
 
 
 
