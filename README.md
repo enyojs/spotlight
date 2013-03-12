@@ -10,6 +10,7 @@
 	2. [Preventing/Allowing default DOM events](#6_2)
 	3. [Sequence of Spotlight events](#6_3)
 	4. [Accelerated keydown events](#6_4)
+	5. [Scroll events](#6_5)
 7. [Extending Spotlight](#7)
 	1. [Spotlight Decorators](#7.1)
 	2. [Extending controls](#7.2)
@@ -252,6 +253,9 @@ This tells the Accelerator to do the following:
 This causes Spotlight focus to move across the screen with apparent acceleration
 while a 5-way key is depressed.
 
+<br />
+
+<a name="6.5"></a>
 ### 6.5. Scroll Events ###
 
 In response to browser's `mousewheel` events, spotlight dispatches `onSpotlightScrollUp` and `onSpotlightScrollDown`.    
