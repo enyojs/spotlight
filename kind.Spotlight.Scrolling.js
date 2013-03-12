@@ -23,6 +23,8 @@ enyo.kind({
 			this._nDelta += oEvent.wheelDeltaY;
 			//enyo.log('wheel', this._nDelta);
 			
+			oEvent.preventDefault();
+			
 			if (this._nDelta >= this.frequency) {
 				this._nDelta = 0;
 				return fCallback.apply(oContext, [oEvent, true]);
