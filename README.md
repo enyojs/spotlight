@@ -128,29 +128,31 @@ The following events are dispatched by the main Spotlight module:
 
 #### 5-way mode
 
-1. **onSpotlightKeyDown**: Dispatched in response to `keydown`
-2. **onSpotlightKeyUp** Dispatched in response to `keyup`
-3. **onSpotlightLeft**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightKeyDown**: Dispatched in response to `keydown`
+- **onSpotlightKeyUp** Dispatched in response to `keyup`
+- **onSpotlightLeft**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 37
-4. **onSpotlightRight**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightRight**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 39
-5. **onSpotlightUp**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightUp**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 38
-6. **onSpotlightDown**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightDown**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 40
-7. **onSpotlightSelect**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightSelect**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 13
-8. **onSpotlightFocus**: Dispatched when focus is transferred to a new control
+- **onSpotlightFocus**: Dispatched when focus is transferred to a new control
     in response to events 3 through 7.
-9. **onSpotlightBlur**: Dispatched when focus is transferred away from a control
-10. **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
+- **onSpotlightBlur**: Dispatched when focus is transferred away from a control
+- **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
     bubbling to app level right after its originator is set as current
+- **onSpotlightScrollUp**: Dispatched when mousewheel event delta exceeds enyo.Spotlight.Scrolling.frequency (Default: 40)  
+- **onSpotlightScrollDown**: Dispatched when mousewheel event delta exceeds -enyo.Spotlight.Scrolling.frequency (Default: 40)
+
 
 #### Pointer mode
 
-1. **onSpotlightPoint**: Dispatched in response to `mousemove`, with coordinates
+- **onSpotlightPoint**: Dispatched in response to `mousemove`, with coordinates
     matching the bounds of the spottable control
-2. **onSpotlightScroll**: TBD  
 
 <br />     
 
