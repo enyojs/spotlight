@@ -188,7 +188,17 @@ enyo.kind({
 				}
 			}
 		},
-
+		
+		// Return true if was in pointer mode
+		_comeBackFromPointerMode: function() {
+			if (!this._bCanFocus) {											// Comming back from pointer mode, show control once before continuing navigation
+				this._bCanFocus = true;
+				this.spot(this._oLastSpotlightTrueControl5Way);
+				return true;
+			}
+			return false;
+		},
+		
 		//* @public
 		/************************************************************/
 
@@ -219,18 +229,16 @@ enyo.kind({
 			var oTarget = null;
 			if (this._oOwner) {												// Events only processed when Spotlight initialized with an owner
 				switch (oEvent.type) {
-					case 'scroll':
-						this.onScroll(oEvent);
-					case 'mousewheel':
-						this.onMouseWheel(oEvent);
 					case 'mousemove':
 						if (this.clientXYChanged(oEvent)) {					// Only register mousemove if the x/y actually changed, avoid mousemove while scrolling, etc.
 							this.onMouseMove(oEvent);
 						}
 						break;
+					case 'mousewheel':
+						return enyo.Spotlight.Scrolling.processMouseWheel(oEvent, this.onScroll, this);
 					case 'keydown':
 					case 'keyup':
-						return enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey);
+						return enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 				}
 			}
 		},
@@ -274,13 +282,14 @@ enyo.kind({
 			}
 		},
 		
-		onScroll: function(oEvent) {
-			//enyo.log('Scroll', oEvent);
-		},
-		
-		onMouseWheel: function(oEvent) {
-			//console.clear();
-			enyo.log('Mousewheel', oEvent.wheelDeltaY);
+		onScroll: function(oEvent, bUp) {
+			this.setPointerMode(false);									// Preserving explicit setting of mode for future features
+			if (this._comeBackFromPointerMode()) {
+				return true;
+			}
+			
+			var sEventName = 'onSpotlightScroll' + (bUp ? 'Up' : 'Down');
+			this._dispatchEvent(sEventName, {domEvent: oEvent});
 		},
 		
 		// Called by onEvent() to process mousemove events
@@ -314,10 +323,7 @@ enyo.kind({
 		onSpotlightKeyUp   : function(oEvent) {},
 		onSpotlightKeyDown : function(oEvent) {
 			this.setPointerMode(false);										// Preserving explicit setting of mode for future features
-
-			if (!this._bCanFocus) {											// Comming back from pointer mode, show control once before continuing navigation
-				this._bCanFocus = true;
-				this.spot(this._oLastSpotlightTrueControl5Way);
+			if (this._comeBackFromPointerMode()) {
 				return true;
 			}
 			
@@ -365,10 +371,10 @@ enyo.kind({
 		//* @public
 		/************************************************************/
 
-		setPointerMode		: function(bPointerMode)	{
-			this._bPointerMode != bPointerMode
-				? enyo.Signals.send('onSpotlightModeChanged', {pointerMode: bPointerMode})
-				: enyo.noop;
+		setPointerMode : function(bPointerMode)	{
+			if (this._bPointerMode != bPointerMode) {
+				enyo.Signals.send('onSpotlightModeChanged', {pointerMode: bPointerMode});
+			}
 			this._bPointerMode = bPointerMode;
 		},
 

@@ -23,14 +23,14 @@ enyo.kind({
 		
 		//* Called from enyo.Spotlight, with current keydown event and Spotlight's callback 
 		//* Which will be called when an event is allowed through
-		processKey: function(oEvent, fCallback) {
+		processKey: function(oEvent, fCallback, oContext) {
 			switch (oEvent.type) {
 				case 'keydown':
 					if (oEvent.keyCode != this._nKey) {
 						this.reset();
 						this._nTime = (new Date()).getTime();
 						this._nKey = oEvent.keyCode;
-						return fCallback(oEvent);
+						return fCallback.apply(oContext, [oEvent]);
 					} else {
 						var nElapsedTime = (new Date()).getTime() - this._nTime,
 							nSeconds	 = Math.floor(nElapsedTime / 1000),
@@ -45,7 +45,7 @@ enyo.kind({
 
 						if (this._nSkipped >= nToSkip) {
 							this._nSkipped = 0;
-							return fCallback(oEvent);
+							return fCallback.apply(oContext, [oEvent]);
 						} else {
 							this._nSkipped ++;
 							oEvent.preventDefault(); // Prevent skipped keydown events from bubbling
@@ -55,7 +55,7 @@ enyo.kind({
 					break;
 				case 'keyup':
 					this.reset();
-					return fCallback(oEvent);
+					return fCallback.apply(oContext, [oEvent]);
 			}
 		},
 

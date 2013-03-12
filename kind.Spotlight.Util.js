@@ -50,7 +50,7 @@ enyo.kind({
 			var oLeft 			= 0,
 				oTop 			= 0,
 				oMatch			= null,
-				oNode 			= oControl.hasNode(),
+				oNode 			= oControl instanceof enyo.Control ? oControl.hasNode() : oControl,
 				nWidth 			= oNode.offsetWidth,
 				nHeight 		= oNode.offsetHeight,
 				sTransformProp 	= enyo.dom.getStyleTransformProp(),
