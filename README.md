@@ -252,6 +252,21 @@ This tells the Accelerator to do the following:
 This causes Spotlight focus to move across the screen with apparent acceleration
 while a 5-way key is depressed.
 
+### 6.5. Scroll Events ###
+
+In response to browser's `mousewheel` events, spotlight dispatches `onSpotlightScrollUp` and `onSpotlightScrollDown`.    
+However, there is a difference in how these are dispatched:  
+The `mousewheel` event has a `wheelDeltaY` property which is translatable to degree of wheel rotation.
+[Spotlight Scrolling](kind.Spotlight.Scrolling.js) accumulates `wheelDeltaY` values in a direction of rotation.
+Once their cumulative value exceeds `enyo.Spotlight.Scrolling.frequency`, the `onSpotlightScrollUp` or `onSpotlightScrollDown` are
+then dispatched and cumulative value is set back to 0.
+
+This way Spotlight scrolling events are made to behave more like repeating keydown events, 
+which is useful for controls like pickers and list scrollers that don't use smooth scrolling, instead animating to their next item.
+
+Note: when Spotlight is in [Pointer Mode](#2), it treats first scroll event as first keyboard event, using it to come back from 
+pointer mode and re-spot the item that was spotted previously.
+
 <a name="7"></a>
 ## 7. EXTENDING SPOTLIGHT ##
 
