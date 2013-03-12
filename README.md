@@ -6,10 +6,11 @@
 4. [Containers](#4)
 5. [Nesting](#5)
 6. [Events](#6)
-	1. [Spotlight events list](#6_1)
-	2. [Preventing/Allowing default DOM events](#6_2)
-	3. [Sequence of Spotlight events](#6_3)
-	4. [Accelerated keydown events](#6_4)
+	1. [Spotlight events list](#6.1)
+	2. [Preventing/Allowing default DOM events](#6.2)
+	3. [Sequence of Spotlight events](#6.3)
+	4. [Accelerated keydown events](#6.4)
+	5. [Scroll events](#6.5)
 7. [Extending Spotlight](#7)
 	1. [Spotlight Decorators](#7.1)
 	2. [Extending controls](#7.2)
@@ -128,29 +129,31 @@ The following events are dispatched by the main Spotlight module:
 
 #### 5-way mode
 
-1. **onSpotlightKeyDown**: Dispatched in response to `keydown`
-2. **onSpotlightKeyUp** Dispatched in response to `keyup`
-3. **onSpotlightLeft**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightKeyDown**: Dispatched in response to `keydown`
+- **onSpotlightKeyUp** Dispatched in response to `keyup`
+- **onSpotlightLeft**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 37
-4. **onSpotlightRight**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightRight**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 39
-5. **onSpotlightUp**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightUp**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 38
-6. **onSpotlightDown**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightDown**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 40
-7. **onSpotlightSelect**: Dispatched in response to `onSpotlightKeyDown` event's
+- **onSpotlightSelect**: Dispatched in response to `onSpotlightKeyDown` event's
     bubbling to app level with keyCode 13
-8. **onSpotlightFocus**: Dispatched when focus is transferred to a new control
+- **onSpotlightFocus**: Dispatched when focus is transferred to a new control
     in response to events 3 through 7.
-9. **onSpotlightBlur**: Dispatched when focus is transferred away from a control
-10. **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
+- **onSpotlightBlur**: Dispatched when focus is transferred away from a control
+- **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
     bubbling to app level right after its originator is set as current
+- **onSpotlightScrollUp**: Dispatched when mousewheel event delta exceeds enyo.Spotlight.Scrolling.frequency (Default: 40)  
+- **onSpotlightScrollDown**: Dispatched when mousewheel event delta exceeds -enyo.Spotlight.Scrolling.frequency (Default: 40)
+
 
 #### Pointer mode
 
-1. **onSpotlightPoint**: Dispatched in response to `mousemove`, with coordinates
+- **onSpotlightPoint**: Dispatched in response to `mousemove`, with coordinates
     matching the bounds of the spottable control
-2. **onSpotlightScroll**: TBD  
 
 <br />     
 
@@ -249,6 +252,24 @@ This tells the Accelerator to do the following:
 
 This causes Spotlight focus to move across the screen with apparent acceleration
 while a 5-way key is depressed.
+
+<br />
+
+<a name="6.5"></a>
+### 6.5. Scroll Events ###
+
+In response to browser's `mousewheel` events, spotlight dispatches `onSpotlightScrollUp` and `onSpotlightScrollDown`.    
+However, there is a difference in how these are dispatched:  
+The `mousewheel` event has a `wheelDeltaY` property which is translatable to degree of wheel rotation.
+[Spotlight Scrolling](kind.Spotlight.Scrolling.js) accumulates `wheelDeltaY` values in a direction of rotation.
+Once their cumulative value exceeds `enyo.Spotlight.Scrolling.frequency`, the `onSpotlightScrollUp` or `onSpotlightScrollDown` are
+then dispatched and cumulative value is set back to 0.
+
+This way Spotlight scrolling events are made to behave more like repeating keydown events, 
+which is useful for controls like pickers and list scrollers that don't use smooth scrolling, instead animating to their next item.
+
+Note: when Spotlight is in [Pointer Mode](#2), it treats first scroll event as first keyboard event, using it to come back from 
+pointer mode and re-spot the item that was spotted previously.
 
 <a name="7"></a>
 ## 7. EXTENDING SPOTLIGHT ##
