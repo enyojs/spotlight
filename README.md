@@ -148,7 +148,7 @@ The following events are dispatched by the main Spotlight module:
     bubbling to app level right after its originator is set as current
 - **onSpotlightScrollUp**: Dispatched when `mousewheel` event delta exceeds
     `enyo.Spotlight.Scrolling.frequency` (Default: 40)  
-- **onSpotlightScrollDown**: Dispatched when `mousewheel` event delta exceeds
+- **onSpotlightScrollDown**: Dispatched when `mousewheel` negative event delta exceeds
     `-enyo.Spotlight.Scrolling.frequency` (Default: 40)
 
 
@@ -278,7 +278,8 @@ that don't use smooth scrolling, instead animating from one item to the next.
 
 Note: In [Pointer Mode](#2), Spotlight treats the first scroll event as the
 first keyboard event; in response, Spotlight returns from pointer mode and
-re-spots the item that was previously spotted.
+re-spots the item that was previously spotted. No scrolling happens on first
+scroll event when returning from pointer mode.
 
 <a name="7"></a>
 ## 7. EXTENDING SPOTLIGHT ##
