@@ -27,8 +27,8 @@ In addition, Spotlight includes support for Point-and-Click events, so all bases
 are covered.
 
 To add **[Spotlight](kind.Spotlight.js)** to an application, simply include the
-**Spotlight** package and add a spotlight control as a top-level component in
-the app:
+`Spotlight` package in your `package.js` file and add a Spotlight control as a
+top-level component in the app kind:
 
     enyo.kind({
         name: 'App',
@@ -38,170 +38,217 @@ the app:
             ...
         ],
         ...
-    })
+    });
 
 <a name="2"></a>
-## 2. MODES: ##
+## 2. MODES ##
 
-**[Spotlight](kind.Spotlight.js)** functions in two mutually exclusive modes: **5-way** and **Pointer** mode.
-Currently it is configured to switch between modes whenever corresponding input is received. I.e. it switches to pointer mode on mousemove, and back to 5-way on keydown.
-However, **[Spotlight](kind.Spotlight.js)** API provides a way to explicitly perform the switch by calling 
+Spotlight operates in two mutually exclusive modes: **5-way mode** and **Pointer
+mode**.  By default, it is configured to switch between these modes whenever
+suitable input is received--i.e., it switches to pointer mode on `mousemove`,
+and back to 5-way mode on `keydown`.
 
-> `Enyo.Spotlight.setPointerMode([BOOLEAN]);`
+The Spotlight API also provides a way to explicitly perform the switch:
+
+    `Enyo.Spotlight.setPointerMode([BOOLEAN]);`
 
 <a name="3"></a>
-## 3. NAVIGATION: ##
+## 3. NAVIGATION ##
 
-**[Spotlight](kind.Spotlight.js)** allows navigation between Enyo controls by setting spotlight focus to one control at a time. 
-When control is focused, it is assigned a CSS class ".spotlight" which allows to style focused controls on per-kind basis using `.<kindClass>.spotlight` selectors.
+**[Spotlight](kind.Spotlight.js)** allows navigation between Enyo controls by
+assigning focus to one control at a time.  When a control is focused, it takes
+on the CSS class `.spotlight`, which allows focused controls to be styled on a
+per-kind basis using `.<kindClass>.spotlight` selectors.
 
-In order to make a control focusable with **[Spotlight](kind.Spotlight.js)** ( **Spottable** ), simply set it's "spotlight" property to TRUE, like so:
+In order to make a control focusable (or **"spottable"**) with Spotlight, simply
+set its `spotlight` property to `TRUE`, like so:
 
-> `{name: 'mybutton', tag: 'button', spotlight: true}`
+    {name: 'mybutton', tag: 'button', spotlight: true}
 	
-When application loads, spotlight searches for a control name specified by it's **defaultControl** property, 
-if defaultControl is not specified, spotlight focuses on the first available spottable control.
+When the application loads, Spotlight searches for a control with the name
+specified in its `defaultControl` property; if `defaultControl` is not
+specified, Spotlight assigns focus to the first available spottable control.
 
-In 5-way mode, spotlight uses [Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to determine what spottable control is nearest in the direction of navigation. 
-The coordinates of spottable controls are derived from their actual position on the screen.
+In 5-way mode, Spotlight uses the
+[Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to determine
+which spottable control is the nearest in the direction of navigation.  The
+coordinates of a spottable control are derived from its actual position on the
+screen.
 
-It's worth noting, that spottable controls don't have to be found on the same hierarchal level of an Enyo component tree. 
-**[Spotlight](kind.Spotlight.js)** takes care of allowing seamless navigation between topmost spottable components found in the tree.
+It's worth noting that spottable controls may be found on different hierarchical
+levels of an Enyo component tree.  Spotlight facilitates seamless navigation
+between the topmost spottable components found in the tree.
 
 <a name="4"></a>
-## 4. CONTAINERS: ##
+## 4. CONTAINERS ##
 
-In order to organize controls into navigation groups we have created Spotlight containers. 
-A good use case for containers is a set of radio buttons that need to be navigable independently from the rest of controls.
+In order to organize controls into navigation groups, we have created Spotlight
+containers. 
 
-When Spotlight container is focused it passes the focus to it's own hierarchy of spottable child controls, 
-namely to the spottable child, which has been focused last before the focus has moved outside of the container.
-If the container in question has never been focused, it focuses it's first spottable child.
+A good example use case for containers is a set of radio buttons that must be
+navigable separate from the rest of the app's controls.
 
-To define a container, set control's `spotlight` property to "container":
+When a Spotlight container is focused, it passes the focus to its own hierarchy
+of spottable child controls--namely, to the last spottable child to hold focus
+before the focus moved outside of the container.  If the container in question
+has never been focused, it passes focus to its first spottable child.
 
-> `{name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}`
-	
-In a way, containers are the branches and `spotlight:true` controls are the leaves of **[Spotlight](kind.Spotlight.js)** navigation tree.
-	
+To define a container, set a control's `spotlight` property to `"container"`:
+
+    {name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}
+
+In a way, containers may be thought of as the branches--and `spotlight:true`
+controls as the leaves--of the Spotlight navigation tree.
+
 <a name="5"></a>
 ## 5. NESTING ##
 
-The containers can be nested. The inner containers can be remembered by outer as their "last focused children", and act as conduits of focus passed by the outer ones.
+Spotlight containers may be nested.  The inner containers may be remembered as
+"last focused children" of the outer ones; they act as conduits of focus passed
+by the outer containers.
 
-Nesting `spotlight:true` controls was not found useful. 
-As of now, they act as the leaves of the spottable tree and don't conduct focus, however this behavior can be overridden on per-control basis. 
+We have not found it useful to nest `spotlight:true` controls.  For now, these
+controls act as the leaves of the spottable tree and do not conduct focus;
+however, this behavior may be overridden on a per-control basis.
 
 <a name="6"></a>
 ## 6. EVENTS ##
 
-All spotlight events are dispatched directly to the currently spotted control, where they can be prevented from bubbling to define custom behavior. (See [Extending Spotlight](#7) section)
-If spotlight events are allowed to bubble to the application level, the **[Spotlight](kind.Spotlight.js)** responds to them with default behavior.
+All Spotlight events are dispatched directly to the currently spotted control,
+which may prevent bubbling to define custom behavior. (See [Extending Spotlight](#7).)
+
+If Spotlight events are allowed to bubble to the application level, the app
+responds to them with default behavior.
 
 <br />
 <a name="6_1"></a>
-### 6.1. Spotlight events list ###
+### 6.1. List of Spotlight Events ###
 
-The events dispatched by main **[Spotlight](kind.Spotlight.js)** module are:
-> ### 5-way mode: ###
->
-> 1. **onSpotlightKeyDown** - dispatched in response to keydown
->
-> 2. **onSpotlightKeyUp** - dispatched in response to keyup
-> 
-> 3. **onSpotlightLeft** - dispatched in response to onSpotlightKeyDown bubble to app level with keyCode 37
-> 
-> 4. **onSpotlightRight** - dispatched in response to onSpotlightKeyDown bubble to app level with keyCode 39
-> 
-> 5. **onSpotlightUp** - dispatched in response to onSpotlightKeyDown bubble to app level with keyCode 38
-> 
-> 6. **onSpotlightDown** - dispatched in response to onSpotlightKeyDown bubble to app level with keyCode 40
-> 
-> 7. **onSpotlightSelect** - dispatched in response to onSpotlightKeyDown bubble to app level with keyCode 13
-> 
-> 8. **onSpotlightFocus** - dispatched when focus is being transferred to new control in response to events 3-8
-> 
-> 9. **onSpotlightBlur** - dispatched when focus is transferred away from a control
-> 
-> 10. **onSpotlightFocused** - dispatched in response to onSpotlightFocus bubble to app level right after it's originator is set as current
->
-> ### Pointer mode: ###
->
-> 1. **onSpotlightPoint** - dispatched in response to mousemove with coordinates matching bounds of spottable control
->
-> 2. **onSpotlightScroll** - TBD    
+The following events are dispatched by the main Spotlight module:
+
+#### 5-way mode
+
+1. **onSpotlightKeyDown**: Dispatched in response to `keydown`
+2. **onSpotlightKeyUp** Dispatched in response to `keyup`
+3. **onSpotlightLeft**: Dispatched in response to `onSpotlightKeyDown` event's
+    bubbling to app level with keyCode 37
+4. **onSpotlightRight**: Dispatched in response to `onSpotlightKeyDown` event's
+    bubbling to app level with keyCode 39
+5. **onSpotlightUp**: Dispatched in response to `onSpotlightKeyDown` event's
+    bubbling to app level with keyCode 38
+6. **onSpotlightDown**: Dispatched in response to `onSpotlightKeyDown` event's
+    bubbling to app level with keyCode 40
+7. **onSpotlightSelect**: Dispatched in response to `onSpotlightKeyDown` event's
+    bubbling to app level with keyCode 13
+8. **onSpotlightFocus**: Dispatched when focus is transferred to a new control
+    in response to events 3 through 7.
+9. **onSpotlightBlur**: Dispatched when focus is transferred away from a control
+10. **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
+    bubbling to app level right after its originator is set as current
+
+#### Pointer mode
+
+1. **onSpotlightPoint**: Dispatched in response to `mousemove`, with coordinates
+    matching the bounds of the spottable control
+2. **onSpotlightScroll**: TBD  
 
 <br />     
 
 <a name="6_2"></a>
-### 6.2. Preventing/Allowing default DOM events ###
+### 6.2. Preventing or Allowing Default DOM events ###
 
-By default, if keydown event carries 5-way keyCode (13, 37, 38, 39 or 40), it is prevented from bubbling to trigger default browser behavior. 
-This has been done to disable default browser scrolling, because in presence of **[Spotlight](kind.Spotlight.js)**, scrolling is handled otherwise using components like Scroller.
-Of course, there are other cases where you may want the default behavior to happen. 
-For example, in text inputs, moving cursor to the next character when right arrow key is depressed, may not require interference from JavaScript. 
+By default, if a `keydown` event carries a 5-way keyCode (13, 37, 38, 39 or 40),
+it will be prevented from bubbling and triggering default browser behavior.
+This is done to disable default browser scrolling, because in the presence of
+Spotlight, scrolling is handled using components such as Scroller.
 
-For cases like that, there is a **Allow DOM default** feature.
-Events **onSpotlightKeyDown**, **onSpotlightLeft**, **onSpotlightRight**, **onSpotlightUp**, **onSpotlightDown** and **onSpotlightSelect** supply to their handlers an event with added `allowDomDefault` method:
+Of course, there are some cases where you may want to allow the default browser
+behavior.  For example, in text inputs, you may want to allow the cursor to move
+to the next character when the right arrow key is pressed, without any
+interference from JavaScript. 
 
->	`onSpotlightKeyDown: function(oSender, oEvent) {`   
->	&nbsp;&nbsp;&nbsp;&nbsp;`oEvent.allowDomDefault();`   
->	`}`
+For such cases, we have included an **Allow DOM Default** feature.  The events
+`onSpotlightKeyDown`, `onSpotlightLeft`, `onSpotlightRight`, `onSpotlightUp`,
+`onSpotlightDown` and `onSpotlightSelect` pass their handlers an event object
+with an added `allowDomDefault` method:
 
-If the above handler, if the spotlight event is allowed to propagate, it will allow the original DOM keydown to trigger default browser behavior. See [Figure A](#A).   
+    onSpotlightKeyDown: function(oSender, oEvent) {
+        oEvent.allowDomDefault();
+    }
+
+In the above handler, if the Spotlight event is allowed to propagate, it will
+allow the original DOM `keydown` to trigger default browser behavior. (See
+[Figure A](#A)).
+   
 <br />  
 
 <a name="6.3"></a>
-### 6.3. Sequence of Spotlight events ###
+### 6.3. Sequence of Spotlight Events ###
 
 <a name="A"></a>
 Figure A
 --------
 ![Spotlight keyboard events](docs/chart_spotlight_5way_events.jpg)
 
-Following [Figure A](#A), **[Spotlight](kind.Spotlight.js)** 5-way mode events are following a sequence each step of which can be modified/prevented on the currently focused control level (See [Extending Spotlight](#7) section).
+[Figure A](#A) illustrates the sequence of events in Spotlight's 5-way mode.  At
+each step, the sequence may be modified (bubbling may be prevented) on the level
+of the currently focused control.  (See [Extending Spotlight](#7).)
 
-For an instance, when `onSpotlightKeyDown` is dispatched to focused control, the control has a choice to prevent it from ever reaching the App level where it would be handled by **[Spotlight](kind.Spotlight.js)**, and replace the default behavior with custom.
+For instance, when `onSpotlightKeyDown` is dispatched to the focused control,
+the control may choose to prevent it from ever reaching the app level (where it
+would be handled by Spotlight) and replace the default behavior with its own
+custom handling.
 
-If, however, `onSpotlightKeydown` is allowed to propagate and the **[Spotlight](kind.Spotlight.js)** recognizes it's keyCode as one of 5-way key codes, it dispatches `onSpotlight<5-Way Direction>` event back to the focused control.
-At this point, the control has, yet again, the option of overriding default behavior.
+If, however, `onSpotlightKeydown` is allowed to propagate and Spotlight
+recognizes its keyCode as one of 5-way key codes, it dispatches an
+`onSpotlight<5-Way Direction>` event back to the focused control.  At this point,
+the control has, yet again, the option of overriding default behavior.
 
-If `onSpotlight<5-Way Direction>` event bubbles up to App level, **[Spotlight](kind.Spotlight.js)** employs it's [Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to figure out what spottable control is closest in the `<5-Way Direction>`. 
-It dispatches `onSpotlightBlur` (while removing CSS *.spotlight* class) to the current control, and `onSpotlightFocus` to the neighbor in question (while adding CSS *.spotlight* class to it).
+If `the onSpotlight<5-Way Direction>` event bubbles up to the app level,
+Spotlight employs its [Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js)
+to figure out which spottable control is closest in the `<5-Way Direction>`.  It
+then dispatches an `onSpotlightBlur` event to the current control (while also
+removing the CSS *.spotlight* class), and an `onSpotlightFocus` event to the
+nearest neighbor (while also adding the CSS *.spotlight* class).
 
-If `onSpotlightFocus` is allowed to bubble from the newly focused control, **[Spotlight](kind.Spotlight.js)** set's it's originator as **current**, and it officially becomes focused control. 
-In celebration of this fact, **[Spotlight](kind.Spotlight.js)** dispatches `onSpotlightFocused` to the control.   
+If `onSpotlightFocus` is allowed to bubble from the newly focused control,
+Spotlight sets its originator as `current`, and it officially becomes the
+focused control.  In recognition of this fact, Spotlight dispatches
+`onSpotlightFocused` to the control.
 
 <br />
 
 <a name="6.4"></a>
-### 6.4. Accelerated keydown events ###
+### 6.4. Accelerated keydown Events ###
 
 <a name="B"></a>
 Figure B
 --------
 ![Accelerated keydown sequence](docs/chart_spotlight_accelerator_events.jpg)
 
-While key is depressed, browser dispatches keydown events with equal (or nearly equal) intervals.
+While a key is depressed, the browser dispatches `keydown` events at equal (or
+nearly equal) intervals.
 
-Following [Figure B](#B), we can see that not all of them affect application.
-Function of [Spotlight Accelerator](kind.Spotlight.Accelerator.js) is to distribute events in time per it's configuration.
+Looking at [Figure B](#B), we can see that not all of these events affect the
+application.  The function of the [Spotlight Accelerator](kind.Spotlight.Accelerator.js)
+is to distribute events over time (according to its configuration).
 
-[Spotlight Accelerator](kind.Spotlight.Accelerator.js) can be configured via it's array property `enyo.Spotlight.Accelerator.frequency`.
-It's default configuration is:
+Spotlight Accelerator may be configured via its array property,
+`enyo.Spotlight.Accelerator.frequency`.  The default configuration is as
+follows:
 
-> `//* Firing configuration. At n-th second use every frequency[n] subsequent keydown event`    
-> frequency	: [3, 3, 3, 2, 2, 2, 1], ...   
- 
-This commands [Accelerator](kind.Spotlight.Accelerator.js) the following:
+    //* Firing configuration. At n-th second use every frequency[n] subsequent keydown event
+    frequency : [3, 3, 3, 2, 2, 2, 1], ...
 
-* On 1st, 2nd and 3rd second after key is depressed, only allow through every 3rd keydown event
-* On 4th, 5th and 6th second - allow every 2nd keydown event
-* On 7th and on second - allow every keydown event
+This tells the Accelerator to do the following:
 
-This creates an appearance of Spotlight focus moving on the screen with acceleration while 5-way key is depressed.
+* In the first, second, and third seconds after the key is depressed, only let
+    through every third `keydown` event.
+* In the fourth, fifth, and sixth seconds, allow every second `keydown` event.
+* In the seventh second and later, allow every `keydown` event.
 
-
+This causes Spotlight focus to move across the screen with apparent acceleration
+while a 5-way key is depressed.
 
 <a name="7"></a>
 ## 7. EXTENDING SPOTLIGHT ##
@@ -255,7 +302,6 @@ If you need to persist a state of control between event handler calls you can us
 
 Please refer to **[existing Spotlight decorators](decorators)** package for samples.
 
-
 <br />
 <a name="7.2"></a>
 ### 7.2. Extending controls ###
@@ -263,9 +309,4 @@ Please refer to **[existing Spotlight decorators](decorators)** package for samp
 Extending enyo controls to use **[Spotlight](kind.Spotlight.js)** functionality does not require any knowledge beyond enyo inheritance patterns and all described above in this document.
 To do so, you simply subkind the kind you want to extend and define event handlers to handle spotlight events.
 Please refer to **[Moonraker](https://github.com/enyojs/moonraker)** package for samples.
-
-
-
-
-
 
