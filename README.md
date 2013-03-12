@@ -260,18 +260,25 @@ while a 5-way key is depressed.
 <a name="6.5"></a>
 ### 6.5. Scroll Events ###
 
-In response to browser's `mousewheel` events, spotlight dispatches `onSpotlightScrollUp` and `onSpotlightScrollDown`.    
-However, there is a difference in how these are dispatched:  
-The `mousewheel` event has a `wheelDeltaY` property which is translatable to degree of wheel rotation.
-[Spotlight Scrolling](kind.Spotlight.Scrolling.js) accumulates `wheelDeltaY` values in a direction of rotation.
-Once their cumulative value exceeds `enyo.Spotlight.Scrolling.frequency`, the `onSpotlightScrollUp` or `onSpotlightScrollDown` are
-then dispatched and cumulative value is set back to 0.
+In response to `mousewheel` events from the browser, Spotlight dispatches
+`onSpotlightScrollUp` and `onSpotlightScrollDown`.  Here's how the process
+works:
 
-This way Spotlight scrolling events are made to behave more like repeating keydown events, 
-which is useful for controls like pickers and list scrollers that don't use smooth scrolling, instead animating to their next item.
+The `mousewheel` event has a `wheelDeltaY` property, which translates to a given
+amount of wheel rotation.  [Spotlight Scrolling](kind.Spotlight.Scrolling.js)
+accumulates `wheelDeltaY` values in a given direction of rotation (up or down).
 
-Note: when Spotlight is in [Pointer Mode](#2), it treats first scroll event as first keyboard event, using it to come back from 
-pointer mode and re-spot the item that was spotted previously.
+Once the cumulative value exceeds `enyo.Spotlight.Scrolling.frequency`,
+`onSpotlightScrollUp` or `onSpotlightScrollDown` is dispatched and the
+cumulative value is reset to 0.
+
+In this way, Spotlight scrolling events are made to behave more like repeating
+keydown events, which is useful for controls like pickers and list scrollers
+that don't use smooth scrolling, instead animating from one item to the next.
+
+Note: In [Pointer Mode](#2), Spotlight treats the first scroll event as the
+first keyboard event; in response, Spotlight returns from pointer mode and
+re-spots the item that was previously spotted.
 
 <a name="7"></a>
 ## 7. EXTENDING SPOTLIGHT ##
