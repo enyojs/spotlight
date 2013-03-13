@@ -1,19 +1,19 @@
 # SPOTLIGHT DOCUMENTATION #
 
-1. [What is Spotlight?](#1)
+1. [What Is Spotlight?](#1)
 2. [Modes](#2)
 3. [Navigation](#3)
 4. [Containers](#4)
 5. [Nesting](#5)
 6. [Events](#6)
-	1. [Spotlight events list](#6.1)
-	2. [Preventing/Allowing default DOM events](#6.2)
-	3. [Sequence of Spotlight events](#6.3)
-	4. [Accelerated keydown events](#6.4)
-	5. [Scroll events](#6.5)
+	1. [List of Spotlight Events](#6.1)
+	2. [Preventing/Allowing Default DOM Events](#6.2)
+	3. [Sequence of Spotlight Events](#6.3)
+	4. [Accelerated keydown Events](#6.4)
+	5. [Scroll Events](#6.5)
 7. [Extending Spotlight](#7)
 	1. [Spotlight Decorators](#7.1)
-	2. [Extending controls](#7.2)
+	2. [Extending Controls](#7.2)
 
 <a name="1"></a>
 ## 1. WHAT IS SPOTLIGHT? ##
@@ -278,7 +278,7 @@ that don't use smooth scrolling, instead animating from one item to the next.
 
 Note: In [Pointer Mode](#2), Spotlight treats the first scroll event as the
 first keyboard event; in response, Spotlight returns from pointer mode and
-re-spots the item that was previously spotted. No scrolling happens on first
+re-spots the item that was previously spotted. No scrolling happens on the first
 scroll event when returning from pointer mode.
 
 <a name="7"></a>
