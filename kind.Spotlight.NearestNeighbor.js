@@ -141,10 +141,15 @@ enyo.kind({
 		
 		//* @public
 		/**************************************************************/
-
+		
 		getNearestNeighbor: function(sDirection, oControl) {
 			sDirection = sDirection.toUpperCase();
 			oControl = oControl || enyo.Spotlight.getCurrent();
+			
+			var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
+			if (oNeighbor) {
+				return oNeighbor; 
+			}
 
 			var n,
 				oBestMatch	= null,

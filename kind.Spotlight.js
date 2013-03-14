@@ -342,7 +342,14 @@ enyo.kind({
 
 		onSpotlightSelect: function(oEvent) {
 			this._preventDomDefault(oEvent);								// If oEvent.allowDomDefault() was not called this will preventDefault on dom keydown event
-			var aChildren = this.getChildren(oEvent.originator);
+			var aChildren,
+				oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl('SELECT', this.getCurrent());
+				
+			if (oNeighbor) {
+				return this.spot(oNeighbor);
+			}
+			
+			aChildren = this.getChildren(oEvent.originator);
 			if (aChildren.length == 0) {
 				return this._dispatchEvent('ontap', null, oEvent.originator);
 			} else {

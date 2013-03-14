@@ -25,7 +25,6 @@ enyo.kind({
 
 			oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
 				if (fHandler(oControl, oEvent)) {										// If handler returns true - prevent default
-					enyo.log('Setting type to NULL', oEvent);
 					oEvent.type = null;
 				} else {
 					f.apply(oControl, [sEventName, oEvent, oEventSender]);				// If handler returns false - call original dispatcher and allow bubbling
@@ -104,6 +103,23 @@ enyo.kind({
 
 		stringEndsWith: function(s, sSuffix) {
 		    return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
-		}
+		},
+		
+		directionToEvent: function(sDirection) {
+			return 'onSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase();
+		},
+		
+		getDefaultDirectionControl: function(sDirection, oControl) {
+			var sProperty = 'defaultSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase(),
+				oNeighbor;
+			
+			if (typeof oControl[sProperty] == 'string') {
+				oNeighbor = oControl.owner.$[oControl[sProperty]];
+				if (typeof oNeighbor != 'undefined') {
+					return oNeighbor;
+				}
+			}
+			return null;
+		},
 	}
 });
