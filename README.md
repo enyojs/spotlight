@@ -11,6 +11,7 @@
 	3. [Sequence of Spotlight Events](#6.3)
 	4. [Accelerated keydown Events](#6.4)
 	5. [Scroll Events](#6.5)
+	6. [Default 5-way controls](#6.6)
 7. [Extending Spotlight](#7)
 	1. [Spotlight Decorators](#7.1)
 	2. [Extending Controls](#7.2)
@@ -280,6 +281,28 @@ Note: In [Pointer Mode](#2), Spotlight treats the first scroll event as the
 first keyboard event; in response, Spotlight returns from pointer mode and
 re-spots the item that was previously spotted. No scrolling happens on the first
 scroll event when returning from pointer mode.
+
+<a name="6.6"></a>
+### 6.6. Default 5-way controls ###
+
+Sometimes Nearest Neighbor algorithm is just not enough. 
+Application UI specs may require you to specify where spotlight focus should move in response to 5-way event.
+
+For cases like that Spotlight has convenience properties:
+
+* **defaultSpotlightUp**
+* **defaultSpotlightDown**
+* **defaultSpotlightLeft**
+* **defaultSpotlightRight**
+* **defaultSpotlightSelect**
+
+Simply add them to your control, and if corresponding events is allowed to bubble,
+Spotlight will move focus to control, which name is specified in the property:
+
+	{name: 'control1', spotlight: true, defaultSpotlightRight: 'control2'},
+	{name: 'control2', spotlight: true, defaultSpotlightRight: 'control1'}
+	 
+In this example, focus will be passed back and forth between both controls with every right arrow button press.
 
 <a name="7"></a>
 ## 7. EXTENDING SPOTLIGHT ##
