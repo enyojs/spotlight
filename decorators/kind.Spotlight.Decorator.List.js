@@ -36,7 +36,7 @@ enyo.kind({
 				this._blurNode(oSender, nCurrent);
 			}
 
-			if (n !== null) {
+			if ((n !== null) && (n !== undefined)) {
 				this._focusNode(oSender, n);
 				oSender._nCurrentSpotlightItem = n;
 				node = this._getNode(oSender, n);
