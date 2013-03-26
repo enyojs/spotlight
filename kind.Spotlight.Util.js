@@ -59,12 +59,10 @@ enyo.kind({
 			if (oNode.offsetParent) {
 				do {
 					// Fix for FF (GF-2036), offsetParent is working differently between FF and chrome 
-					if(enyo.platform.firefox) {					
+					if (enyo.platform.firefox) {					
 						oLeft += oNode.offsetLeft;
 						oTop  += oNode.offsetTop;
-					}
-					else
-					{
+					} else {
 						oLeft += oNode.offsetLeft - (oNode.offsetParent ? oNode.offsetParent.scrollLeft : 0);
 						oTop  += oNode.offsetTop  - (oNode.offsetParent ? oNode.offsetParent.scrollTop  : 0);	
 					}
