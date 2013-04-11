@@ -22,8 +22,12 @@ enyo.kind({
 		processMouseWheel: function(oEvent, fCallback, oContext) {
 			this._nDelta += oEvent.wheelDeltaY;
 			//enyo.log('wheel', this._nDelta);
-			
-			oEvent.preventDefault();
+
+			// When no spottable elements are present in the app, rely on default events
+			if (oContext == enyo.Spotlight && oContext.getCurrent()) {
+				oEvent.preventDefault();
+				return;
+			}
 			
 			if (this._nDelta >= this.frequency) {
 				this._nDelta = 0;

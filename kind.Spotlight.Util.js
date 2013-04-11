@@ -13,8 +13,9 @@ enyo.kind({
 			oData		 	 = oData ? enyo.clone(oData) : {};
 			oData.type 		 = sEvent;
 			oData.originator = oControl;
-			//console.log('Dispatching:', oData.type, oControl.name);
-
+			
+			if (!oControl) { return; }
+			
 			return oControl.dispatchBubble(sEvent, oData, oControl);
 		},
 

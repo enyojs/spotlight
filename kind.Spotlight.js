@@ -59,7 +59,7 @@ enyo.kind({
 				return true;
 			}
 			this._oCurrent = oControl;
-			//enyo.log('CURRENT: ', enyo.Spotlight.Util.getParentString(oControl));
+			// console.log('CURRENT: ', oControl.name, oControl.kindName);
 			if (oControl.spotlight === true) {
 				this._oLastSpotlightTrueControl = oControl;
 				if (!this.getPointerMode() || !this._oLastSpotlightTrueControl5Way) {
