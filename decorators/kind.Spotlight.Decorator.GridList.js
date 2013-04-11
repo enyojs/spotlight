@@ -102,7 +102,7 @@ enyo.kind({
 			var nCurrent = this._getCurrent(oSender);
 			if (nCurrent === null) { return true; }
 			var nNew = nCurrent - oSender.itemsPerRow;
-			if (nNew > 0) {
+			if (nNew >= 0) {
 				this._setCurrent(oSender, nNew, true);
 				return true;
 			}
