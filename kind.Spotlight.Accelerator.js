@@ -26,6 +26,8 @@ enyo.kind({
 		processKey: function(oEvent, fCallback, oContext) {
 			switch (oEvent.type) {
 				case 'keydown':
+				case 'pagehold':
+				case 'pageholdpulse':				
 					if (oEvent.keyCode != this._nKey) {
 						this.reset();
 						this._nTime = (new Date()).getTime();
@@ -54,6 +56,7 @@ enyo.kind({
 					}
 					break;
 				case 'keyup':
+				case 'pagerelease':
 					this.reset();
 					return fCallback.apply(oContext, [oEvent]);
 			}
