@@ -136,8 +136,8 @@ enyo.kind({
 				return null;
 			}
 
-			if (typeof this._oDecorators[oSender.kind] != 'undefined') {
-				return this._oDecorators[oSender.kind];
+			if (typeof this._oDecorators[oSender.kindName] != 'undefined') {
+				return this._oDecorators[oSender.kindName];
 			}
 
 			var oDecorator = null,
@@ -157,7 +157,7 @@ enyo.kind({
 				}
 			}
 
-			this._oDecorators[oSender.kind] = oDecorator;					// Hash decorator by sender kind
+			this._oDecorators[oSender.kindName] = oDecorator;					// Hash decorator by sender kind
 			return oDecorator;
 		},
 
