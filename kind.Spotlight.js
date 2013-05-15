@@ -39,6 +39,7 @@ enyo.kind({
 		_oLastSpotlightTrueControl 		: null,
 		_oLastSpotlightTrueControl5Way 	: null,
 		_bCanFocus						: true,		// Flag reserved for hiding focus when entering pointer mode
+		_bEnablePointerMode             : true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
 		
 		_testMode						: false,
 		_testModeHighlightNodes			: [],
@@ -294,6 +295,8 @@ enyo.kind({
 		
 		// Called by onEvent() to process mousemove events
 		onMouseMove: function(oEvent) {
+			if (!this._bEnablePointerMode) { return; }
+			// console.log('Mousemove');
 			this.setPointerMode(true);  								// Preserving explicit setting of mode for future features
 			if (this.getPointerMode()) {
 				oTarget = this._getTarget(oEvent.target.id);
@@ -505,6 +508,14 @@ enyo.kind({
 			this._nPrevClientY = oEvent.clientY;
 
 			return bChanged;
+		},
+		
+		disablePointerMode: function() {
+			this._bEnablePointerMode = false;
+		},
+		
+		enablePointerMode: function() {
+			this._bEnablePointerMode = true;
 		},
 
 
