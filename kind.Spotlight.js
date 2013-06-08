@@ -89,9 +89,9 @@ enyo.kind({
 
 			this.ownerDispatchFn = this._oOwner.dispatchEvent;
 			this._oOwner.dispatchEvent = function(sEventName, oEvent, oSender) {
-				var a = oThis.ownerDispatchFn.apply(oThis._oOwner, [sEventName, oEvent, oSender]);
-				var b = oThis.onSpotlightEvent(oEvent);
-				return a || b;
+				var bOwnerDispatchResult = oThis.ownerDispatchFn.apply(oThis._oOwner, [sEventName, oEvent, oSender]);
+				var bSpotlightResult = oThis.onSpotlightEvent(oEvent);
+				return bOwnerDispatchResult || bSpotlightResult;
 			};
 		},
 		
