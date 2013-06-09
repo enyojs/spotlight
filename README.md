@@ -392,5 +392,5 @@ presented in this document.
 To extend a control to use Spotlight, simply create a subkind of the kind you
 want to extend and define event handlers to handle Spotlight events.
 
-Please refer to the **[Moonraker](https://github.com/enyojs/moonstone)** package
+Please refer to the **[Moonstone](https://github.com/enyojs/moonstone)** package
 for examples.
