@@ -415,9 +415,9 @@ enyo.kind({
 
 		setPointerMode : function(bPointerMode)	{
 			if (this._bPointerMode != bPointerMode) {
+				this._bPointerMode = bPointerMode;
 				enyo.Signals.send('onSpotlightModeChanged', {pointerMode: bPointerMode});
 			}
-			this._bPointerMode = bPointerMode;
 		},
 
 		getPointerMode		: function() 				{ return this._bPointerMode; 						},
