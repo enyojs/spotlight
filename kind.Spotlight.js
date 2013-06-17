@@ -46,6 +46,7 @@ enyo.kind({
 
 		_nPrevClientX					: null,
 		_nPrevClientY					: null,
+		_oLastMouseMoveTarget			: null,
 
 		// Set currently spotted control
 		_setCurrent: function(oControl) {
@@ -305,18 +306,22 @@ enyo.kind({
 		onMouseMove: function(oEvent) {
 			if (!this._bEnablePointerMode) { return; }
 			// console.log('Mousemove');
-			this.setPointerMode(true);  								// Preserving explicit setting of mode for future features
+			this.setPointerMode(true);									// Preserving explicit setting of mode for future features
 			if (this.getPointerMode()) {
 				var oTarget = this._getTarget(oEvent.target.id);
 				if (oTarget) {
+					if (oTarget === this._oLastMouseMoveTarget) {		// ignore consecutive mouse moves on same target
+						//return;
+					}
+					this._oLastMouseMoveTarget = oTarget;
+					this._bCanFocus = true;
 					this._dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 					if (oTarget.spotlight !== true) {
 						this._bCanFocus = false;
 						this.unspot();
-					} else {
-						this._bCanFocus = true;
 					}
 				} else {
+					this._oLastMouseMoveTarget = null;
 					this._bCanFocus = false;
 					this.unspot();
 				}
