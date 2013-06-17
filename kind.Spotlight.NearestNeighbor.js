@@ -123,11 +123,9 @@ enyo.kind({
 				case 'UP'	:
 				case 'DOWN'	:
 					return delta.dx/delta.dy;
-					break;
 				case 'LEFT'	:
 				case 'RIGHT':
 					return delta.dy/delta.dx;
-					break;
 			}
 		},
 
@@ -138,17 +136,17 @@ enyo.kind({
 		_getAdjacentControlAngle: function(nSlope) {
 			return Math.atan(nSlope) * 180/Math.PI || 0.1;
 		},
-		
+
 		//* @public
 		/**************************************************************/
-		
+
 		getNearestNeighbor: function(sDirection, oControl) {
 			sDirection = sDirection.toUpperCase();
 			oControl = oControl || enyo.Spotlight.getCurrent();
-			
+
 			var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
 			if (oNeighbor) {
-				return oNeighbor; 
+				return oNeighbor;
 			}
 
 			var n,
