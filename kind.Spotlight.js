@@ -310,8 +310,11 @@ enyo.kind({
 			if (this.getPointerMode()) {
 				var oTarget = this._getTarget(oEvent.target.id);
 				if (oTarget) {
-					if (oTarget === this._oLastMouseMoveTarget) {		// ignore consecutive mouse moves on same target
-						//return;
+					if (oTarget === this._oLastMouseMoveTarget &&
+						(oEvent.index === undefined ||
+						oEvent.index === this._oLastMouseMoveTarget._nCurrentSpotlightItem)) {
+						// ignore consecutive mouse moves on same target
+						return;
 					}
 					this._oLastMouseMoveTarget = oTarget;
 					this._bCanFocus = true;
@@ -409,6 +412,7 @@ enyo.kind({
 
 		onSpotlightPoint: function(oEvent) {
 			if (oEvent.originator.spotlight != 'container') {
+				oEvent.originator.timestamp = oEvent.timeStamp;
 				this.spot(oEvent.originator);
 			}
 		},
@@ -508,8 +512,10 @@ enyo.kind({
 				oControl = this.getFirstChild(oControl);
 			}
 			if (oControl) {
-				oControl.addClass('spotlight');
-				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
+				if (!oControl.hasClass('spotlight')) {
+					oControl.addClass('spotlight');
+					this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
+				}
 				return true;
 			}
 
