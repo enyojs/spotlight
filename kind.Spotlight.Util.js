@@ -10,8 +10,8 @@ enyo.kind({
 		/************ PUBLIC *************/
 
 		dispatchEvent: function(sEvent, oData, oControl) {
-			oData		 	 = oData ? enyo.clone(oData) : {};
-			oData.type 		 = sEvent;
+			oData            = oData ? enyo.clone(oData) : {};
+			oData.type       = sEvent;
 			oData.originator = oControl;
 			oData.originator.timestamp = oData.timeStamp;
 
@@ -25,10 +25,10 @@ enyo.kind({
 			var f = oControl.dispatchEvent;
 
 			oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
-				if (fHandler(oControl, oEvent)) {										// If handler returns true - prevent default
+				if (fHandler(oControl, oEvent)) {                                       // If handler returns true - prevent default
 					oEvent.type = null;
 				} else {
-					f.apply(oControl, [sEventName, oEvent, oEventSender]);				// If handler returns false - call original dispatcher and allow bubbling
+					f.apply(oControl, [sEventName, oEvent, oEventSender]);              // If handler returns false - call original dispatcher and allow bubbling
 				}
 			};
 		},
@@ -47,15 +47,15 @@ enyo.kind({
 		},
 
 		getAbsoluteBounds: function(oControl) {
-			var oLeft 			= 0,
-				oTop 			= 0,
-				oMatch			= null,
-				oNode 			= oControl instanceof enyo.Control ? oControl.hasNode() : oControl,
-				nWidth 			= oNode.offsetWidth,
-				nHeight 		= oNode.offsetHeight,
-				sTransformProp 	= enyo.dom.getStyleTransformProp(),
-				oXRegEx 		= /translateX\((-?\d+)px\)/i,
-				oYRegEx 		= /translateY\((-?\d+)px\)/i;
+			var oLeft           = 0,
+				oTop            = 0,
+				oMatch          = null,
+				oNode           = oControl instanceof enyo.Control ? oControl.hasNode() : oControl,
+				nWidth          = oNode.offsetWidth,
+				nHeight         = oNode.offsetHeight,
+				sTransformProp  = enyo.dom.getStyleTransformProp(),
+				oXRegEx         = /translateX\((-?\d+)px\)/i,
+				oYRegEx         = /translateY\((-?\d+)px\)/i;
 
 			if (oNode.offsetParent) {
 				do {
@@ -80,12 +80,12 @@ enyo.kind({
 				} while ((oNode = oNode.offsetParent));
 			}
 			return {
-				top		: oTop,
-				left	: oLeft,
-				bottom	: document.body.offsetHeight - oTop  - nHeight,
-				right	: document.body.offsetWidth  - oLeft - nWidth,
-				height	: nHeight,
-				width	: nWidth
+				top     : oTop,
+				left    : oLeft,
+				bottom  : document.body.offsetHeight - oTop  - nHeight,
+				right   : document.body.offsetWidth  - oLeft - nWidth,
+				height  : nHeight,
+				width   : nWidth
 			};
 		},
 
@@ -109,7 +109,7 @@ enyo.kind({
 		},
 
 		stringEndsWith: function(s, sSuffix) {
-		    return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
+			return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
 		},
 
 		directionToEvent: function(sDirection) {
@@ -130,3 +130,22 @@ enyo.kind({
 		}
 	}
 });
+
+// use faster classList interface if it exists
+if (document.createElement('div').classList) {
+	enyo.Spotlight.Util.hasClass    = function(o, s) {
+		if (o) {
+			return o.classList.contains(s);
+		}
+	};
+	enyo.Spotlight.Util.addClass    = function(o, s) {
+		if (o) {
+			return o.classList.add(s);
+		}
+	};
+	enyo.Spotlight.Util.removeClass = function (o, s) {
+		if (o) {
+			return o.classList.remove(s);
+		}
+	};
+}
