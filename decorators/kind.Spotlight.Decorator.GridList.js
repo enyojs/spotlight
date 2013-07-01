@@ -128,6 +128,7 @@ enyo.kind({
 	
 		onSpotlightPoint: function(oSender, oEvent) {
 			this._setCurrent(oSender, oEvent.index);
+			return true;
 		}
 	}
 });
