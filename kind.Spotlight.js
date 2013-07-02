@@ -333,17 +333,21 @@ enyo.kind({
 
 		onMouseDown: function(oEvent) {
 			if (this.getPointerMode()) { return; }
+			oEvent.preventDefault();
+			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-			oEvent.preventDefault();
+
 			return this._dispatchEvent('onSpotlightKeyDown', oEvent);
 		},
 
 		onMouseUp: function(oEvent) {
 			if (this.getPointerMode()) { return; }
+			oEvent.preventDefault();
+			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-			oEvent.preventDefault();
+
 			return this._dispatchEvent('onSpotlightKeyUp', oEvent);
 		},
 
