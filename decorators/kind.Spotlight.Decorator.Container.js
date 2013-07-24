@@ -52,7 +52,19 @@ enyo.kind({
 			}
 			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);
 		},
-				
+
+		_getInstanceOfPanels: function(oChild) {
+			if (!oChild)  { return null; }
+
+			while (oChild.parent) {
+				oChild = oChild.parent;
+				if (oChild instanceof enyo.Panels) {
+					return oChild;
+				}
+			}
+			return null;
+		},
+		
 		/******************************/
 		
 		onSpotlightFocused: function(oSender, oEvent) {
@@ -61,11 +73,12 @@ enyo.kind({
 			this._initComponent(oSender);
 			
 			if (this._hadFocus(oSender)) {												// Focus came from within
-				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
-				if (!(oSender.parent instanceof enyo.Panels)) {
+				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '',
+					panels = this._getInstanceOfPanels(oSender);
+				if (panels === null) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				} else 
-				if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
+				if (panels.spotlight !== true && panels.spotlight != 'true') {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				this._focusLeave(oSender, s5WayEventType);
