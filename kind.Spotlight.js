@@ -13,10 +13,15 @@ enyo.kind({
 
 	//* @public
 	/************************************************************/
-
-	rendered: function() {
+	
+	create: function() {
+		var oThis = this;
 		this.inherited(arguments);
-		enyo.Spotlight.initialize(this.owner, this.defaultControl);
+		var fOwnerRendered = this.owner.rendered;
+		this.owner.rendered = function() {
+			fOwnerRendered.apply(oThis.owner, arguments);
+			enyo.Spotlight.initialize(oThis.owner, oThis.defaultControl);
+		}
 	},
 
 	destroy: function() {
@@ -441,12 +446,13 @@ enyo.kind({
 
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
-			return (
+			var bSpottable = (
 				typeof oControl.spotlight != 'undefined' 	&&	// Control has spotlight property set
 				oControl.spotlight 							&&	// Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing() 				&&	// Control is visible
 				!(oControl.disabled)							// Control is not disabled
 			);
+			return bSpottable;
 		},
 
 		// Returns spottable chldren along with position of self
@@ -522,7 +528,6 @@ enyo.kind({
 				}
 				return true;
 			}
-
 			return false;
 		},
 
