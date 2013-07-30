@@ -421,7 +421,6 @@ enyo.kind({
 
 		onSpotlightPoint: function(oEvent) {
 			if (oEvent.originator.spotlight != 'container') {
-				oEvent.originator.timestamp = oEvent.timeStamp;
 				this.spot(oEvent.originator);
 			}
 		},
