@@ -45,6 +45,7 @@ enyo.kind({
 		_oLastSpotlightTrueControl5Way 	: null,
 		_bCanFocus						: true,		// Flag reserved for hiding focus when entering pointer mode
 		_bEnablePointerMode             : true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
+		_oDepressedControl              : null,     // Keeping state consistency between onMouseDown() and onMouseUp(), for cases when focus has been moved in between
 
 		_testMode						: false,
 		_testModeHighlightNodes			: [],
@@ -337,23 +338,25 @@ enyo.kind({
 		},
 
 		onMouseDown: function(oEvent) {
-			if (this.getPointerMode()) { return; }
+			if (this.getPointerMode()) { return; } // Why?
 			oEvent.preventDefault();
 			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-
-			return this._dispatchEvent('onSpotlightKeyDown', oEvent);
+			
+			this._oDepressedControl = this.getCurrent();
+			// console.log('mousedown', this._oDepressedControl.name);
+			return this._dispatchEvent('onSpotlightKeyDown', oEvent, this._oDepressedControl);
 		},
 
 		onMouseUp: function(oEvent) {
-			if (this.getPointerMode()) { return; }
+			if (this.getPointerMode()) { return; } // Why?
 			oEvent.preventDefault();
 			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-
-			return this._dispatchEvent('onSpotlightKeyUp', oEvent);
+			// console.log('mouseup', this._oDepressedControl.name);
+			return this._dispatchEvent('onSpotlightKeyUp', oEvent, this._oDepressedControl);
 		},
 
 		onClick: function(oEvent) {
