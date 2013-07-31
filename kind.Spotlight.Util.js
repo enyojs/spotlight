@@ -13,7 +13,6 @@ enyo.kind({
 			oData            = oData ? enyo.clone(oData) : {};
 			oData.type       = sEvent;
 			oData.originator = oControl;
-			oData.originator.timestamp = oData.timeStamp;
 
 			if (!oControl) { return; }
 
