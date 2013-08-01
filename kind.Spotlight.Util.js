@@ -10,12 +10,11 @@ enyo.kind({
 		/************ PUBLIC *************/
 
 		dispatchEvent: function(sEvent, oData, oControl) {
+			if (!oControl) { return; }
 			oData            = oData ? enyo.clone(oData) : {};
 			oData.type       = sEvent;
 			oData.originator = oControl;
-
-			if (!oControl) { return; }
-
+			oData.originator.timestamp = oData.timeStamp;
 			return oControl.dispatchBubble(sEvent, oData, oControl);
 		},
 

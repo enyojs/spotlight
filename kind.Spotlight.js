@@ -448,6 +448,7 @@ enyo.kind({
 
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			var bSpottable = (
 				typeof oControl.spotlight != 'undefined' 	&&	// Control has spotlight property set
 				oControl.spotlight 							&&	// Control has spotlight=true or 'container'
@@ -460,7 +461,7 @@ enyo.kind({
 		// Returns spottable chldren along with position of self
 		getSiblings: function(oControl) {
 			oControl = oControl || this.getCurrent();
-
+			if (!oControl) { return; }
 			var n,
 				o = {},
 				oParent = this.getParent(oControl) || oControl.parent;
@@ -478,6 +479,7 @@ enyo.kind({
 		// Returns all spottable children
 		getChildren: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			var n,
 				aChildren = [],
 				oNext;
@@ -496,6 +498,7 @@ enyo.kind({
 		// Returns closest spottable parent
 		getParent: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			var oSpottableParent = null;
 			while (oControl.parent) {
 				oControl = oControl.parent;
@@ -546,6 +549,7 @@ enyo.kind({
 		// Get first spottable child of a control
 		getFirstChild: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			return this.getChildren(oControl)[0];
 		},
 
