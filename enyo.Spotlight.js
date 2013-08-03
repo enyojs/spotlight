@@ -1,5 +1,5 @@
 /**
- * Spotlight kind definition
+ * Spotlight definition
  * @author: Lex Podgorny
  */
 
