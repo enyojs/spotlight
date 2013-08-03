@@ -66,7 +66,7 @@ enyo.Spotlight = new function() {
 			
 			_oCurrent = oControl;
 			
-			console.log('CURRENT: ', oControl.name, oControl.kindName);
+			// console.log('CURRENT: ', oControl.name, oControl.kindName);
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 			
 			if (oControl.spotlight === true) {
