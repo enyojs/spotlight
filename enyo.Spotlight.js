@@ -487,8 +487,8 @@ enyo.Spotlight = new function() {
 		if (oControl) {
 			if (!oControl.hasClass('spotlight')) {
 				oControl.addClass('spotlight');
-				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 			}
+			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 			return true;
 		}
 		return false;
