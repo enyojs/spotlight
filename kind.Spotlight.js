@@ -279,10 +279,11 @@ enyo.kind({
 
 		// Spotlight events bubbled back up to the App
 		onSpotlightEvent: function(oEvent) {
+			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return; }
 			this._oLastEvent = oEvent;
 
-			if (this._delegateSpotlightEvent(oEvent)) { return false; }	// If decorator's onSpotlight<Event> method returns true - kill Spotlight event
-
+			var nReturn = this._delegateSpotlightEvent(oEvent);
+			if (nReturn) { return false; }	// If decorator's onSpotlight<Event> method returns true - kill Spotlight event
 			switch (oEvent.type) {
 				case 'onSpotlightKeyUp'		: return this.onSpotlightKeyUp(oEvent);
 				case 'onSpotlightKeyDown'	: return this.onSpotlightKeyDown(oEvent);
@@ -311,7 +312,6 @@ enyo.kind({
 		// Called by onEvent() to process mousemove events
 		onMouseMove: function(oEvent) {
 			if (!this._bEnablePointerMode) { return; }
-			// console.log('Mousemove');
 			this.setPointerMode(true);									// Preserving explicit setting of mode for future features
 			if (this.getPointerMode()) {
 				var oTarget = this._getTarget(oEvent.target.id);
@@ -345,7 +345,6 @@ enyo.kind({
 			oEvent.domEvent = oEvent;
 			
 			this._oDepressedControl = this.getCurrent();
-			// console.log('mousedown', this._oDepressedControl.name);
 			return this._dispatchEvent('onSpotlightKeyDown', oEvent, this._oDepressedControl);
 		},
 
@@ -355,7 +354,6 @@ enyo.kind({
 			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-			// console.log('mouseup', this._oDepressedControl.name);
 			return this._dispatchEvent('onSpotlightKeyUp', oEvent, this._oDepressedControl);
 		},
 
@@ -529,8 +527,8 @@ enyo.kind({
 			if (oControl) {
 				if (!oControl.hasClass('spotlight')) {
 					oControl.addClass('spotlight');
-					this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 				}
+				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 				return true;
 			}
 			return false;
