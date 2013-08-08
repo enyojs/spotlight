@@ -653,6 +653,7 @@ enyo.kind({
 
 		//* Highlight controls adjacent to the current spotlighted controls and add them to _this._testModeHighlightNodes_
 		_highlightAdjacentControls: function() {
+			if (!enyo.Spotlight.getCurrent()) { return; }
 			var controls = this._removeDuplicateHighlightNodes([{
 					control	: enyo.Spotlight.NearestNeighbor.getNearestNeighbor('UP'),
 					str		: 'U'
