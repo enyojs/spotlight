@@ -45,6 +45,7 @@ enyo.kind({
 		_oLastSpotlightTrueControl5Way 	: null,
 		_bCanFocus						: true,		// Flag reserved for hiding focus when entering pointer mode
 		_bEnablePointerMode             : true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
+		_oDepressedControl              : null,     // Keeping state consistency between onMouseDown() and onMouseUp(), for cases when focus has been moved in between
 
 		_testMode						: false,
 		_testModeHighlightNodes			: [],
@@ -278,10 +279,11 @@ enyo.kind({
 
 		// Spotlight events bubbled back up to the App
 		onSpotlightEvent: function(oEvent) {
+			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') != 0) { return; }
 			this._oLastEvent = oEvent;
 
-			if (this._delegateSpotlightEvent(oEvent)) { return false; }	// If decorator's onSpotlight<Event> method returns true - kill Spotlight event
-
+			var nReturn = this._delegateSpotlightEvent(oEvent);
+			if (nReturn) { return false; }	// If decorator's onSpotlight<Event> method returns true - kill Spotlight event
 			switch (oEvent.type) {
 				case 'onSpotlightKeyUp'		: return this.onSpotlightKeyUp(oEvent);
 				case 'onSpotlightKeyDown'	: return this.onSpotlightKeyDown(oEvent);
@@ -310,7 +312,6 @@ enyo.kind({
 		// Called by onEvent() to process mousemove events
 		onMouseMove: function(oEvent) {
 			if (!this._bEnablePointerMode) { return; }
-			// console.log('Mousemove');
 			this.setPointerMode(true);									// Preserving explicit setting of mode for future features
 			if (this.getPointerMode()) {
 				var oTarget = this._getTarget(oEvent.target.id);
@@ -337,23 +338,23 @@ enyo.kind({
 		},
 
 		onMouseDown: function(oEvent) {
-			if (this.getPointerMode()) { return; }
+			if (this.getPointerMode()) { return; } // Why?
 			oEvent.preventDefault();
 			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-
-			return this._dispatchEvent('onSpotlightKeyDown', oEvent);
+			
+			this._oDepressedControl = this.getCurrent();
+			return this._dispatchEvent('onSpotlightKeyDown', oEvent, this._oDepressedControl);
 		},
 
 		onMouseUp: function(oEvent) {
-			if (this.getPointerMode()) { return; }
+			if (this.getPointerMode()) { return; } // Why?
 			oEvent.preventDefault();
 			oEvent = enyo.clone(oEvent);
 			oEvent.keyCode  = 13;
 			oEvent.domEvent = oEvent;
-
-			return this._dispatchEvent('onSpotlightKeyUp', oEvent);
+			return this._dispatchEvent('onSpotlightKeyUp', oEvent, this._oDepressedControl);
 		},
 
 		onClick: function(oEvent) {
@@ -421,7 +422,6 @@ enyo.kind({
 
 		onSpotlightPoint: function(oEvent) {
 			if (oEvent.originator.spotlight != 'container') {
-				oEvent.originator.timestamp = oEvent.timeStamp;
 				this.spot(oEvent.originator);
 			}
 		},
@@ -446,6 +446,7 @@ enyo.kind({
 
 		isSpottable: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			var bSpottable = (
 				typeof oControl.spotlight != 'undefined' 	&&	// Control has spotlight property set
 				oControl.spotlight 							&&	// Control has spotlight=true or 'container'
@@ -458,7 +459,7 @@ enyo.kind({
 		// Returns spottable chldren along with position of self
 		getSiblings: function(oControl) {
 			oControl = oControl || this.getCurrent();
-
+			if (!oControl) { return; }
 			var n,
 				o = {},
 				oParent = this.getParent(oControl) || oControl.parent;
@@ -476,6 +477,7 @@ enyo.kind({
 		// Returns all spottable children
 		getChildren: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			var n,
 				aChildren = [],
 				oNext;
@@ -494,6 +496,7 @@ enyo.kind({
 		// Returns closest spottable parent
 		getParent: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			var oSpottableParent = null;
 			while (oControl.parent) {
 				oControl = oControl.parent;
@@ -524,8 +527,8 @@ enyo.kind({
 			if (oControl) {
 				if (!oControl.hasClass('spotlight')) {
 					oControl.addClass('spotlight');
-					this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 				}
+				this._dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
 				return true;
 			}
 			return false;
@@ -544,6 +547,7 @@ enyo.kind({
 		// Get first spottable child of a control
 		getFirstChild: function(oControl) {
 			oControl = oControl || this.getCurrent();
+			if (!oControl) { return; }
 			return this.getChildren(oControl)[0];
 		},
 
@@ -647,6 +651,7 @@ enyo.kind({
 
 		//* Highlight controls adjacent to the current spotlighted controls and add them to _this._testModeHighlightNodes_
 		_highlightAdjacentControls: function() {
+			if (!enyo.Spotlight.getCurrent()) { return; }
 			var controls = this._removeDuplicateHighlightNodes([{
 					control	: enyo.Spotlight.NearestNeighbor.getNearestNeighbor('UP'),
 					str		: 'U'

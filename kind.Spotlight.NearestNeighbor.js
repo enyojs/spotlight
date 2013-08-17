@@ -50,17 +50,17 @@ enyo.kind({
 				:	oBounds2.top;
 
 			if (oBounds1.left < oBounds2.left) {
-				if (oBounds1.left + oBounds1.width < oBounds2.left) {
-					x1 = oBounds1.left + oBounds1.width;
+				if (oBounds1.left + oBounds1.width <= oBounds2.left) {
+					x1 = oBounds1.left + oBounds1.width + 1;
 					x2 = oBounds2.left;
 				} else {
 					x1 = oBounds2.left;
 					x2 = oBounds2.left;
 				}
 			} else {
-				if (oBounds1.left > oBounds2.left + oBounds2.width) {
+				if (oBounds1.left >= oBounds2.left + oBounds2.width) {
 					x1 = oBounds1.left;
-					x2 = oBounds2.left + oBounds2.left;
+					x2 = oBounds2.left + oBounds2.left + 1;
 				} else {
 					x1 = oBounds1.left;
 					x2 = oBounds1.left;
@@ -82,17 +82,17 @@ enyo.kind({
 				:	oBounds2.left;
 
 			if (oBounds1.top < oBounds2.top) {
-				if (oBounds1.top + oBounds1.height < oBounds2.top) {
-					y1 = oBounds1.top + oBounds1.height;
+				if (oBounds1.top + oBounds1.height <= oBounds2.top) {
+					y1 = oBounds1.top + oBounds1.height + 1;
 					y2 = oBounds2.top;
 				} else {
 					y1 = oBounds2.top;
 					y2 = oBounds2.top;
 				}
 			} else {
-				if (oBounds1.top > oBounds2.top + oBounds2.height) {
+				if (oBounds1.top >= oBounds2.top + oBounds2.height) {
 					y1 = oBounds1.top;
-					y2 = oBounds2.top + oBounds2.height;
+					y2 = oBounds2.top + oBounds2.height + 1;
 				} else {
 					y1 = oBounds1.top;
 					y2 = oBounds1.top;
@@ -143,7 +143,6 @@ enyo.kind({
 		getNearestNeighbor: function(sDirection, oControl) {
 			sDirection = sDirection.toUpperCase();
 			oControl = oControl || enyo.Spotlight.getCurrent();
-
 			var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
 			if (oNeighbor) {
 				return oNeighbor;

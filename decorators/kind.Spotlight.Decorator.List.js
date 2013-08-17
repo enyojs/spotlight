@@ -13,48 +13,60 @@ enyo.kind({
 			return oSender.$.generator.fetchRowNode(n);
 		},
 	
-		_focusNode: function(oSender, n) {
-			enyo.Spotlight.Util.addClass(this._getNode(oSender, n), 'spotlight');
+		_focusItem: function(oSender, n, bScrollIntoView) {
+			if (!enyo.exists(n) || n === null) { n = 0; }
+			
+			var oNode = this._getNode(oSender, n);
+			enyo.Spotlight.Util.addClass(oNode, 'spotlight');
+			
+			if (bScrollIntoView && oNode && !this._isInView(oSender, oNode)) {
+				if (oSender.animateToNode) {
+					oSender.animateToNode(oNode, true);
+				} else {
+					oSender.scrollIntoView({
+						hasNode : function() { return true; },
+						oNode    : this._getNode(oSender, n)
+					}, false);
+				}
+			}
 		},
 	
-		_blurNode: function(oSender, n) {
+		_blurItem: function(oSender, n) {
+			if (!enyo.exists(n) || n === null) { n = this.getCurrent(oSender); }
 			enyo.Spotlight.Util.removeClass(this._getNode(oSender, n), 'spotlight');
-		},
-
-		_getCurrent: function(oSender) {
-			if (typeof oSender._nCurrentSpotlightItem == 'undefined') {
-				return 0;
-			}
-			return oSender._nCurrentSpotlightItem;
-		},
-		
-		_setCurrent: function(oSender, n, bScrollIntoView) {
-			var nCurrent = this._getCurrent(oSender),
-				node;
-			
-			if (nCurrent !== null) {
-				this._blurNode(oSender, nCurrent);
-			}
-
-			if ((n !== null) && (n !== undefined)) {
-				this._focusNode(oSender, n);
-				oSender._nCurrentSpotlightItem = n;
-				node = this._getNode(oSender, n);
-				if (node && !this._isInView(oSender, node)) {
-					if(oSender.animateToNode) {
-						oSender.animateToNode(node, true);
-					} else {
-						oSender.scrollIntoView({
-							hasNode : function() { return true; },
-							node    : this._getNode(oSender, n)
-						}, false);
-					}
-				}
-				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
-			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 		},
+		
+		_unspot: function(oSender) {
+			this.setCurrent(oSender, null, true);
+		},
+		
+		_itemExists: function(oSender, n) {
+			return n >= 0 && n < oSender.getCount();
+		},
 
+		_spotNextItem: function(oSender) {
+			var nNext = this.getCurrent(oSender) + 1;
+			
+			if (this._itemExists(oSender, nNext)) {
+				this.setCurrent(oSender, nNext, true);
+				return true;
+			} else {
+				this._unspot(oSender);
+			}
+		},
+		
+		_spotPreviousItem: function(oSender) {
+			var nPrev = this.getCurrent(oSender) - 1;
+
+			if (this._itemExists(oSender, nPrev)) {
+				this.setCurrent(oSender, nPrev, true);
+				return true;
+			} else {
+				this._unspot(oSender);
+			}
+		},
+		
 		//replacement ScrollStrategy function to address the offsets in List where a paging strategy is used
 		_isInView: function(oSender, inNode) {
 			var sb = oSender.getScrollBounds();
@@ -68,80 +80,76 @@ enyo.kind({
 		/******************************/
 	
 		onSpotlightFocus: function(oSender, oEvent) {
-			this._setCurrent(oSender, this._getCurrent(oSender), false);
-			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+			console.log('LIST FOCUS');
+			this.setCurrent(oSender, this.getCurrent(oSender), false);
 		},
 	
 		onSpotlightBlur: function(oSender, oEvent) {
-			this._setCurrent(oSender, null, true);
-			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+			console.log('LIST BLUR');
+			this._unspot(oSender);
 		},
 	
 		onSpotlightSelect: function(oSender, oEvent) {
-			if (this._getCurrent(oSender) !== null) {
-				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this._getCurrent(oSender)}, oSender.children[0]);
-			} else {
-				this._setCurrent(oSender, 0, true);
-			}
-			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+			var nCurrent = this.getCurrent(oSender);
+			enyo.Spotlight.Util.dispatchEvent('ontap', {index: nCurrent}, oSender.children[nCurrent]);
 			return true;
 		},
 	
 		onSpotlightDown: function(oSender, oEvent) {
-			if(oSender.getOrient && oSender.getOrient() === "h") {
-				this._setCurrent(oSender, null, true);
+			if (oSender.getOrient && oSender.getOrient() === 'h') {
+				this._unspot(oSender);
 			} else {
-				this._spotNextListItem(oSender, oEvent);
+				return this._spotNextItem(oSender);
 			}
 		},
 	
 		onSpotlightUp: function(oSender, oEvent) {
-			if(oSender.getOrient && oSender.getOrient() === "h") {
-				this._setCurrent(oSender, null, true);
+			if (oSender.getOrient && oSender.getOrient() === 'h') {
+				this._unspot(oSender);
 			} else {
-				this._spotPreviousListItem(oSender, oEvent);
+				return this._spotPreviousItem(oSender);
 			}
 		},
 	
 		onSpotlightLeft: function(oSender, oEvent) {
-			if(oSender.getOrient && oSender.getOrient() === "h") {
-				this._spotPreviousListItem(oSender, oEvent);
+			if (oSender.getOrient && oSender.getOrient() === 'h') {
+				return this._spotPreviousItem(oSender);
 			} else {
-				this._setCurrent(oSender, null, true);
+				this._unspot(oSender);
 			}
 		},
 	
 		onSpotlightRight: function(oSender, oEvent) {
-			if(oSender.getOrient && oSender.getOrient() === "h") {
-				this._spotNextListItem(oSender, oEvent);
+			if (oSender.getOrient && oSender.getOrient() === 'h') {
+				return this._spotNextItem(oSender);
 			} else {
-				this._setCurrent(oSender, null, true);
+				this._unspot(oSender);
 			}
 		},
 	
 		onSpotlightPoint: function(oSender, oEvent) {
-			this._setCurrent(oSender, oEvent.index);
+			this.setCurrent(oSender, oEvent.index, false);
 			return true;
 		},
 		
-		_spotNextListItem: function(oSender, oEvent) {
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
-			if (nCurrent < oSender.getCount() - 1) {
-				this._setCurrent(oSender, nCurrent + 1, true);
-				return false;
-			}
-			this._setCurrent(oSender, null, true);
+		getCurrent: function(oSender) {
+			return enyo.exists(oSender._nCurrentSpotlightItem)
+				? oSender._nCurrentSpotlightItem
+				: 0;
 		},
 		
-		_spotPreviousListItem: function(oSender, oEvent) {
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return; }
-			if (nCurrent > 0) {
-				this._setCurrent(oSender, nCurrent - 1, true);
-				return false;
+		setCurrent: function(oSender, n, bScrollIntoView) {
+			bScrollIntoView = bScrollIntoView || false;
+			
+			if (!enyo.exists(n))               { n = null; }
+			if (!this._itemExists(oSender, n)) { return; }
+			
+			this._blurItem(oSender, null);
+			if (n !== null) {                             // Navigating within list - blur current and spot another
+				this._focusItem(oSender, n, bScrollIntoView)
+				oSender._nCurrentSpotlightItem = n;
+				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
-			this._setCurrent(oSender, null, true);
-		}
+		},
 	}
 });
