@@ -408,6 +408,7 @@ enyo.Spotlight = new function() {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
 		var bSpottable = (
+			!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
 			typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 			oControl.spotlight                          && // Control has spotlight=true or 'container'
 			oControl.getAbsoluteShowing()               && // Control is visible
