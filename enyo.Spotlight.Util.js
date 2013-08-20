@@ -5,7 +5,8 @@
 
 enyo.Spotlight.Util = new function() {
 	this.dispatchEvent = function(sEvent, oData, oControl) {
-		if (!oControl) { return; }
+		if (!oControl || !enyo.Spotlight.isSpottable(oControl)) { return; }
+		
 		oData            = oData ? enyo.clone(oData) : {};
 		oData.type       = sEvent;
 		oData.originator = oControl;
