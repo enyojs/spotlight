@@ -66,6 +66,9 @@ enyo.kind({
 			if (this._oCurrent === oControl) {
 				return true;
 			}
+			if (this._oCurrent !== null) {
+				this._dispatchEvent('onSpotlightKeyUp');
+			}
 			this._oCurrent = oControl;
 			// console.log('CURRENT: ', oControl.name, oControl.kindName);
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
