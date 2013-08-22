@@ -1,4 +1,5 @@
 enyo.depends(
+	"version.js",
 	'kind.Spotlight.js',
 	'kind.Spotlight.Util.js',
 	'kind.Spotlight.Accelerator.js',
