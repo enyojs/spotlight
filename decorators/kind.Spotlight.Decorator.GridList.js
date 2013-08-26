@@ -31,15 +31,87 @@ enyo.kind({
 			enyo.Spotlight.Util.removeClass(this._getNode(oSender, n), 'spotlight');
 		},
 
-		_getCurrent: function(oSender) {
+		/******************************/
+	
+		onSpotlightFocus: function(oSender, oEvent) {
+			this.setCurrent(oSender, this.getCurrent(oSender), false);
+			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+		},
+	
+		onSpotlightBlur: function(oSender, oEvent) {
+			this.setCurrent(oSender, null, true);
+			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+		},
+	
+		onSpotlightSelect: function(oSender, oEvent) {
+			if (this.getCurrent(oSender) !== null) {
+				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this.getCurrent(oSender)}, oSender.$.generator.$.selection);
+				this.setCurrent(oSender, this.getCurrent(oSender), true);
+			} else {
+				this.setCurrent(oSender, 0, true);
+			}
+			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
+			return true;
+		},
+	
+		onSpotlightDown: function(oSender, oEvent) {
+			//Jump one row down (increment index by itemsPerRow)
+			var nCurrent = this.getCurrent(oSender);
+			if (nCurrent === null) { return true; }
+			var nNew = nCurrent + oSender.itemsPerRow;
+			if (nNew <= oSender.getCount() - 1) {
+				this.setCurrent(oSender, nNew, true);
+				return true;
+			}
+			this.setCurrent(oSender, null, true);
+		},
+	
+		onSpotlightUp: function(oSender, oEvent) {
+			//Jump one row up (decrement index by itemsPerRow)
+			var nCurrent = this.getCurrent(oSender);
+			if (nCurrent === null) { return true; }
+			var nNew = nCurrent - oSender.itemsPerRow;
+			if (nNew >= 0) {
+				this.setCurrent(oSender, nNew, true);
+				return true;
+			}
+			this.setCurrent(oSender, null, true);
+		},
+	
+		onSpotlightLeft: function(oSender, oEvent) {
+			var nCurrent = this.getCurrent(oSender);
+			if (nCurrent === null) { return true; }
+			if (nCurrent > 0) {
+				this.setCurrent(oSender, nCurrent - 1, true);
+				return true;
+			}
+			this.setCurrent(oSender, null, true);
+		},
+
+		onSpotlightRight: function(oSender, oEvent) {
+			var nCurrent = this.getCurrent(oSender);
+			if (nCurrent === null) { return true; }
+			if (nCurrent < oSender.getCount() - 1) {
+				this.setCurrent(oSender, nCurrent + 1, true);
+				return true;
+			}
+			this.setCurrent(oSender, null, true);
+		},
+	
+		onSpotlightPoint: function(oSender, oEvent) {
+			this.setCurrent(oSender, oEvent.index);
+			return true;
+		},
+		
+		getCurrent: function(oSender) {
 			if (typeof oSender._nCurrentSpotlightItem == 'undefined') {
 				return 0;
 			}
 			return oSender._nCurrentSpotlightItem;
 		},
 		
-		_setCurrent: function(oSender, n, bScrollIntoView) {
-			var nCurrent = this._getCurrent(oSender);
+		setCurrent: function(oSender, n, bScrollIntoView) {
+			var nCurrent = this.getCurrent(oSender);
 			
 			if (nCurrent !== null) {
 				this._blurNode(oSender, nCurrent);
@@ -58,77 +130,5 @@ enyo.kind({
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 		},
-	
-		/******************************/
-	
-		onSpotlightFocus: function(oSender, oEvent) {
-			this._setCurrent(oSender, this._getCurrent(oSender), false);
-			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-		},
-	
-		onSpotlightBlur: function(oSender, oEvent) {
-			this._setCurrent(oSender, null, true);
-			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-		},
-	
-		onSpotlightSelect: function(oSender, oEvent) {
-			if (this._getCurrent(oSender) !== null) {
-				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this._getCurrent(oSender)}, oSender.$.generator.$.selection);
-				this._setCurrent(oSender, this._getCurrent(oSender), true);
-			} else {
-				this._setCurrent(oSender, 0, true);
-			}
-			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-			return true;
-		},
-	
-		onSpotlightDown: function(oSender, oEvent) {
-			//Jump one row down (increment index by itemsPerRow)
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return true; }
-			var nNew = nCurrent + oSender.itemsPerRow;
-			if (nNew <= oSender.getCount() - 1) {
-				this._setCurrent(oSender, nNew, true);
-				return true;
-			}
-			this._setCurrent(oSender, null, true);
-		},
-	
-		onSpotlightUp: function(oSender, oEvent) {
-			//Jump one row up (decrement index by itemsPerRow)
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return true; }
-			var nNew = nCurrent - oSender.itemsPerRow;
-			if (nNew >= 0) {
-				this._setCurrent(oSender, nNew, true);
-				return true;
-			}
-			this._setCurrent(oSender, null, true);
-		},
-	
-		onSpotlightLeft: function(oSender, oEvent) {
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return true; }
-			if (nCurrent > 0) {
-				this._setCurrent(oSender, nCurrent - 1, true);
-				return true;
-			}
-			this._setCurrent(oSender, null, true);
-		},
-
-		onSpotlightRight: function(oSender, oEvent) {
-			var nCurrent = this._getCurrent(oSender);
-			if (nCurrent === null) { return true; }
-			if (nCurrent < oSender.getCount() - 1) {
-				this._setCurrent(oSender, nCurrent + 1, true);
-				return true;
-			}
-			this._setCurrent(oSender, null, true);
-		},
-	
-		onSpotlightPoint: function(oSender, oEvent) {
-			this._setCurrent(oSender, oEvent.index);
-			return true;
-		}
 	}
 });
