@@ -80,12 +80,10 @@ enyo.kind({
 		/******************************/
 	
 		onSpotlightFocus: function(oSender, oEvent) {
-			console.log('LIST FOCUS');
 			this.setCurrent(oSender, this.getCurrent(oSender), false);
 		},
 	
 		onSpotlightBlur: function(oSender, oEvent) {
-			console.log('LIST BLUR');
 			this._unspot(oSender);
 		},
 	
