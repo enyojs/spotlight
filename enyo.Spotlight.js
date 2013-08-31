@@ -40,10 +40,10 @@ enyo.Spotlight = new function() {
 		_interceptEvents = function() {
 			_oThis.rootDispatchFunction = _oRoot.dispatchEvent;
 			_oRoot.dispatchEvent = function(sEventName, oEvent, oSender) {
-				if (oThis.ownerDispatchFn.apply(oThis._oOwner, [sEventName, oEvent, oSender])) {
-					return true
+				if (_oThis.rootDispatchFunction.apply(_oRoot, [sEventName, oEvent, oSender])) {
+					return true;
 				}
-				return oThis.onSpotlightEvent(oEvent);
+				return _oThis.onSpotlightEvent(oEvent);
 			};
 		},
 		
