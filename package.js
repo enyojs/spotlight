@@ -4,6 +4,7 @@ enyo.depends(
 	'enyo.Spotlight.Accelerator.js',
 	'enyo.Spotlight.Scrolling.js',
 	'enyo.Spotlight.NearestNeighbor.js',
+	'enyo.Spotlight.Muter.js',
 	'decorators',
 	'css'
 );
