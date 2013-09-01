@@ -304,7 +304,7 @@ enyo.Spotlight = new function() {
 	}
 
 	this.onMouseDown = function(oEvent) {
-		if (this.getPointerMode()) { return; } // Why?
+		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
 		oEvent = enyo.clone(oEvent);
 		oEvent.keyCode  = 13;
@@ -315,7 +315,7 @@ enyo.Spotlight = new function() {
 	}
 
 	this.onMouseUp = function(oEvent) {
-		if (this.getPointerMode()) { return; } // Why?
+		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
 		oEvent = enyo.clone(oEvent);
 		oEvent.keyCode  = 13;
@@ -478,21 +478,21 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection) {
-		if (!_bCanFocus) {
+		if (!_bCanFocus) { return false; }               // Focusing is disabled when entering pointer mode
+		
+		if (_oCurrent && !this.isSpottable(oControl)) {  // Control is not spottable and something is already 
 			return false;
 		}
-		if (_oCurrent && !this.isSpottable(oControl)) {
-			return false;
-		}
-		if (_oCurrent && oControl !== _oCurrent) {
+		if (_oCurrent && oControl !== _oCurrent) {       // Blur last control before spotting new one
 			_dispatchEvent('onSpotlightBlur', null);
 		}
+		
 		oControl = oControl || this.getCurrent();
 		if (!this.isSpottable(oControl)) {
 			oControl = this.getFirstChild(oControl);
 		}
 		if (oControl) {
-			if (!oControl.hasClass('spotlight')) {
+			if (!oControl.hasClass('spotlight') && !this.isMuted()) {
 				oControl.addClass('spotlight');
 			}
 			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
@@ -532,14 +532,14 @@ enyo.Spotlight = new function() {
 	}
 
 	// Disables switching to pointer mode
-	this.disablePointerMode = function() {
-		_bEnablePointerMode = false;
-	}
+	this.disablePointerMode = function() { _bEnablePointerMode = false; }
 
 	// Enables switching to pointer mode
-	this.enablePointerMode = function() {
-		_bEnablePointerMode = true;
-	}
+	this.enablePointerMode = function() { _bEnablePointerMode = true; }
+	
+	this.mute    = function(oSender) { enyo.Spotlight.Muter.addMuteReason(oSender);    }
+	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); }
+	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); }
 	
 	enyo.ready(function() {
 		_initialize();
