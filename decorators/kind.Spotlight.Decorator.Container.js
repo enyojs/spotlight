@@ -62,12 +62,7 @@ enyo.kind({
 			
 			if (this._hadFocus(oSender)) {												// Focus came from within
 				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
-				if (!(oSender.parent instanceof enyo.Panels)) {
-					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
-				} else 
-				if (oSender.parent.spotlight !== true && oSender.parent.spotlight != 'true') {
-					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
-				}
+				enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				this._focusLeave(oSender, s5WayEventType);
 			} else {																	// Focus came from without
 				this._focusEnter(oSender);
