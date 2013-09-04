@@ -12,7 +12,11 @@ enyo.kind({
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {
 			if (!this._isInitialized(oSender)) {
-				this.setLastFocusedChild(oSender, enyo.Spotlight.getFirstChild(oSender));
+				if (oSender.defaultSpotlightControl && oSender.$[oSender.defaultSpotlightControl]) {
+					this.setLastFocusedChild(oSender, oSender.$[oSender.defaultSpotlightControl]);
+				} else {
+					this.setLastFocusedChild(oSender, enyo.Spotlight.getFirstChild(oSender));
+				}
 				enyo.Spotlight.Util.interceptEvents(oSender, this._handleEvent);
 			}
 		},
