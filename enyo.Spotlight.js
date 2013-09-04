@@ -541,9 +541,7 @@ enyo.Spotlight = new function() {
 	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); }
 	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); }
 	
-	enyo.ready(function() {
-		_initialize();
-	});
+	_initialize();
 };
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
