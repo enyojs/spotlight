@@ -39,7 +39,7 @@ enyo.kind({
 		},
 		
 		_focusLeave: function(oSender, s5WayEventType) {
-			// console.log('FOCUS LEAVE', oSender.name);
+			// console.log('FOCUS LEAVE', oSender.name, s5WayEventType);
 			var sDirection = s5WayEventType.replace('onSpotlight','').toUpperCase();
 			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
 		},
@@ -62,33 +62,15 @@ enyo.kind({
 			
 			if (this._hadFocus(oSender)) {												// Focus came from within
 				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
-				enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
+				if (s5WayEventType) {
+					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
+				}
 				this._focusLeave(oSender, s5WayEventType);
 			} else {																	// Focus came from without
 				this._focusEnter(oSender);
 			}
 			
 			return true;
-		},
-		
-		onSpotlightLeft: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
-		onSpotlightRight: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
-		onSpotlightUp: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
-		onSpotlightDown: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
 		},
 		
 		// What child of container was last focused?
