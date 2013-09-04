@@ -361,6 +361,8 @@ enyo.Spotlight = new function() {
 		_preventDomDefault(oEvent); // If oEvent.allowDomDefault() was not called this will preventDefault on dom keydown event
 		var aChildren,
 			oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl('SELECT', this.getCurrent());
+		
+		_oLast5WayEvent = null;	// clear last 5way event
 
 		if (oNeighbor) {
 			return this.spot(oNeighbor);
