@@ -362,8 +362,6 @@ enyo.Spotlight = new function() {
 		var aChildren,
 			oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl('SELECT', this.getCurrent());
 
-		_oLast5WayEvent = null;	// clear last 5way event
-
 		if (oNeighbor) {
 			return this.spot(oNeighbor);
 		}
@@ -543,7 +541,9 @@ enyo.Spotlight = new function() {
 	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); }
 	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); }
 	
-	_initialize();
+	enyo.ready(function() {
+		_initialize();
+	});
 };
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
