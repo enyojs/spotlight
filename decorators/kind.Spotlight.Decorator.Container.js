@@ -24,8 +24,8 @@ enyo.kind({
 				} else {
 					oLastFocusedChild = enyo.Spotlight.getFirstChild(oSender);
 				}
-
-				if (oLastFocusedChild.isDescendantOf(oSender)) {
+				
+				if (oLastFocusedChild && oLastFocusedChild.isDescendantOf(oSender)) {
 					this.setLastFocusedChild(oSender, oLastFocusedChild);
 				}
 				enyo.Spotlight.Util.interceptEvents(oSender, this._handleEvent);
