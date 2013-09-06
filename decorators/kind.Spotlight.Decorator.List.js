@@ -80,12 +80,10 @@ enyo.kind({
 		/******************************/
 	
 		onSpotlightFocus: function(oSender, oEvent) {
-			console.log('LIST FOCUS');
 			this.setCurrent(oSender, this.getCurrent(oSender), false);
 		},
 	
 		onSpotlightBlur: function(oSender, oEvent) {
-			console.log('LIST BLUR');
 			this._unspot(oSender);
 		},
 	
@@ -113,7 +111,7 @@ enyo.kind({
 	
 		onSpotlightLeft: function(oSender, oEvent) {
 			if (oSender.getOrient && oSender.getOrient() === 'h') {
-				return this._spotPreviousItem(oSender);
+				return oSender.rtl ? this._spotNextItem(oSender) : this._spotPreviousItem(oSender);
 			} else {
 				this._unspot(oSender);
 			}
@@ -121,7 +119,7 @@ enyo.kind({
 	
 		onSpotlightRight: function(oSender, oEvent) {
 			if (oSender.getOrient && oSender.getOrient() === 'h') {
-				return this._spotNextItem(oSender);
+				return oSender.rtl ? this._spotPreviousItem(oSender) : this._spotNextItem(oSender);
 			} else {
 				this._unspot(oSender);
 			}

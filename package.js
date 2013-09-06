@@ -1,10 +1,11 @@
 enyo.depends(
-	"version.js",
-	'kind.Spotlight.js',
-	'kind.Spotlight.Util.js',
-	'kind.Spotlight.Accelerator.js',
-	'kind.Spotlight.Scrolling.js',
-	'kind.Spotlight.NearestNeighbor.js',
+	'version.js',
+	'enyo.Spotlight.js',
+	'enyo.Spotlight.Util.js',
+	'enyo.Spotlight.Accelerator.js',
+	'enyo.Spotlight.Scrolling.js',
+	'enyo.Spotlight.NearestNeighbor.js',
+	'enyo.Spotlight.Muter.js',
 	'decorators',
 	'css'
 );
