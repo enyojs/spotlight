@@ -306,23 +306,21 @@ enyo.Spotlight = new function() {
 	this.onMouseDown = function(oEvent) {
 		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
-		
-		oEvent          = enyo.clone(oEvent);
+		oEvent = enyo.clone(oEvent);
 		oEvent.keyCode  = 13;
 		oEvent.domEvent = oEvent;
 		
-		return _dispatchEvent('onSpotlightKeyDown', oEvent);
+		_oDepressedControl = this.getCurrent();
+		return _dispatchEvent('onSpotlightKeyDown', oEvent, _oDepressedControl);
 	}
 
 	this.onMouseUp = function(oEvent) {
 		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
-		
-		oEvent          = enyo.clone(oEvent);
+		oEvent = enyo.clone(oEvent);
 		oEvent.keyCode  = 13;
 		oEvent.domEvent = oEvent;
-		
-		return _dispatchEvent('onSpotlightKeyUp', oEvent);
+		return _dispatchEvent('onSpotlightKeyUp', oEvent, _oDepressedControl);
 	}
 
 	this.onClick = function(oEvent) {
