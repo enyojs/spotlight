@@ -64,6 +64,11 @@ enyo.kind({
 			var oLastFocusedChild = this.getLastFocusedChild(oSender);
 			if (oLastFocusedChild) {
 				enyo.Spotlight.spot(oLastFocusedChild);
+			} else {
+				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
+				if (s5WayEventType) {
+					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
+				}
 			}
 			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);
 		},
