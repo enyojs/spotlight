@@ -76,6 +76,8 @@ enyo.Spotlight = new function() {
 			}
 			
 			_dispatchEvent('onSpotlightFocused');
+			
+			enyo.Spotlight.TestMode.highlight();
 
 			return true;
 		},

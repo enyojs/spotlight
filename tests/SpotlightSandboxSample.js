@@ -3,7 +3,6 @@ enyo.kind({
 	classes: "moon",
 	fit: false,
 	components:[
-		{kind: 'enyo.Spotlight'},
 		{style: "height:50px;background:#444;border-bottom:1px solid #111;", components: [
 			{kind: "enyo.Button", content: "Add Control", style: "margin:10px 20px; width:300px; background:#ccc;", ontap: "addBarracuda"}
 		]},
@@ -11,7 +10,7 @@ enyo.kind({
 	],
 	rendered: function() {
 		this.inherited(arguments);
-		enyo.Spotlight.setTestMode(true);
+		enyo.Spotlight.TestMode.enable();
 	},
 	addBarracuda: function() {
 		var b = this.$.container.createComponent({kind: "Barracuda"}).render();
