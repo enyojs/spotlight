@@ -42,7 +42,9 @@ enyo.Spotlight = new function() {
 				if (_oThis.rootDispatchFunction.apply(_oRoot, [sEventName, oEvent, oSender])) {
 					return true;
 				}
-				return _oThis.onSpotlightEvent(oEvent);
+				if (!oEvent.delegate) {
+					return _oThis.onSpotlightEvent(oEvent);
+				}
 			};
 		},
 		
@@ -100,7 +102,7 @@ enyo.Spotlight = new function() {
 				_oThis.spot(oControl, sDirection);
 			} else {
 				var oParent = _oThis.getParent();
-				if (typeof oParent.spotlight == 'undefined') {  // Reached the end of spottable world
+				if (typeof oParent.spotlight == 'undefined' || oParent.spotlightModal) {  // Reached the end of spottable world
 					_oThis.spot(_oLastSpotlightTrueControl);
 				} else {
 					_oThis.spot(_oThis.getParent(), sDirection);

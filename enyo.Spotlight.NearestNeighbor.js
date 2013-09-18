@@ -6,10 +6,10 @@
 enyo.Spotlight.NearestNeighbor = new function() {
 	var _isInHalfPlane = function(sDirection, oBounds1, oBounds2) {
 			switch (sDirection) {
-				case 'UP'    : return oBounds1.top  >= oBounds2.top    +  oBounds2.height;
-				case 'DOWN'  : return oBounds1.top  +  oBounds1.height <= oBounds2.top;
-				case 'LEFT'  : return oBounds1.left >= oBounds2.left   +  oBounds2.width;
-				case 'RIGHT' : return oBounds1.left +  oBounds1.width  <= oBounds2.left;
+				case 'UP'    : return oBounds1.top  >= oBounds2.top    +  oBounds2.height - 1;
+				case 'DOWN'  : return oBounds1.top  +  oBounds1.height - 1 <= oBounds2.top;
+				case 'LEFT'  : return oBounds1.left >= oBounds2.left   +  oBounds2.width - 1;
+				case 'RIGHT' : return oBounds1.left +  oBounds1.width - 1 <= oBounds2.left;
 			}
 		},
 

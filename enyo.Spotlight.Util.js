@@ -19,10 +19,11 @@ enyo.Spotlight.Util = new function() {
 		var f = oControl.dispatchEvent;
 
 		oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
-			if (fHandler(oControl, oEvent)) {                                       // If handler returns true - prevent default
+			if (!oEvent.delegate && fHandler(oControl, oEvent)) {                   // If handler returns true - prevent default
 				oEvent.type = null;
+				return true;
 			} else {
-				f.apply(oControl, [sEventName, oEvent, oEventSender]);              // If handler returns false - call original dispatcher and allow bubbling
+				return f.apply(oControl, [sEventName, oEvent, oEventSender]);       // If handler returns false - call original dispatcher and allow bubbling
 			}
 		};
 	},
