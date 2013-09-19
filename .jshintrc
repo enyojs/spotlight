@@ -2,7 +2,8 @@
     "globals": {
         "enyo": true,
         "$L": true,
-        "onyx": true
+        "onyx": true,
+        "moon": true
     },
     "es3": true,
     "evil": false,
@@ -17,5 +18,6 @@
     "curly": true,
     "newcap": true,
     "undef": true,
-    "unused": "vars"
+    "unused": "vars",
+    "supernew": true
 }

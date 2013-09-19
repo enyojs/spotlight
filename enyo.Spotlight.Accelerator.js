@@ -7,24 +7,24 @@ enyo.Spotlight.Accelerator = new function() {
 
 	//* @protected
 	/*************************************************************/
-	
+
 	var _nSkipped = 0,
 		_nTime    = 0,
 		_nKey     = 0;
-	
+
 	//* @public
 	/*************************************************************/
-	
+
 	//* Firing configuration. At n-th second use every frequency[n] subsequent keydown event
-	this.frequency = [3, 3, 3, 2, 2, 2, 1],
-	
-	//* Called from enyo.Spotlight, with current keydown event and Spotlight's callback 
+	this.frequency = [3, 3, 3, 2, 2, 2, 1];
+
+	//* Called from enyo.Spotlight, with current keydown event and Spotlight's callback
 	//* Which will be called when an event is allowed through
 	this.processKey = function(oEvent, fCallback, oContext) {
 		switch (oEvent.type) {
 			case 'keydown':
 			case 'pagehold':
-			case 'pageholdpulse':				
+			case 'pageholdpulse':
 				if (oEvent.keyCode != _nKey) {
 					this.reset();
 					_nTime = (new Date()).getTime();
@@ -32,8 +32,8 @@ enyo.Spotlight.Accelerator = new function() {
 					return fCallback.apply(oContext, [oEvent]);
 				} else {
 					var nElapsedTime = (new Date()).getTime() - _nTime,
-						nSeconds	 = Math.floor(nElapsedTime / 1000),
-						nToSkip		 = 0;
+						nSeconds     = Math.floor(nElapsedTime / 1000),
+						nToSkip      = 0;
 
 					nSeconds = nSeconds > this.frequency.length - 1
 						? this.frequency.length - 1
@@ -57,11 +57,11 @@ enyo.Spotlight.Accelerator = new function() {
 				this.reset();
 				return fCallback.apply(oContext, [oEvent]);
 		}
-	}
+	};
 
 	this.reset = function() {
 		_nSkipped = 0;
 		_nTime    = 0;
 		_nKey     = 0;
-	}
-}
+	};
+};

@@ -7,10 +7,10 @@ if (window.onyx && onyx.DatePicker) {
 
 	enyo.kind({
 		name: 'enyo.Spotlight.Decorator.DatePicker',
-	
+
 		statics: {
 			decorates: onyx.DatePicker,
-			
+
 			onSpotlightFocus: function(oSender, oEvent) {
 				if (oSender.spotlight != 'container') {
 					oSender.spotlight = 'container';
