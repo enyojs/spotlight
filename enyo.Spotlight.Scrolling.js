@@ -7,15 +7,14 @@ enyo.Spotlight.Scrolling = new function() {
 	//* @protected
 	/*************************************************************/
 
-	var _nDelta = 0,
-		_nTime  = 0;
+	var _nDelta = 0;
 
 	//* @public
 	/*************************************************************/
-	
+
 	//* Fire scroll event every this.frequency mousewheel points
 	this.frequency = 40;
-	
+
 	this.processMouseWheel = function(oEvent, fCallback, oContext) {
 		_nDelta += oEvent.wheelDeltaY;
 		//enyo.log('wheel', _nDelta);
@@ -25,7 +24,7 @@ enyo.Spotlight.Scrolling = new function() {
 			oEvent.preventDefault();
 			return;
 		}
-		
+
 		if (_nDelta >= this.frequency) {
 			_nDelta = 0;
 			return fCallback.apply(oContext, [oEvent, true]);
@@ -33,6 +32,6 @@ enyo.Spotlight.Scrolling = new function() {
 			_nDelta = 0;
 			return fCallback.apply(oContext, [oEvent, false]);
 		}
-		
-	}
-}
+
+	};
+};

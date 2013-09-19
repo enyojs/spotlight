@@ -1,10 +1,10 @@
 enyo.Spotlight.TestMode = new function() {
 
 	/********************* PRIVATE ********************/
-	
+
 	var _aNodes   = [],
 		_bEnabled = false;
-		
+
 	var //* Destroy all highlight elements
 		_destroyExistingHighlightNodes = function() {
 			var n;
@@ -19,7 +19,7 @@ enyo.Spotlight.TestMode = new function() {
 		//* Highlight the current spotlighted control and add it to __aNodes_
 		_highlightCurrentControl = function() {
 			_aNodes.push(_addConrolHighlightNode({
-				control : enyo.Spotlight.getCurrent(), 
+				control : enyo.Spotlight.getCurrent(),
 				str     : 'C'
 			}));
 		},
@@ -93,7 +93,7 @@ enyo.Spotlight.TestMode = new function() {
 					style   : 'height:'+bounds.height+'px;width:'+bounds.width+'px;top:'+bounds.top+'px;left:'+bounds.left+'px;line-height:'+bounds.height+'px;',
 					content : inObj.str
 				});
-				
+
 			highlightNode.render();
 
 			return highlightNode;
@@ -105,12 +105,12 @@ enyo.Spotlight.TestMode = new function() {
 	this.enable = function() {
 		_bEnabled = true;
 		 this.highlight();
-	}
-	
+	};
+
 	this.disable = function() {
 		_bEnabled = false;
 		_destroyExistingHighlightNodes();
-	}
+	};
 
 	//* Destroy existing highlight nodes, and highlight current and adjacent spotlight controls
 	this.highlight = function() {
@@ -118,10 +118,10 @@ enyo.Spotlight.TestMode = new function() {
 		_destroyExistingHighlightNodes();
 		_highlightCurrentControl();
 		_highlightAdjacentControls();
-	}
-		
+	};
+
 	//* Return true if test mode is enabled
 	this.isEnabled = function() {
 		return _bEnabled;
-	}
+	};
 };

@@ -1,16 +1,16 @@
 /**
- 	enyo.Spotlight.Decorator.GridList kind definition
- 	
- 	TODO: This is a copy of List decorator. 
+	enyo.Spotlight.Decorator.GridList kind definition
+
+	TODO: This is a copy of List decorator.
 	Ideally, we should be able to inherit decorators from parent kinds and simply override functions that are specific to the overridden decorator
  */
 
 enyo.kind({
 	name: 'enyo.Spotlight.Decorator.GridList',
-	
+
 	statics: {
 		decorates: enyo.GridList,
-	
+
 		_getNodeParent: function(oSender, n) {
 			if (oSender.$.generator.hasNode()) {
 				return oSender.$.generator.node.querySelector('[data-enyo-index="' + n + '"]');
@@ -22,27 +22,27 @@ enyo.kind({
 				return oSender.$.generator.node.querySelector('[data-enyo-index="' + n + '"] > .moon-gridlist-item');
 			}
 		},
-	
+
 		_focusNode: function(oSender, n) {
 			enyo.Spotlight.Util.addClass(this._getNode(oSender, n), 'spotlight');
 		},
-	
+
 		_blurNode: function(oSender, n) {
 			enyo.Spotlight.Util.removeClass(this._getNode(oSender, n), 'spotlight');
 		},
 
 		/******************************/
-	
+
 		onSpotlightFocus: function(oSender, oEvent) {
 			this.setCurrent(oSender, this.getCurrent(oSender), false);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 		},
-	
+
 		onSpotlightBlur: function(oSender, oEvent) {
 			this.setCurrent(oSender, null, true);
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 		},
-	
+
 		onSpotlightSelect: function(oSender, oEvent) {
 			if (this.getCurrent(oSender) !== null) {
 				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this.getCurrent(oSender)}, oSender.$.generator.$.selection);
@@ -53,7 +53,7 @@ enyo.kind({
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 			return true;
 		},
-	
+
 		onSpotlightDown: function(oSender, oEvent) {
 			//Jump one row down (increment index by itemsPerRow)
 			var nCurrent = this.getCurrent(oSender);
@@ -65,7 +65,7 @@ enyo.kind({
 			}
 			this.setCurrent(oSender, null, true);
 		},
-	
+
 		onSpotlightUp: function(oSender, oEvent) {
 			//Jump one row up (decrement index by itemsPerRow)
 			var nCurrent = this.getCurrent(oSender);
@@ -77,7 +77,7 @@ enyo.kind({
 			}
 			this.setCurrent(oSender, null, true);
 		},
-	
+
 		onSpotlightLeft: function(oSender, oEvent) {
 			var nCurrent = this.getCurrent(oSender);
 			if (nCurrent === null) { return true; }
@@ -97,22 +97,22 @@ enyo.kind({
 			}
 			this.setCurrent(oSender, null, true);
 		},
-	
+
 		onSpotlightPoint: function(oSender, oEvent) {
 			this.setCurrent(oSender, oEvent.index);
 			return true;
 		},
-		
+
 		getCurrent: function(oSender) {
 			if (typeof oSender._nCurrentSpotlightItem == 'undefined') {
 				return 0;
 			}
 			return oSender._nCurrentSpotlightItem;
 		},
-		
+
 		setCurrent: function(oSender, n, bScrollIntoView) {
 			var nCurrent = this.getCurrent(oSender);
-			
+
 			if (nCurrent !== null) {
 				this._blurNode(oSender, nCurrent);
 			}
@@ -129,6 +129,6 @@ enyo.kind({
 				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
-		},
+		}
 	}
 });

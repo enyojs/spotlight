@@ -18,14 +18,6 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			return _getPrecedenceValue(oPoints, sDirection);
 		},
 
-		_isBeyondXBounds = function(oBounds1, oBounds2) {
-			return oBounds1.left < oBounds2.left && oBounds1.right < oBounds2.right;
-		},
-
-		_isBeyondYBounds = function(oBounds1, oBounds2) {
-			return oBounds1.top < oBounds2.top && oBounds1.bottom < oBounds2.bottom;
-		},
-
 		_getAdjacentControlPoints = function(sDirection, oBounds1, oBounds2) {
 			switch (sDirection) {
 				case 'UP'	:
@@ -106,7 +98,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 				slope    = _getSlope(delta, sDirection),
 				angle    = _getAngle(slope),
 				distance = _getDistance(delta);
-				
+
 			return angle > 89 ? 0 : 1/(angle * Math.pow(distance, 4));
 		},
 
@@ -116,7 +108,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 				dy: Math.abs(point2.y - point1.y)
 			};
 		},
-		
+
 		_getCenterToCenterDistance = function(oBounds1, oBounds2) {
 			var oCenter1 = {
 					x: oBounds1.left + oBounds1.width  / 2,
@@ -163,12 +155,12 @@ enyo.Spotlight.NearestNeighbor = new function() {
 		if (oNeighbor) { return oNeighbor; }
 
 		// If default control in the directin of navigation is not specified, calculate it
-		
+
 		var n,
 			oBestMatch    = null,
 			nBestMatch    = 0,
 			nBestDistance = 0,
-			
+
 			oBounds1      = enyo.Spotlight.Util.getAbsoluteBounds(oControl),
 			oBounds2      = null,
 			o             = enyo.Spotlight.getSiblings(oControl),
@@ -176,16 +168,16 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			oSibling      = null,
 			nPrecedence,
 			nDistance;
-			
+
 		for (n=0; n<nLen; n++) {
 			oSibling = o.siblings[n];
 			if (oSibling === oControl) { continue; }
-			
+
 			oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(oSibling);
-			
+
 			// If control is in half plane specified by direction
 			if (_isInHalfPlane(sDirection, oBounds1, oBounds2)) {
-				
+
 				// Find control with highest precedence to the direction
 				nPrecedence = _getAdjacentControlPrecedence(sDirection, oBounds1, oBounds2);
 				if (nPrecedence > nBestMatch) {
@@ -204,5 +196,5 @@ enyo.Spotlight.NearestNeighbor = new function() {
 		}
 
 		return oBestMatch;
-	}
-}
+	};
+};
