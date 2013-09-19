@@ -42,7 +42,7 @@ enyo.kind({
 	mousedown: function(inSender, inEvent) {
 		// check if resizing
 		this.resizing = this.isResizing(inEvent);
-		
+
 		// save initial values
 		var bounds = this.getBounds();
 		this.initY = bounds.top;
@@ -63,22 +63,21 @@ enyo.kind({
 			relativeLeft = inEvent.clientX - bounds.left,
 			relativeBottom = bounds.height - relativeTop,
 			relativeRight = bounds.width - relativeLeft;
-		
+
 		this.resizingX =	(relativeLeft < this.cornerWidth) ? -1 :
 							(relativeRight < this.cornerWidth) ? 1 :
 							0;
-		
+
 		this.resizingY =	(relativeTop < this.cornerWidth) ? -1 :
 							(relativeBottom < this.cornerWidth) ? 1 :
 							0;
-		
+
 		//	TODO - only pay attention to bottom right for resizing for now
 		return (relativeRight < this.cornerWidth && relativeBottom < this.cornerWidth);
-		
-		return this.resizingX !== 0 && this.resizingY !== 0;
+		// return this.resizingX !== 0 && this.resizingY !== 0;
 	},
 	doResize: function(inEvent) {
-		this.addStyles("width:"+(inEvent.dx + this.initWidth)+"px;height:"+(inEvent.dy + this.initHeight)+"px;")
+		this.addStyles("width:"+(inEvent.dx + this.initWidth)+"px;height:"+(inEvent.dy + this.initHeight)+"px;");
 	},
 	doDrag: function(inEvent) {
 		this.addStyles("left:"+(inEvent.dx + this.initX)+"px;top:"+(inEvent.dy + this.initY)+"px;");
