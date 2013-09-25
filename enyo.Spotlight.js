@@ -215,6 +215,8 @@ enyo.Spotlight = new function() {
 					return enyo.Spotlight.Scrolling.processMouseWheel(oEvent, this.onScroll, this);
 				case 'keydown':
 				case 'keyup':
+					// Filter out special keycode from Input Manager for magic remote show/hide
+					if (oEvent.keyCode === 0 && (oEvent.keyIdentifier === "U+1200202" || oEvent.keyIdentifier === "U+1200201")) {return true;}
 					return enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 			}
 		}
