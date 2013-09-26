@@ -9,7 +9,9 @@ enyo.kind({
 	name: 'enyo.Spotlight.Decorator.GridList',
 
 	statics: {
-		decorates: enyo.GridList,
+		decorates: function() {
+			return enyo.GridList;
+		},
 
 		_getNodeParent: function(oSender, n) {
 			if (oSender.$.generator.hasNode()) {

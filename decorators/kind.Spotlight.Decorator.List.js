@@ -7,7 +7,9 @@ enyo.kind({
 	name: 'enyo.Spotlight.Decorator.List',
 
 	statics: {
-		decorates: enyo.List,
+		decorates: function() {
+			return enyo.List;
+		},
 
 		_getNode: function(oSender, n) {
 			return oSender.$.generator.fetchRowNode(n);
