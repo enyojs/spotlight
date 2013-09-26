@@ -312,6 +312,7 @@ enyo.Spotlight = new function() {
 		var oEventClone      = enyo.clone(oEvent);
 		oEventClone.keyCode  = 13;
 		oEventClone.domEvent = oEvent;
+		oEventClone.allowDomDefault = enyo.nop;
 
 		_oDepressedControl = this.getCurrent();
 		return _dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
