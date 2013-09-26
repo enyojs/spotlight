@@ -216,6 +216,8 @@ enyo.Spotlight = new function() {
 					return enyo.Spotlight.Scrolling.processMouseWheel(oEvent, this.onScroll, this);
 				case 'keydown':
 				case 'keyup':
+					// Filter out special keycode from Input Manager for magic remote show/hide
+					if (oEvent.keyCode === 0 && (oEvent.keyIdentifier === "U+1200202" || oEvent.keyIdentifier === "U+1200201")) {return true;}
 					return enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 			}
 		}
@@ -311,6 +313,7 @@ enyo.Spotlight = new function() {
 		var oEventClone      = enyo.clone(oEvent);
 		oEventClone.keyCode  = 13;
 		oEventClone.domEvent = oEvent;
+		oEventClone.allowDomDefault = enyo.nop;
 
 		_oDepressedControl = this.getCurrent();
 		return _dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
