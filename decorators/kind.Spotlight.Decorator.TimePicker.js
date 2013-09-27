@@ -9,9 +9,7 @@ if (window.onyx && onyx.TimePicker) {
 		name: 'enyo.Spotlight.Decorator.TimePicker',
 
 		statics: {
-			decorates: function() {
-				return onyx.TimePicker;
-			},
+			decorates: "onyx.TimePicker",
 
 			onSpotlightFocus: function(oSender, oEvent) {
 				if (oSender.spotlight != 'container') {

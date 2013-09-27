@@ -7,9 +7,7 @@ enyo.kind({
 	name: 'enyo.Spotlight.Decorator.Container',
 
 	statics: {
-		decorates: function() {
-			return null;
-		},
+		decorates: null,
 
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {

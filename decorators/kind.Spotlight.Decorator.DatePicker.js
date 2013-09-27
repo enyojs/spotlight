@@ -9,9 +9,7 @@ if (window.onyx && onyx.DatePicker) {
 		name: 'enyo.Spotlight.Decorator.DatePicker',
 
 		statics: {
-			decorates: function() {
-				return onyx.DatePicker;
-			}, 
+			decorates: "onyx.DatePicker",
 
 			onSpotlightFocus: function(oSender, oEvent) {
 				if (oSender.spotlight != 'container') {

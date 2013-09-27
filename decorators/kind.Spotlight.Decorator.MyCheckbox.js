@@ -9,9 +9,7 @@ if (window.onyx && onyx.MyCheckbox) {
 		name: 'enyo.Spotlight.Decorator.MyCheckbox',
 
 		statics: {
-			decorates: function() {
-				return onyx.MyCheckbox;
-			},
+			decorates: "onyx.MyCheckbox",
 
 			/******************************/
 

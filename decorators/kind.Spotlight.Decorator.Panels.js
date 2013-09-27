@@ -11,9 +11,7 @@ enyo.kind({
 	name: 'enyo.Spotlight.Decorator.Panels',
 
 	statics: {
-		decorates: function() {
-			return enyo.Panels;
-		},
+		decorates: "enyo.Panels",
 
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {

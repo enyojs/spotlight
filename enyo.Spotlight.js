@@ -139,12 +139,12 @@ enyo.Spotlight = new function() {
 			// Process non-containers
 			for (var s in enyo.Spotlight.Decorator) {                                  // Loop through decorators namespace
 				o = enyo.Spotlight.Decorator[s];
-				var oDecorates = o.decorates();
+				var oDecorates = enyo.getPath(o.decorates);
 				if (oDecorates && oSender instanceof oDecorates) {                   // If decorator applies to oSender
 					if (!oDecorator) {                                                 // If decorator was NOT set in previous iteration
 						oDecorator = o;                                                // Set it to the first value
 					} else {                                                           // If decorator WAS set in previous iteration
-						if (oDecorates.prototype instanceof oDecorator.decorates()) {   // IF oDecorates is closer to oSender in lineage
+						if (oDecorates.prototype instanceof oDecorator.decorates) {   // IF oDecorates is closer to oSender in lineage
 							oDecorator = o;                                            // Set it as optimal decorator
 						}
 					}
