@@ -6,24 +6,16 @@
 enyo.Spotlight.NearestNeighbor = new function() {
 	var _isInHalfPlane = function(sDirection, oBounds1, oBounds2) {
 			switch (sDirection) {
-				case 'UP'		: return oBounds1.top >= oBounds2.top + oBounds2.height;
-				case 'DOWN'		: return oBounds1.top + oBounds1.height <= oBounds2.top;
-				case 'LEFT'		: return oBounds1.left >= oBounds2.left + oBounds2.width;
-				case 'RIGHT'	: return oBounds1.left + oBounds1.width <= oBounds2.left;
+				case 'UP'    : return oBounds1.top  >= oBounds2.top    +  oBounds2.height - 1;
+				case 'DOWN'  : return oBounds1.top  +  oBounds1.height - 1 <= oBounds2.top;
+				case 'LEFT'  : return oBounds1.left >= oBounds2.left   +  oBounds2.width - 1;
+				case 'RIGHT' : return oBounds1.left +  oBounds1.width - 1 <= oBounds2.left;
 			}
 		},
 
 		_getAdjacentControlPrecedence = function(sDirection, oBounds1, oBounds2) {
 			var oPoints = _getAdjacentControlPoints(sDirection, oBounds1, oBounds2);
 			return _getPrecedenceValue(oPoints, sDirection);
-		},
-
-		_isBeyondXBounds = function(oBounds1, oBounds2) {
-			return oBounds1.left < oBounds2.left && oBounds1.right < oBounds2.right;
-		},
-
-		_isBeyondYBounds = function(oBounds1, oBounds2) {
-			return oBounds1.top < oBounds2.top && oBounds1.bottom < oBounds2.bottom;
 		},
 
 		_getAdjacentControlPoints = function(sDirection, oBounds1, oBounds2) {
@@ -102,22 +94,37 @@ enyo.Spotlight.NearestNeighbor = new function() {
 		},
 
 		_getPrecedenceValue = function(oPoints, sDirection) {
-			var delta    = _getAdjacentControlDelta(oPoints[0], oPoints[1]),
-				slope    = _getAdjacentControlSlope(delta, sDirection),
-				angle    = _getAdjacentControlAngle(slope),
-				distance = _getAdjacentControlDistance(delta);
+			var delta    = _getDelta(oPoints[0], oPoints[1]),
+				slope    = _getSlope(delta, sDirection),
+				angle    = _getAngle(slope),
+				distance = _getDistance(delta);
 
 			return angle > 89 ? 0 : 1/(angle * Math.pow(distance, 4));
 		},
 
-		_getAdjacentControlDelta = function(point1, point2) {
+		_getDelta = function(point1, point2) {
 			return {
 				dx: Math.abs(point2.x - point1.x),
 				dy: Math.abs(point2.y - point1.y)
 			};
 		},
 
-		_getAdjacentControlSlope = function(delta, sDirection) {
+		_getCenterToCenterDistance = function(oBounds1, oBounds2) {
+			var oCenter1 = {
+					x: oBounds1.left + oBounds1.width  / 2,
+					y: oBounds1.top  + oBounds1.height / 2
+				},
+				oCenter2 = {
+					x: oBounds2.left + oBounds2.width  / 2,
+					y: oBounds2.top  + oBounds2.height / 2
+				},
+				oDelta    = _getDelta(oCenter1, oCenter2),
+				nDistance = _getDistance(oDelta);
+
+				return nDistance;
+		},
+
+		_getSlope = function(delta, sDirection) {
 			switch (sDirection) {
 				case 'UP'	:
 				case 'DOWN'	:
@@ -128,11 +135,11 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			}
 		},
 
-		_getAdjacentControlDistance = function(delta) {
+		_getDistance = function(delta) {
 			return Math.pow(delta.dx*delta.dx + delta.dy*delta.dy, 0.5) || 0.1;
 		},
 
-		_getAdjacentControlAngle = function(nSlope) {
+		_getAngle = function(nSlope) {
 			return Math.atan(nSlope) * 180/Math.PI || 0.1;
 		};
 
@@ -145,32 +152,49 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
 		// Check to see if default direction is specified
 		var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
-		if (oNeighbor) {
-			return oNeighbor;
-		}
+		if (oNeighbor) { return oNeighbor; }
 
-		// If default direction is not specified, find control in the direction
+		// If default control in the directin of navigation is not specified, calculate it
+
 		var n,
-			oBestMatch	= null,
-			nBestMatch	= 0,
-			oBounds1 	= enyo.Spotlight.Util.getAbsoluteBounds(oControl),
-			oBounds2	= null,
-			o 			= enyo.Spotlight.getSiblings(oControl),
-			nLen 		= o.siblings.length,
-			nPrecedence;
+			oBestMatch    = null,
+			nBestMatch    = 0,
+			nBestDistance = 0,
+
+			oBounds1      = enyo.Spotlight.Util.getAbsoluteBounds(oControl),
+			oBounds2      = null,
+			o             = enyo.Spotlight.getSiblings(oControl),
+			nLen          = o.siblings.length,
+			oSibling      = null,
+			nPrecedence,
+			nDistance;
+
 		for (n=0; n<nLen; n++) {
-			oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(o.siblings[n]);
+			oSibling = o.siblings[n];
+			if (oSibling === oControl) { continue; }
+
+			oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(oSibling);
+
 			// If control is in half plane specified by direction
-			if (_isInHalfPlane(sDirection, oBounds1, oBounds2) && o.siblings[n] !== oControl) {
+			if (_isInHalfPlane(sDirection, oBounds1, oBounds2)) {
+
 				// Find control with highest precedence to the direction
 				nPrecedence = _getAdjacentControlPrecedence(sDirection, oBounds1, oBounds2);
 				if (nPrecedence > nBestMatch) {
-					nBestMatch = nPrecedence;
-					oBestMatch = o.siblings[n];
+					nBestMatch    = nPrecedence;
+					oBestMatch    = oSibling;
+					nBestDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
+				} else if (nPrecedence == nBestMatch) {
+					nDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
+					if (nBestDistance > nDistance) {
+						nBestMatch    = nPrecedence;
+						oBestMatch    = oSibling;
+						nBestDistance = nDistance;
+					}
 				}
 			}
 		}
 
 		return oBestMatch;
-	}
-}
+	};
+};

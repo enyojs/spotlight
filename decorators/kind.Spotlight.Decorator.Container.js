@@ -5,10 +5,10 @@
 
 enyo.kind({
 	name: 'enyo.Spotlight.Decorator.Container',
-	
+
 	statics: {
 		decorates: null,
-		
+
 		// Creates oSender._spotlight object
 		_initComponent: function(oSender) {
 			var oLastFocusedChild;
@@ -24,18 +24,18 @@ enyo.kind({
 				} else {
 					oLastFocusedChild = enyo.Spotlight.getFirstChild(oSender);
 				}
-				
+
 				if (oLastFocusedChild && oLastFocusedChild.isDescendantOf(oSender)) {
 					this.setLastFocusedChild(oSender, oLastFocusedChild);
 				}
 				enyo.Spotlight.Util.interceptEvents(oSender, this._handleEvent);
 			}
 		},
-		
+
 		_isInitialized: function(oSender) {
 			return typeof oSender._spotlight.lastFocusedChild != 'undefined';
 		},
-		
+
 		// Handle events bubbling from within the container
 		_handleEvent: function(oSender, oEvent) {
 			switch (oEvent.type) {
@@ -46,68 +46,55 @@ enyo.kind({
 				//	return true;	// prevent default ???????? Why whould we need to prevent default here? Why? Why? I think not! Lex.
 			}
 		},
-		
+
 		// Was last spotted control the container's child?
 		_hadFocus: function(oSender) {
 			var oLastControl = enyo.Spotlight.getLastControl();
 			return enyo.Spotlight.Util.isChild(oSender, oLastControl);
 		},
-		
+
 		_focusLeave: function(oSender, s5WayEventType) {
 			// console.log('FOCUS LEAVE', oSender.name);
 			var sDirection = s5WayEventType.replace('onSpotlight','').toUpperCase();
 			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
 		},
-		
-		_focusEnter: function(oSender) {
+
+		_focusEnter: function(oSender, s5WayEventType) {
 			// console.log('FOCUS ENTER', oSender.name);
-			var oLastFocusedChild = this.getLastFocusedChild(oSender);
-			if (oLastFocusedChild) {
-				enyo.Spotlight.spot(oLastFocusedChild);
-			}
-			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, oSender);
+			var sDirection = s5WayEventType.replace('onSpotlight','').toUpperCase();
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {direction: sDirection}, oSender);
 		},
-				
+
 		/******************************/
-		
+
 		onSpotlightFocused: function(oSender, oEvent) {
 			// console.log('FOCUSED', oSender.name);
 			if (enyo.Spotlight.getPointerMode()) { return true; }
 			this._initComponent(oSender);
-			
+
+			var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
+
 			if (this._hadFocus(oSender)) {												// Focus came from within
-				var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
 				if (s5WayEventType) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				this._focusLeave(oSender, s5WayEventType);
 			} else {																	// Focus came from without
-				this._focusEnter(oSender);
+				var oLastFocusedChild = this.getLastFocusedChild(oSender);
+				if (oLastFocusedChild) {
+					enyo.Spotlight.spot(oLastFocusedChild);
+				} else {
+					if (s5WayEventType) {
+						enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
+						return true;
+					}
+				}
+				this._focusEnter(oSender, s5WayEventType);
 			}
-			
+
 			return true;
 		},
-		
-		onSpotlightLeft: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
-		onSpotlightRight: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
-		onSpotlightUp: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
-		onSpotlightDown: function(oSender, oEvent) {
-			// console.log('CONTAINER', oSender.name, '| event:', oEvent.type, '|', oEvent.originator.name);
-			this._focusLeave(oSender, oEvent.type);
-		},
-		
+
 		// What child of container was last focused?
 		getLastFocusedChild: function(oSender) {
 			oSender._spotlight = oSender._spotlight || {};
@@ -116,7 +103,7 @@ enyo.kind({
 			}
 			return oSender._spotlight.lastFocusedChild;
 		},
-		
+
 		// Set last focused child
 		setLastFocusedChild: function(oSender, oChild) {
 			if (!enyo.Spotlight.isSpottable(oChild)) {
@@ -124,6 +111,6 @@ enyo.kind({
 			}
 			oSender._spotlight = oSender._spotlight || {};
 			oSender._spotlight.lastFocusedChild = oChild;
-		},
+		}
 	}
 });

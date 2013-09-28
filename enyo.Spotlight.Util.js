@@ -6,26 +6,27 @@
 enyo.Spotlight.Util = new function() {
 	this.dispatchEvent = function(sEvent, oData, oControl) {
 		if (!oControl || !enyo.Spotlight.isSpottable(oControl)) { return; }
-		
+
 		oData            = oData ? enyo.clone(oData) : {};
 		oData.type       = sEvent;
 		oData.originator = oControl;
 		oData.originator.timestamp = oData.timeStamp;
 		return oControl.dispatchBubble(sEvent, oData, oControl);
-	},
+	};
 
 	// Attach event hook to capture events coming from within the container
 	this.interceptEvents = function(oControl, fHandler) {
 		var f = oControl.dispatchEvent;
 
 		oControl.dispatchEvent = function(sEventName, oEvent, oEventSender) {
-			if (fHandler(oControl, oEvent)) {                                       // If handler returns true - prevent default
+			if (!oEvent.delegate && fHandler(oControl, oEvent)) {                   // If handler returns true - prevent default
 				oEvent.type = null;
+				return true;
 			} else {
-				f.apply(oControl, [sEventName, oEvent, oEventSender]);              // If handler returns false - call original dispatcher and allow bubbling
+				return f.apply(oControl, [sEventName, oEvent, oEventSender]);       // If handler returns false - call original dispatcher and allow bubbling
 			}
 		};
-	},
+	};
 
 	this.isChild = function(oParent, oChild) {
 		if (!oParent) { return false; }
@@ -38,7 +39,7 @@ enyo.Spotlight.Util = new function() {
 			}
 		}
 		return false;
-	},
+	};
 
 	this.getAbsoluteBounds = function(oControl) {
 		var oLeft           = 0,
@@ -81,34 +82,34 @@ enyo.Spotlight.Util = new function() {
 			height  : nHeight,
 			width   : nWidth
 		};
-	},
+	};
 
 	this.hasClass = function(o, s) {
 		if (!o || !o.className) { return; }
 		return (' ' + o.className + ' ').indexOf(' ' + s + ' ') >= 0;
-	},
+	};
 
 	this.addClass = function(o, s) {
 		if (o && !this.hasClass(o, s)) {
 			var ss = o.className;
 			o.className = (ss + (ss ? ' ' : '') + s);
 		}
-	},
+	};
 
 	this.removeClass = function(o, s) {
 		if (o && this.hasClass(o, s)) {
 			var ss = o.className;
 			o.className = (' ' + ss + ' ').replace(' ' + s + ' ', ' ').slice(1, -1);
 		}
-	},
+	};
 
 	this.stringEndsWith = function(s, sSuffix) {
 		return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
-	},
+	};
 
 	this.directionToEvent = function(sDirection) {
 		return 'onSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase();
-	},
+	};
 
 	this.getDefaultDirectionControl = function(sDirection, oControl) {
 		var sProperty = 'defaultSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase(),
@@ -121,8 +122,8 @@ enyo.Spotlight.Util = new function() {
 			}
 		}
 		return null;
-	}
-}
+	};
+};
 
 // use faster classList interface if it exists
 if (document.createElement('div').classList) {
