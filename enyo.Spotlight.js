@@ -144,7 +144,8 @@ enyo.Spotlight = new function() {
 					if (!oDecorator) {                                                 // If decorator was NOT set in previous iteration
 						oDecorator = o;                                                // Set it to the first value
 					} else {                                                           // If decorator WAS set in previous iteration
-						if (oDecorates.prototype instanceof oDecorator.decorates) {   // IF oDecorates is closer to oSender in lineage
+						var oDecoratesOld = enyo.getPath(oDecorator.decorates);
+						if (oDecorates.prototype instanceof oDecoratesOld) {          // IF oDecorates is closer to oSender in lineage
 							oDecorator = o;                                            // Set it as optimal decorator
 						}
 					}
