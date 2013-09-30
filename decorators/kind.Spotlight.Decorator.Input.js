@@ -9,7 +9,7 @@ if(window.moon && moon.InputDecorator) {
 		name: 'enyo.Spotlight.Decorator.Input',
 
 		statics: {
-			decorates: moon.InputDecorator,
+			decorates: "moon.InputDecorator",
 
 			/******************************/
 

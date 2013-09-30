@@ -9,7 +9,7 @@ if (window.onyx && onyx.Picker) {
 		name: 'enyo.Spotlight.Decorator.Picker',
 
 		statics: {
-			decorates: onyx.PickerDecorator,
+			decorates: "onyx.PickerDecorator",
 
 			_getButton: function(oSender) {
 				var n = 0,
