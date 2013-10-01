@@ -187,7 +187,7 @@ enyo.Spotlight = new function() {
 		_comeBackFromPointerMode = function() {
 			if (!_bCanFocus) {  // Comming back from pointer mode, show control once before continuing navigation
 				_bCanFocus = true;
-				_oThis.spot(_oLastSpotlightTrueControl5Way);
+				_oThis.spot(_oCurrent);
 				return true;
 			}
 			return false;
