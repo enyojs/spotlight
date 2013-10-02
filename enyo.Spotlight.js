@@ -332,6 +332,7 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onClick = function(oEvent) {
+		_oLastSpotlightTrueControl5Way = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
 		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
 		return true;
