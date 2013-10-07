@@ -98,7 +98,7 @@ enyo.kind({
 		// What child of container was last focused?
 		getLastFocusedChild: function(oSender) {
 			oSender._spotlight = oSender._spotlight || {};
-			if (!oSender._spotlight.lastFocusedChild || oSender._spotlight.lastFocusedChild.destroyed) {
+			if (!oSender._spotlight.lastFocusedChild || !enyo.Spotlight.isSpottable(oSender._spotlight.lastFocusedChild)) {
 				oSender._spotlight.lastFocusedChild = enyo.Spotlight.getChildren(oSender)[0];
 			}
 			return oSender._spotlight.lastFocusedChild;
