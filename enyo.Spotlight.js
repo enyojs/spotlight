@@ -20,7 +20,7 @@ enyo.Spotlight = new function() {
 		_bCanFocus                      = true,     // Flag reserved for hiding focus when entering pointer mode
 		_bEnablePointerMode             = true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
 		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), for cases when focus has been moved in between
-		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to console
+		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
 
 		_nPrevClientX                   = null,
 		_nPrevClientY                   = null,
@@ -64,7 +64,7 @@ enyo.Spotlight = new function() {
 
 			_oCurrent = oControl;
 			
-			if (_bVerbose) { console.log('SPOTLIGHT CURRENT: ', oControl.name, '[' + oControl.kindName + ']'); }
+			if (_bVerbose) { enyo.log('SPOTLIGHT CURRENT: ', oControl.name, '[' + oControl.kindName + ']'); }
 			
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
@@ -136,16 +136,20 @@ enyo.Spotlight = new function() {
 			}
 
 			var oDecorator = null,
+				oDecorates,
+				oDecoratesOld,
 				o;
 
 			// Process non-containers
 			for (var s in enyo.Spotlight.Decorator) {                                  // Loop through decorators namespace
 				o = enyo.Spotlight.Decorator[s];
-				if (o.decorates && oSender instanceof o.decorates) {                   // If decorator applies to oSender
+				oDecorates = enyo.getPath(o.decorates);
+				if (oDecorates && oSender instanceof oDecorates) {                     // If decorator applies to oSender
 					if (!oDecorator) {                                                 // If decorator was NOT set in previous iteration
 						oDecorator = o;                                                // Set it to the first value
 					} else {                                                           // If decorator WAS set in previous iteration
-						if (o.decorates.prototype instanceof oDecorator.decorates) {   // IF o.decorates is closer to oSender in lineage
+						oDecoratesOld = enyo.getPath(oDecorator.decorates);
+						if (oDecorates.prototype instanceof oDecoratesOld) {           // IF oDecorates is closer to oSender in lineage
 							oDecorator = o;                                            // Set it as optimal decorator
 						}
 					}
@@ -332,6 +336,7 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onClick = function(oEvent) {
+		_oLastSpotlightTrueControl5Way = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
 		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
 		return true;
@@ -408,7 +413,7 @@ enyo.Spotlight = new function() {
 	this.setPointerMode  = function(bPointerMode) {
 		if (_bPointerMode != bPointerMode) {
 			_bPointerMode = bPointerMode;
-			if (_bVerbose) { console.log('SPOTLIGHT: Pointer mode', _bPointerMode); }
+			if (_bVerbose) { enyo.log('SPOTLIGHT: Pointer mode', _bPointerMode); }
 			enyo.Signals.send('onSpotlightModeChanged', {pointerMode: bPointerMode});
 		}
 	};
@@ -555,7 +560,7 @@ enyo.Spotlight = new function() {
 	this.verbose = function(bVerbose) {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
-	}
+	};
 
 	_initialize();
 }();
