@@ -112,7 +112,12 @@ enyo.Spotlight = new function() {
 		_is5WayKeyCode = function(n) {
 			return enyo.indexOf(n, [13, 37, 38, 39, 40]) > -1;
 		},
-
+		
+		// Is n a key code of an arrow button?
+		_isArrowKey = function(n) {
+			return enyo.indexOf(n, [37, 38, 39, 40]) > -1;
+		},
+		
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
@@ -352,9 +357,11 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightKeyUp    = function(oEvent) {};
 	this.onSpotlightKeyDown  = function(oEvent) {
-		this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-		if (_comeBackFromPointerMode()) {
-			return true;
+		if (_isArrowKey(oEvent.keyCode)) {
+			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
+			if (_comeBackFromPointerMode()) {
+				return true;
+			}
 		}
 
 		if (!this.getPointerMode()) {
