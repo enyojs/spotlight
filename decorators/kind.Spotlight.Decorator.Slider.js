@@ -9,7 +9,7 @@ if (window.onyx && onyx.Slider) {
 		name: 'enyo.Spotlight.Decorator.Slider',
 
 		statics: {
-			decorates: onyx.Slider,
+			decorates: "onyx.Slider",
 
 			_setSelected: function(oSender, bSelected) {
 				oSender._bSpotlightSelected = bSelected;
