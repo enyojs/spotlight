@@ -110,7 +110,7 @@ enyo.Spotlight = new function() {
 
 		// Is n a key code of one of the 5Way buttons?
 		_is5WayKeyCode = function(n) {
-			return ['',13, 37, 38, 39, 40,''].join(',').indexOf(',' + n + ',') > -1;
+			return enyo.indexOf(n, [13, 37, 38, 39, 40]) > -1;
 		},
 
 		// Prevent default on dom event associated with spotlight event
