@@ -51,7 +51,7 @@ enyo.Spotlight.States = new function() {
 		// Push component id onto the stack
 		_oStacks[sStackName].push(sComponentId);
 		_log('Pushed', sComponentId, 'onto stack', sStackName + '[' + _oStacks[sStackName].length + ']');
-	}
+	};
 	
 	this.pop = function(sStackName) {
 		var sComponentId;
@@ -65,10 +65,10 @@ enyo.Spotlight.States = new function() {
 			enyo.Spotlight.spot(enyo.$[sComponentId]);
 			_log('Popped', sComponentId, 'off stack', sStackName + '[' + _oStacks[sStackName].length + ']');
 		}
-	}
+	};
 	
 	this.verbose = function(bVerbose) {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT.STATES: verbose mode is ' + (_bVerbose ? 'ON' : 'OFF');
-	}
+	};
 };
