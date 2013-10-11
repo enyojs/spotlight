@@ -107,11 +107,6 @@ enyo.Spotlight = new function() {
 				}
 			}
 		},
-
-		// Is n a key code of one of the 5Way buttons?
-		_is5WayKeyCode = function(n) {
-			return enyo.indexOf(n, [13, 37, 38, 39, 40]) > -1;
-		},
 		
 		// Is n a key code of an arrow button?
 		_isArrowKey = function(n) {
@@ -121,8 +116,8 @@ enyo.Spotlight = new function() {
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
-			if (_is5WayKeyCode(oSpotlightEvent.keyCode)) {   // Prevent default to keep the browser from scrolling the page, etc.,
-				oSpotlightEvent.domEvent.preventDefault();        // unless Event.allowDomDefault is explicitly called on the event
+			if (_isArrowKey(oSpotlightEvent.keyCode)) {      // Prevent default to keep the browser from scrolling the page, etc.,
+				oSpotlightEvent.domEvent.preventDefault();   // unless Event.allowDomDefault is explicitly called on the event
 			}
 		},
 
