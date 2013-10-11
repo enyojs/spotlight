@@ -364,14 +364,12 @@ enyo.Spotlight = new function() {
 			}
 		}
 
-		if (!this.getPointerMode()) {
-			switch (oEvent.keyCode) {
-				case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
-				case 37: return _dispatchEvent('onSpotlightLeft',   oEvent);
-				case 38: return _dispatchEvent('onSpotlightUp',     oEvent);
-				case 39: return _dispatchEvent('onSpotlightRight',  oEvent);
-				case 40: return _dispatchEvent('onSpotlightDown',   oEvent);
-			}
+		switch (oEvent.keyCode) {
+			case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
+			case 37: return _dispatchEvent('onSpotlightLeft',   oEvent);
+			case 38: return _dispatchEvent('onSpotlightUp',     oEvent);
+			case 39: return _dispatchEvent('onSpotlightRight',  oEvent);
+			case 40: return _dispatchEvent('onSpotlightDown',   oEvent);
 		}
 
 		return true; // Should never get here
