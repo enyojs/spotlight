@@ -29,18 +29,7 @@ In addition, Spotlight includes support for Point-and-Click events, so all bases
 are covered.
 
 To add **[Spotlight](kind.Spotlight.js)** to an application, simply include the
-`Spotlight` package in your `package.js` file and add a Spotlight control as a
-top-level component in the app kind:
-
-    enyo.kind({
-        name: 'App',
-        kind: 'FittableRows',   
-        components:[   
-            {kind: 'enyo.Spotlight', defaultControl: 'list1'},
-            ...
-        ],
-        ...
-    });
+`Spotlight` package in your `package.js` file.
 
 <a name="2"></a>
 ## 2. MODES ##
