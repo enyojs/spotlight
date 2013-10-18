@@ -572,9 +572,9 @@ enyo.Spotlight = new function() {
 		_bFrozen = true;
 		_oCurrent.addClass('spotlight');
 		return 'SPOTLIGHT: Frozen on ' + _oCurrent.name + ' [' + _oCurrent.kindName + ']'; 
-	}
-	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  }
-	this.isFrozen = function() { return _bFrozen;  }
+	};
+	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  };
+	this.isFrozen = function() { return _bFrozen;  };
 
 	_initialize();
 };
