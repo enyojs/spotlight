@@ -21,6 +21,7 @@ enyo.Spotlight = new function() {
 		_bEnablePointerMode             = true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
 		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), for cases when focus has been moved in between
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
+		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
 
 		_nPrevClientX                   = null,
 		_nPrevClientY                   = null,
@@ -396,7 +397,7 @@ enyo.Spotlight = new function() {
 	this.onSpotlightFocused = function(oEvent) {};
 
 	this.onSpotlightBlur = function(oEvent) {
-		if (_oCurrent) {
+		if (this.hasCurrent()) {
 			oEvent.originator.removeClass('spotlight');
 		}
 	};
@@ -421,6 +422,7 @@ enyo.Spotlight = new function() {
 	this.getPointerMode       = function()                { return _bPointerMode;                        };
 	this.getCurrent           = function()                { return _oCurrent;                            };
 	this.setCurrent           = function(oControl)        { return _setCurrent(oControl);                };
+	this.hasCurrent           = function()                { return _oCurrent !== null;                   };
 	this.getLastEvent         = function()                { return _oLastEvent;                          };
 	this.getLastControl       = function()                { return _oLastSpotlightTrueControl;           };
 	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;                      };
@@ -494,6 +496,7 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection) {
+		if (_bFrozen)    { return false; }               // Current cannot change while in frozen mode
 		if (!_bCanFocus) { return false; }               // Focusing is disabled when entering pointer mode
 
 		if (_oCurrent && !this.isSpottable(oControl)) {  // Control is not spottable and something is already
@@ -519,7 +522,8 @@ enyo.Spotlight = new function() {
 
 	// Dispatches spotlight blur event to current control
 	this.unspot = function() {
-		if (_oCurrent) {
+		if (_bFrozen) { return false; }                  // Current cannot change while in frozen mode
+		if (this.hasCurrent()) {
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
 		}
@@ -547,23 +551,33 @@ enyo.Spotlight = new function() {
 		return bChanged;
 	};
 
-	// Disables switching to pointer mode
+	// Switching to pointer mode
 	this.disablePointerMode = function() { _bEnablePointerMode = false; };
+	this.enablePointerMode  = function() { _bEnablePointerMode = true;  };
 
-	// Enables switching to pointer mode
-	this.enablePointerMode = function() { _bEnablePointerMode = true; };
-
+	// Switching to muted mode (no "spotlight" css class is being set in dom)
 	this.mute    = function(oSender) { enyo.Spotlight.Muter.addMuteReason(oSender);    };
 	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); };
-	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); };
+	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted();          };
 	
+	// Switching to verbose mode
 	this.verbose = function(bVerbose) {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
 	};
+	
+	// Switching to frozen mode (current cannot change while frozen)
+	this.freeze = function() {
+		if (!this.hasCurrent()) { throw 'Can not enter frozen mode until something is spotted'; }
+		_bFrozen = true;
+		_oCurrent.addClass('spotlight');
+		return 'SPOTLIGHT: Frozen on ' + _oCurrent.name + ' [' + _oCurrent.kindName + ']'; 
+	}
+	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  }
+	this.isFrozen = function() { return _bFrozen;  }
 
 	_initialize();
-}();
+};
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
 enyo.dispatcher.features.push(function(oEvent) {
