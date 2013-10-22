@@ -107,17 +107,17 @@ enyo.Spotlight = new function() {
 				}
 			}
 		},
-
-		// Is n a key code of one of the 5Way buttons?
-		_is5WayKeyCode = function(n) {
-			return enyo.indexOf(n, [13, 37, 38, 39, 40]) > -1;
+		
+		// Is n a key code of an arrow button?
+		_isArrowKey = function(n) {
+			return enyo.indexOf(n, [37, 38, 39, 40]) > -1;
 		},
-
+		
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
-			if (_is5WayKeyCode(oSpotlightEvent.keyCode)) {   // Prevent default to keep the browser from scrolling the page, etc.,
-				oSpotlightEvent.domEvent.preventDefault();        // unless Event.allowDomDefault is explicitly called on the event
+			if (_isArrowKey(oSpotlightEvent.keyCode)) {      // Prevent default to keep the browser from scrolling the page, etc.,
+				oSpotlightEvent.domEvent.preventDefault();   // unless Event.allowDomDefault is explicitly called on the event
 			}
 		},
 
@@ -239,7 +239,7 @@ enyo.Spotlight = new function() {
 
 		// Special case code for bootstrapping 5-way navigation - can't dispatch Spotlight
 		// key events until we have a spotted a child at least once, so we do it here
-		if (!this.getCurrent() && enyo.roots && enyo.roots[0]) {
+		if (!this.getCurrent() && _isArrowKey(oEvent.keyCode) && enyo.roots && enyo.roots[0]) {
 			this.setPointerMode(false);
 			_bCanFocus = true;
 			enyo.Spotlight.spot(enyo.roots[0]);
@@ -354,19 +354,19 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightKeyUp    = function(oEvent) {};
 	this.onSpotlightKeyDown  = function(oEvent) {
-		this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-		if (_comeBackFromPointerMode()) {
-			return true;
+		if (_isArrowKey(oEvent.keyCode)) {
+			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
+			if (_comeBackFromPointerMode()) {
+				return true;
+			}
 		}
 
-		if (!this.getPointerMode()) {
-			switch (oEvent.keyCode) {
-				case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
-				case 37: return _dispatchEvent('onSpotlightLeft',   oEvent);
-				case 38: return _dispatchEvent('onSpotlightUp',     oEvent);
-				case 39: return _dispatchEvent('onSpotlightRight',  oEvent);
-				case 40: return _dispatchEvent('onSpotlightDown',   oEvent);
-			}
+		switch (oEvent.keyCode) {
+			case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
+			case 37: return _dispatchEvent('onSpotlightLeft',   oEvent);
+			case 38: return _dispatchEvent('onSpotlightUp',     oEvent);
+			case 39: return _dispatchEvent('onSpotlightRight',  oEvent);
+			case 40: return _dispatchEvent('onSpotlightDown',   oEvent);
 		}
 
 		return true; // Should never get here
