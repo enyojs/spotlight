@@ -55,10 +55,16 @@ In order to make a control focusable (or **"spottable"**) with Spotlight, simply
 set its `spotlight` property to `TRUE`, like so:
 
     {name: 'mybutton', tag: 'button', spotlight: true}
-	
-When the application loads, Spotlight searches for a control with the name
-specified in its `defaultControl` property; if `defaultControl` is not
-specified, Spotlight assigns focus to the first available spottable control.
+
+Note that Enyo UI libraries such as _Moonstone_ are built with default Spotlight 
+support, such that any control can be focused using pointer or 5-way keys without 
+setting any special flags or configuration.  In general, setting the `spotlight:true`
+flag explicitly is only required when building custom UI controls or libraries.
+
+When the application loads, there will generally be no focused control on screen
+until the user moves the mouse or presses an arrow key.  If no control has been focused
+yet, Spotlight will choose the first spottable control on screen upon the first
+arrow press.
 
 In 5-way mode, Spotlight uses the
 [Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to determine
