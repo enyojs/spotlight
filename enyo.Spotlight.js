@@ -240,6 +240,8 @@ enyo.Spotlight = new function() {
 		// Special case code for bootstrapping 5-way navigation - can't dispatch Spotlight
 		// key events until we have a spotted a child at least once, so we do it here
 		if (!this.getCurrent() && _isArrowKey(oEvent.keyCode) && enyo.roots && enyo.roots[0]) {
+			this.setPointerMode(false);
+			_bCanFocus = true;
 			enyo.Spotlight.spot(enyo.roots[0]);
 			return;
 		}
