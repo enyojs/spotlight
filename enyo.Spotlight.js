@@ -333,7 +333,6 @@ enyo.Spotlight = new function() {
 		oEventClone.allowDomDefault = enyo.nop;
 		
 		_oDepressedControl = this.getCurrent();
-		console.log('dispatching keydown to ', oEvent.originator);
 		return _dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
 	};
 
