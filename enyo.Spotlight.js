@@ -63,9 +63,9 @@ enyo.Spotlight = new function() {
 			}
 
 			_oCurrent = oControl;
-			
+
 			if (_bVerbose) { enyo.log('SPOTLIGHT CURRENT: ', oControl.name, '[' + oControl.kindName + ']'); }
-			
+
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
 			if (oControl.spotlight === true) {
@@ -107,12 +107,12 @@ enyo.Spotlight = new function() {
 				}
 			}
 		},
-		
+
 		// Is n a key code of an arrow button?
 		_isArrowKey = function(n) {
 			return enyo.indexOf(n, [37, 38, 39, 40]) > -1;
 		},
-		
+
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
@@ -510,7 +510,7 @@ enyo.Spotlight = new function() {
 			oControl = this.getFirstChild(oControl);
 		}
 		if (oControl) {
-			if (!oControl.hasClass('spotlight') && !this.isMuted()) {
+			if (!oControl.hasClass('spotlight') && !this.isMuted() && (oControl.spotlight !== 'container')) {
 				oControl.addClass('spotlight');
 			}
 			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
@@ -558,7 +558,7 @@ enyo.Spotlight = new function() {
 	this.mute    = function(oSender) { enyo.Spotlight.Muter.addMuteReason(oSender);    };
 	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); };
 	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); };
-	
+
 	this.verbose = function(bVerbose) {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
