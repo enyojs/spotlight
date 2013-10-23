@@ -63,9 +63,9 @@ enyo.Spotlight = new function() {
 			}
 
 			_oCurrent = oControl;
-
+			
 			if (_bVerbose) { enyo.log('SPOTLIGHT CURRENT: ', oControl.name, '[' + oControl.kindName + ']'); }
-
+			
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
 			if (oControl.spotlight === true) {
@@ -510,7 +510,7 @@ enyo.Spotlight = new function() {
 			oControl = this.getFirstChild(oControl);
 		}
 		if (oControl) {
-			if (!oControl.hasClass('spotlight') && !this.isMuted() && (oControl.spotlight != 'container')) {
+			if (!oControl.hasClass('spotlight') && !this.isMuted()) {
 				oControl.addClass('spotlight');
 			}
 			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
@@ -558,7 +558,7 @@ enyo.Spotlight = new function() {
 	this.mute    = function(oSender) { enyo.Spotlight.Muter.addMuteReason(oSender);    };
 	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); };
 	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); };
-
+	
 	this.verbose = function(bVerbose) {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
