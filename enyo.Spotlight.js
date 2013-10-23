@@ -11,7 +11,8 @@ enyo.Spotlight = new function() {
 	var _oThis                          = this,
 		_oRoot                          = null,     // Component owner, usually application
 		_bPointerMode                   = false,
-		_oCurrent                       = null,     // Currently spotlighted element
+		_oCurrent                       = null,     // Currently spotlighted control
+		_oPointed                       = null,     // Currently pointed control
 		_oDecorators                    = {},       // For further optimization
 		_oLastEvent                     = null,
 		_oLast5WayEvent                 = null,
@@ -313,15 +314,26 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onMouseDown = function(oEvent) {
+		// Logic to exit frozen mode when depressing control other then current
+		// And transfer spotlight directly to it
+		if (this.isFrozen()) {
+			if (_oPointed != _oCurrent) {
+				this.unfreeze();
+				this.spot(_oPointed);
+				return true;
+			}
+		}
+		
 		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
 
-		var oEventClone      = enyo.clone(oEvent);
-		oEventClone.keyCode  = 13;
-		oEventClone.domEvent = oEvent;
+		var oEventClone             = enyo.clone(oEvent);
+		oEventClone.keyCode         = 13;
+		oEventClone.domEvent        = oEvent;
 		oEventClone.allowDomDefault = enyo.nop;
-
+		
 		_oDepressedControl = this.getCurrent();
+		console.log('dispatching keydown to ', oEvent.originator);
 		return _dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
 	};
 
@@ -404,6 +416,7 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightPoint = function(oEvent) {
 		if (oEvent.originator.spotlight != 'container') {
+			_oPointed = oEvent.originator;
 			this.spot(oEvent.originator);
 		}
 	};
