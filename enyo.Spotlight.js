@@ -8,18 +8,19 @@ enyo.Spotlight = new function() {
 	//* @protected
 	/************************************************************/
 
-	var _oThis                          = this,
-		_oRoot                          = null,     // Component owner, usually application
-		_bPointerMode                   = false,
+	var _oThis                          = this,     // Reference to this to be inherited by private closures below
+		_oRoot                          = null,     // Topmost component instance where spotlight events are caught
+		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
+		_bInitialized                   = false,    // Does spotlight have _oCurrent and _oLast5WayControl?
 		_oCurrent                       = null,     // Currently spotlighted element
 		_oDecorators                    = {},       // For further optimization
-		_oLastEvent                     = null,
-		_oLast5WayEvent                 = null,
-		_oLastSpotlightTrueControl      = null,
-		_oLastSpotlightTrueControl5Way  = null,
+		_oLastEvent                     = null,     // Last event received by Spotlight
+		_oLast5WayEvent                 = null,     // Last 5way event received by Spotlight
+		_oLastControl                   = null,     // Last control that was _oCurrent
+		_oLast5WayControl               = null,     // Last control that became _oCurrent by means of 5way navigation
 		_bCanFocus                      = true,     // Flag reserved for hiding focus when entering pointer mode
 		_bEnablePointerMode             = true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
-		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), for cases when focus has been moved in between
+		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), if focus has been moved in between
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
 
 		_nPrevClientX                   = null,
@@ -27,12 +28,7 @@ enyo.Spotlight = new function() {
 		_oLastMouseMoveTarget           = null;
 
 
-	var _initialize = function() {
-			_oRoot = enyo.master;
-			_interceptEvents();
-		},
-
-		// Event hook to the owner to catch Spotlight Events
+	var // Event hook to the owner to catch Spotlight Events
 		_interceptEvents = function() {
 			_oThis.rootDispatchFunction = _oRoot.dispatchEvent;
 			_oRoot.dispatchEvent = function(sEventName, oEvent, oSender) {
@@ -45,32 +41,32 @@ enyo.Spotlight = new function() {
 			};
 		},
 
+		// Create control-specific spotlight state storage
 		_initializeControl = function(oControl) {
-			// Create control-specific spotlight state storage
 			if (typeof oControl._spotlight == 'undefined') {
 				oControl._spotlight = {};
 			}
 		},
 
-		// Set currently spotted control
+		// Set currently spotted control. 
 		_setCurrent = function(oControl) {
 			if (_oCurrent === oControl) { return true; }
 
 			_initializeControl(oControl);
 
 			if (!_oThis.isSpottable(oControl)) {
-				throw 'Attempting to spot not-spottable control ' + oControl.name;
+				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
 
 			_oCurrent = oControl;
 
-			if (_bVerbose) { enyo.log('SPOTLIGHT CURRENT: ', oControl.name, '[' + oControl.kindName + ']'); }
+			_log('CURRENT =', _oCurrent.toString());
 
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
 			if (oControl.spotlight === true) {
-				_oLastSpotlightTrueControl = oControl;
-				if (!_oThis.getPointerMode() || !_oLastSpotlightTrueControl5Way) {
+				_oLastControl = oControl;
+				if (!_oThis.getPointerMode() || !_oLast5WayControl) {
 					_oThis.setLast5WayControl(oControl);
 				}
 			}
@@ -101,7 +97,7 @@ enyo.Spotlight = new function() {
 			} else {
 				var oParent = _oThis.getParent();
 				if (typeof oParent.spotlight == 'undefined' || oParent.spotlightModal) {  // Reached the end of spottable world
-					_oThis.spot(_oLastSpotlightTrueControl);
+					_oThis.spot(_oLastControl);
 				} else {
 					_oThis.spot(_oThis.getParent(), sDirection);
 				}
@@ -191,10 +187,17 @@ enyo.Spotlight = new function() {
 		_comeBackFromPointerMode = function() {
 			if (!_bCanFocus) {  // Comming back from pointer mode, show control once before continuing navigation
 				_bCanFocus = true;
-				_oThis.spot(_oLastSpotlightTrueControl5Way);
+				_oThis.spot(_oLast5WayControl);
 				return true;
 			}
 			return false;
+		},
+		
+		// enyo.logs messages in verbose mode
+		_log = function() {
+			if (_bVerbose) {
+				enyo.log('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
+			}
 		};
 
 	//* Generic event handlers
@@ -202,7 +205,7 @@ enyo.Spotlight = new function() {
 
 	// Events dispatched to the spotlighted controls
 	this.onEvent = function(oEvent) {
-		if (_oRoot) {                              // Events only processed when Spotlight initialized with a root
+		if (this.isInitialized()) {                      // Events only processed when Spotlight initialized with a root
 			switch (oEvent.type) {
 				case 'mousemove':
 					if (this.clientXYChanged(oEvent)) {  // Only register mousemove if the x/y actually changed, avoid mousemove while scrolling, etc.
@@ -237,14 +240,14 @@ enyo.Spotlight = new function() {
 			};
 		};
 
-		// Special case code for bootstrapping 5-way navigation - can't dispatch Spotlight
-		// key events until we have a spotted a child at least once, so we do it here
-		if (!this.getCurrent() && _isArrowKey(oEvent.keyCode) && enyo.roots && enyo.roots[0]) {
-			this.setPointerMode(false);
-			_bCanFocus = true;
-			enyo.Spotlight.spot(enyo.roots[0]);
-			return;
-		}
+		// // Special case code for bootstrapping 5-way navigation - can't dispatch Spotlight
+		// 		// key events until we have a spotted a child at least once, so we do it here
+		// 		if (!this.getCurrent() && _isArrowKey(oEvent.keyCode) && enyo.roots && enyo.roots[0]) {
+		// 			this.setPointerMode(false);
+		// 			_bCanFocus = true;
+		// 			enyo.Spotlight.spot(enyo.roots[0]);
+		// 			return;
+		// 		}
 
 		switch (oEvent.type) {
 			case 'keydown'  : return _dispatchEvent('onSpotlightKeyDown', oEvent);
@@ -338,7 +341,7 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onClick = function(oEvent) {
-		_oLastSpotlightTrueControl5Way = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
+		_oLast5WayControl = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
 		if (this.getPointerMode()) { return; }
 		oEvent.preventDefault();
 		return true;
@@ -356,6 +359,7 @@ enyo.Spotlight = new function() {
 	this.onSpotlightKeyDown  = function(oEvent) {
 		if (_isArrowKey(oEvent.keyCode)) {
 			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
+			console.log('onSpotlightKeyDown', _oCurrent.toString());
 			if (_comeBackFromPointerMode()) {
 				return true;
 			}
@@ -411,22 +415,42 @@ enyo.Spotlight = new function() {
 
 	//* Public
 	/******************* PUBLIC METHODS *********************/
+	
+	// Initializes spotlight with all current and last5waycontrol
+	this.initialize = function(oRoot) {
+		_oRoot = oRoot;
+		_interceptEvents();
+		
+		if (this.isInitialized()) { return; }
+		var oFirst = this.getFirstChild(oRoot);
+		if (oFirst) {
+			this.spot(oFirst);
+			_bCanFocus = true;
+		
+			_bInitialized = true;
+			return true;
+		}
+		throw 'Spotlight initialization failed. No spottable children found in ' + oRoot.toString(); 
+	}
+	
+	// Does spotlight have _oCurrent and last5waycontrol?
+	this.isInitialized = function() { return _bInitialized; }
 
 	this.setPointerMode  = function(bPointerMode) {
 		if (_bPointerMode != bPointerMode) {
 			_bPointerMode = bPointerMode;
-			if (_bVerbose) { enyo.log('SPOTLIGHT: Pointer mode', _bPointerMode); }
+			_log('Pointer mode', _bPointerMode);
 			enyo.Signals.send('onSpotlightModeChanged', {pointerMode: bPointerMode});
 		}
 	};
 
-	this.getPointerMode       = function()                { return _bPointerMode;                        };
-	this.getCurrent           = function()                { return _oCurrent;                            };
-	this.setCurrent           = function(oControl)        { return _setCurrent(oControl);                };
-	this.getLastEvent         = function()                { return _oLastEvent;                          };
-	this.getLastControl       = function()                { return _oLastSpotlightTrueControl;           };
-	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;                      };
-	this.setLast5WayControl   = function(oControl)        { _oLastSpotlightTrueControl5Way = oControl;   };
+	this.getPointerMode       = function()                { return _bPointerMode;           };
+	this.getCurrent           = function()                { return _oCurrent;               };
+	this.setCurrent           = function(oControl)        { return _setCurrent(oControl);   };
+	this.getLastEvent         = function()                { return _oLastEvent;             };
+	this.getLastControl       = function()                { return _oLastControl;           };
+	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;         };
+	this.setLast5WayControl   = function(oControl)        { _oLast5WayControl = oControl;   };
 
 	this.isSpottable = function(oControl) {
 		oControl = oControl || this.getCurrent();
@@ -510,7 +534,7 @@ enyo.Spotlight = new function() {
 			oControl = this.getFirstChild(oControl);
 		}
 		if (oControl) {
-			if (!oControl.hasClass('spotlight') && !this.isMuted() && (oControl.spotlight != 'container')) {
+			if (!this.isMuted() && (oControl.spotlight != 'container')) {
 				oControl.addClass('spotlight');
 			}
 			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
@@ -532,7 +556,7 @@ enyo.Spotlight = new function() {
 	// Get first spottable child of a control
 	this.getFirstChild = function(oControl) {
 		oControl = oControl || this.getCurrent();
-		if (!oControl) { return; }
+		if (!oControl) { return null; }
 		return this.getChildren(oControl)[0];
 	};
 
@@ -548,7 +572,7 @@ enyo.Spotlight = new function() {
 
 		return bChanged;
 	};
-
+	
 	// Disables switching to pointer mode
 	this.disablePointerMode = function() { _bEnablePointerMode = false; };
 
@@ -563,13 +587,38 @@ enyo.Spotlight = new function() {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
 	};
-
-	_initialize();
+	
 }();
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
 enyo.dispatcher.features.push(function(oEvent) {
 	return enyo.Spotlight.onEvent(oEvent);
 });
+
+// Initialization
+enyo.rendered(function(oRoot) {
+	enyo.Spotlight.initialize(oRoot);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
