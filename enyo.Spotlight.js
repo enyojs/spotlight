@@ -359,7 +359,6 @@ enyo.Spotlight = new function() {
 	this.onSpotlightKeyDown  = function(oEvent) {
 		if (_isArrowKey(oEvent.keyCode)) {
 			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-			console.log('onSpotlightKeyDown', _oCurrent.toString());
 			if (_comeBackFromPointerMode()) {
 				return true;
 			}
@@ -431,10 +430,10 @@ enyo.Spotlight = new function() {
 			return true;
 		}
 		throw 'Spotlight initialization failed. No spottable children found in ' + oRoot.toString(); 
-	}
+	};
 	
 	// Does spotlight have _oCurrent and last5waycontrol?
-	this.isInitialized = function() { return _bInitialized; }
+	this.isInitialized = function() { return _bInitialized; };
 
 	this.setPointerMode  = function(bPointerMode) {
 		if (_bPointerMode != bPointerMode) {
