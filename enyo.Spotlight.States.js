@@ -60,10 +60,14 @@ enyo.Spotlight.States = new function() {
 			throw 'Error in enyo.Spotlight.States: stack "' + sStackName + "' dose not exist, call push to create it";
 		}
 		
-		sComponentId = _oStacks[sStackName].pop();
-		if (sComponentId) {
-			enyo.Spotlight.spot(enyo.$[sComponentId]);
-			_log('Popped', sComponentId, 'off stack', sStackName + '[' + _oStacks[sStackName].length + ']');
+		if (_oStacks[sStackName].length > 0) {
+			sComponentId = _oStacks[sStackName].pop();
+			if (sComponentId) {
+				enyo.Spotlight.spot(enyo.$[sComponentId]);
+				_log('Popped', sComponentId, 'off stack', sStackName + '[' + _oStacks[sStackName].length + ']');
+			}
+		} else {
+			enyo.warn('enyo.Spotlight.States.pop() has failed: Stack "' + sStackName + '" is empty');
 		}
 	};
 	
