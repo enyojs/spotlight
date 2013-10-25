@@ -417,10 +417,11 @@ enyo.Spotlight = new function() {
 	
 	// Initializes spotlight with all current and last5waycontrol
 	this.initialize = function(oRoot) {
+		if (this.isInitialized()) { return; }
+		
 		_oRoot = oRoot;
 		_interceptEvents();
 		
-		if (this.isInitialized()) { return; }
 		var oFirst = this.getFirstChild(oRoot);
 		if (oFirst) {
 			this.spot(oFirst);

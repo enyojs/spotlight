@@ -3,6 +3,10 @@ enyo.kind({
 	classes : 'sample',
 	fit     : true,
 	
+	handlers: {
+		onSpotlightFocus: 'onSpotlightFocus'
+	},
+	
 	components: [
 		{name: 'c1', spotlight: 'container', classes: 'container', components: [
 			{name: 'c11', spotlight: 'container', classes: 'container', components: [
@@ -18,8 +22,13 @@ enyo.kind({
 			{name: 'c13', spotlight: 'container', classes: 'container', components: [
 			]},
 			{name: 'button5', spotlight: true, kind: 'Button', content: 'Button5'}
-		]}
+		]},
+		{name: 'button6', spotlight: true, kind: 'Button', content: 'Button6'}
 	],
+	
+	onSpotlightFocus: function(oSender, oEvent) {
+		console.log('Focus', oEvent.originator.toString());
+	},
 	
 	rendered: function() {
 		this.inherited(arguments);
