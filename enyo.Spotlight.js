@@ -508,15 +508,14 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection) {
-		if (_bFrozen)    { return false; }               // Current cannot change while in frozen mode
-		if (!_bCanFocus) { return false; }               // Focusing is disabled when entering pointer mode
+		if (this.isFrozen()) { return false; }           // Current cannot change while in frozen mode
+		if (!_bCanFocus)     { return false; }           // Focusing is disabled when entering pointer mode
 
 		if (_oCurrent && !this.isSpottable(oControl)) {  // Control is not spottable and something is already
 			return false;
 		}
-		if (_oCurrent && oControl !== _oCurrent) {       // Blur last control before spotting new one
-			_dispatchEvent('onSpotlightBlur', null);
-		}
+		
+		if (oControl !== _oCurrent) { this.unspot(); }   // Blur last control before spotting new one
 
 		oControl = oControl || this.getCurrent();
 		if (!this.isSpottable(oControl)) {
@@ -534,12 +533,11 @@ enyo.Spotlight = new function() {
 
 	// Dispatches spotlight blur event to current control
 	this.unspot = function() {
-		if (_bFrozen) { return false; }                  // Current cannot change while in frozen mode
+		if (this.isFrozen()) { return false; }           // Current cannot change while in frozen mode
 		if (this.hasCurrent()) {
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
 		}
-
 		return false;
 	};
 
@@ -583,7 +581,7 @@ enyo.Spotlight = new function() {
 		if (!this.hasCurrent()) { throw 'Can not enter frozen mode until something is spotted'; }
 		_bFrozen = true;
 		_oCurrent.addClass('spotlight');
-		return 'SPOTLIGHT: Frozen on ' + _oCurrent.name + ' [' + _oCurrent.kindName + ']'; 
+		return 'SPOTLIGHT: Frozen on ' + _oCurrent.toString(); 
 	};
 	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  };
 	this.isFrozen = function() { return _bFrozen;  };
