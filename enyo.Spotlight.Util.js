@@ -7,8 +7,8 @@ enyo.Spotlight.Util = new function() {
 	this.dispatchEvent = function(sEvent, oData, oControl) {
 		if (!oControl || oControl.destroyed) { return; }
 		
-		if (enyo.Spotlight.isFrozen() && sEvent != 'onSpotlightPoint') { // Allow only onSpotlightPoint in frozen mode
-			if (sEvent == 'onSpotlightBlur') { return; }
+		if (enyo.Spotlight.isFrozen()) {
+			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
 			oControl = enyo.Spotlight.getCurrent();
 		}
 

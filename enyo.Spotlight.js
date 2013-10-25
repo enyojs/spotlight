@@ -300,6 +300,8 @@ enyo.Spotlight = new function() {
 				}
 				_oLastMouseMoveTarget = oTarget;
 				_bCanFocus = true;
+				_oPointed  = oTarget;
+				// console.log(_oPointed.toString());
 				_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 				if (oTarget.spotlight !== true) {
 					_bCanFocus = false;
@@ -319,6 +321,7 @@ enyo.Spotlight = new function() {
 		if (this.isFrozen()) {
 			if (_oPointed != _oCurrent) {
 				this.unfreeze();
+				console.log('spotting', _oPointed.toString());
 				this.spot(_oPointed);
 				return true;
 			}
@@ -415,7 +418,6 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightPoint = function(oEvent) {
 		if (oEvent.originator.spotlight != 'container') {
-			_oPointed = oEvent.originator;
 			this.spot(oEvent.originator);
 		}
 	};
