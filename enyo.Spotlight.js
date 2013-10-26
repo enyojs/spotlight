@@ -224,8 +224,9 @@ enyo.Spotlight = new function() {
 				case 'keydown':
 				case 'keyup':
 					// Filter out special keycode from Input Manager for magic remote show/hide
-					if (oEvent.keyCode === 0 && (oEvent.keyIdentifier === "U+1200202" || oEvent.keyIdentifier === "U+1200201")) {return true;}
-					return enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
+					if (oEvent.keyCode === 0 && (oEvent.keyIdentifier === "U+1200202" || oEvent.keyIdentifier === "U+1200201")) { return true; }
+					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
+					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
 			}
 		}
 	};
@@ -247,12 +248,10 @@ enyo.Spotlight = new function() {
 			enyo.Spotlight.spot(enyo.roots[0]);
 			return;
 		}
-
 		switch (oEvent.type) {
 			case 'keydown'  : return _dispatchEvent('onSpotlightKeyDown', oEvent);
 			case 'keyup'    : return _dispatchEvent('onSpotlightKeyUp'  , oEvent);
 		}
-
 		return true; // Should never get here
 	};
 
@@ -284,7 +283,7 @@ enyo.Spotlight = new function() {
 		}
 
 		var sEventName = 'onSpotlightScroll' + (bUp ? 'Up' : 'Down');
-		_dispatchEvent(sEventName, {domEvent: oEvent});
+		return _dispatchEvent(sEventName, {domEvent: oEvent});
 	};
 
 	// Called by onEvent() to process mousemove events
@@ -327,7 +326,9 @@ enyo.Spotlight = new function() {
 			}
 		}
 		
-		if (this.getPointerMode()) { return; }
+		if (this.getPointerMode()) { return false; } // Allow mousedown to bubble
+
+		// Simulate an Enter key from Magic Remote click in 5Way mode
 		oEvent.preventDefault();
 
 		var oEventClone             = enyo.clone(oEvent);
@@ -336,25 +337,32 @@ enyo.Spotlight = new function() {
 		oEventClone.allowDomDefault = enyo.nop;
 		
 		_oDepressedControl = this.getCurrent();
-		return _dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
+		_dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
+		return true; // Because we should never see mouse events in 5way mode
 	};
 
 	this.onMouseUp = function(oEvent) {
-		if (this.getPointerMode()) { return; }
+		if (this.getPointerMode()) { return false; } // Allow mouseup to bubble
+
+		// Simulate an Enter key from Magic Remote click in 5Way mode
 		oEvent.preventDefault();
 
 		var oEventClone      = enyo.clone(oEvent);
 		oEventClone.keyCode  = 13;
 		oEventClone.domEvent = oEvent;
 
-		return _dispatchEvent('onSpotlightKeyUp', oEventClone, _oDepressedControl);
+		_dispatchEvent('onSpotlightKeyUp', oEventClone, _oDepressedControl);
+		return true; // Because we should never see mouse events in 5way mode
 	};
 
 	this.onClick = function(oEvent) {
 		_oLastSpotlightTrueControl5Way = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
-		if (this.getPointerMode()) { return; }
+
+		if (this.getPointerMode()) { return false; } // Allow click to bubble
+		
+		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
 		oEvent.preventDefault();
-		return true;
+		return true; // Because we should never see mouse events in 5way mode
 	};
 
 	//* Spotlight event handlers
