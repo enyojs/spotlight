@@ -27,7 +27,7 @@ enyo.kind({
 	],
 	
 	onSpotlightFocus: function(oSender, oEvent) {
-		console.log('Focus', oEvent.originator.toString());
+		enyo.log('Focus ' + oEvent.originator.toString());
 	},
 	
 	rendered: function() {
