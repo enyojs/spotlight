@@ -6,6 +6,11 @@
 enyo.Spotlight.Util = new function() {
 	this.dispatchEvent = function(sEvent, oData, oControl) {
 		if (!oControl || oControl.destroyed) { return; }
+		
+		if (enyo.Spotlight.isFrozen()) {
+			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
+			oControl = enyo.Spotlight.getCurrent();
+		}
 
 		oData            = oData ? enyo.clone(oData) : {};
 		oData.type       = sEvent;
