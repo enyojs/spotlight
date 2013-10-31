@@ -11,7 +11,7 @@ enyo.Spotlight.Util = new function() {
 			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
 			oControl = enyo.Spotlight.getCurrent();
 		}
-
+		
 		oData            = oData ? enyo.clone(oData) : {};
 		oData.type       = sEvent;
 		oData.originator = oControl;
@@ -47,6 +47,10 @@ enyo.Spotlight.Util = new function() {
 	};
 
 	this.getAbsoluteBounds = function(oControl) {
+		
+		var bHidden = !oControl.getShowing();
+		if (bHidden) { oControl.setShowing(true); }
+		
 		var oLeft           = 0,
 			oTop            = 0,
 			oMatch          = null,
@@ -79,6 +83,9 @@ enyo.Spotlight.Util = new function() {
 				}
 			} while ((oNode = oNode.offsetParent));
 		}
+		
+		if (bHidden) { oControl.setShowing(false); }
+		
 		return {
 			top     : oTop,
 			left    : oLeft,
