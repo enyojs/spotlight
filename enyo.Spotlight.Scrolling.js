@@ -17,16 +17,13 @@ enyo.Spotlight.Scrolling = new function() {
 
 	this.processMouseWheel = function(oEvent, fCallback, oContext) {
 		_nDelta += oEvent.wheelDeltaY;
-		var bUp = true;
 
 		if (_nDelta >= this.frequency) {
 			_nDelta = 0;
+			return fCallback.apply(oContext, [oEvent, true]);
 		} else if (_nDelta <= -this.frequency) {
 			_nDelta = 0;
-			bUp = false;
+			return fCallback.apply(oContext, [oEvent, false]);
 		}
-		
-		return fCallback.apply(oContext, [oEvent, bUp]);
-
 	};
 };
