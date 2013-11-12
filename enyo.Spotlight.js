@@ -10,6 +10,7 @@ enyo.Spotlight = new function() {
 
 	var _oThis                          = this,     // Reference to this to be inherited by private closures below
 		_oRoot                          = null,     // Topmost component instance where spotlight events are caught
+		_oPointed                       = null,     // Currently pointed control
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent and _oLast5WayControl?
 		_oCurrent                       = null,     // Currently spotlighted element
@@ -616,8 +617,6 @@ enyo.Spotlight = new function() {
 	};
 	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  };
 	this.isFrozen = function() { return _bFrozen;  };
-
-	_initialize();
 };
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
