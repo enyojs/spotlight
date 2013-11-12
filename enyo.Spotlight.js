@@ -22,6 +22,7 @@ enyo.Spotlight = new function() {
 		_bEnablePointerMode             = true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
 		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), if focus has been moved in between
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
+		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
 
 		_nPrevClientX                   = null,
 		_nPrevClientY                   = null,
@@ -59,9 +60,7 @@ enyo.Spotlight = new function() {
 			}
 
 			_oCurrent = oControl;
-
 			_log('CURRENT =', _oCurrent.toString());
-
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
 			if (oControl.spotlight === true) {
@@ -233,8 +232,9 @@ enyo.Spotlight = new function() {
 				case 'keydown':
 				case 'keyup':
 					// Filter out special keycode from Input Manager for magic remote show/hide
-					if (oEvent.keyCode === 0 && (oEvent.keyIdentifier === "U+1200202" || oEvent.keyIdentifier === "U+1200201")) {return true;}
-					return enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
+					if (oEvent.keyCode === 0 && (oEvent.keyIdentifier === "U+1200202" || oEvent.keyIdentifier === "U+1200201")) { return true; }
+					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
+					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
 			}
 		}
 	};
@@ -252,7 +252,6 @@ enyo.Spotlight = new function() {
 			case 'keydown'  : return _dispatchEvent('onSpotlightKeyDown', oEvent);
 			case 'keyup'    : return _dispatchEvent('onSpotlightKeyUp'  , oEvent);
 		}
-
 		return true; // Should never get here
 	};
 
@@ -284,7 +283,7 @@ enyo.Spotlight = new function() {
 		}
 
 		var sEventName = 'onSpotlightScroll' + (bUp ? 'Up' : 'Down');
-		_dispatchEvent(sEventName, {domEvent: oEvent});
+		return _dispatchEvent(sEventName, {domEvent: oEvent});
 	};
 
 	// Called by onEvent() to process mousemove events
@@ -304,6 +303,7 @@ enyo.Spotlight = new function() {
 				
 				_oLastMouseMoveTarget = oTarget;
 				_bCanFocus = true;
+				_oPointed  = oTarget;
 				_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
 				
 				if (oTarget.spotlight !== true) {
@@ -319,34 +319,52 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onMouseDown = function(oEvent) {
-		if (this.getPointerMode()) { return; }
+		// Logic to exit frozen mode when depressing control other then current
+		// And transfer spotlight directly to it
+		if (this.isFrozen()) {
+			if (_oPointed != _oCurrent) {
+				this.unfreeze();
+				this.spot(_oPointed);
+				return true;
+			}
+		}
+		
+		if (this.getPointerMode()) { return false; } // Allow mousedown to bubble
+
+		// Simulate an Enter key from Magic Remote click in 5Way mode
 		oEvent.preventDefault();
 
-		var oEventClone      = enyo.clone(oEvent);
-		oEventClone.keyCode  = 13;
-		oEventClone.domEvent = oEvent;
+		var oEventClone             = enyo.clone(oEvent);
+		oEventClone.keyCode         = 13;
+		oEventClone.domEvent        = oEvent;
 		oEventClone.allowDomDefault = enyo.nop;
-
+		
 		_oDepressedControl = this.getCurrent();
-		return _dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
+		_dispatchEvent('onSpotlightKeyDown', oEventClone, _oDepressedControl);
+		return true; // Because we should never see mouse events in 5way mode
 	};
 
 	this.onMouseUp = function(oEvent) {
-		if (this.getPointerMode()) { return; }
+		if (this.getPointerMode()) { return false; } // Allow mouseup to bubble
+
+		// Simulate an Enter key from Magic Remote click in 5Way mode
 		oEvent.preventDefault();
 
 		var oEventClone      = enyo.clone(oEvent);
 		oEventClone.keyCode  = 13;
 		oEventClone.domEvent = oEvent;
 
-		return _dispatchEvent('onSpotlightKeyUp', oEventClone, _oDepressedControl);
+		_dispatchEvent('onSpotlightKeyUp', oEventClone, _oDepressedControl);
+		return true; // Because we should never see mouse events in 5way mode
 	};
 
 	this.onClick = function(oEvent) {
 		_oLast5WayControl = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
-		if (this.getPointerMode()) { return; }
+		if (this.getPointerMode()) { return false; } // Allow click to bubble
+
+		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
 		oEvent.preventDefault();
-		return true;
+		return true; // Because we should never see mouse events in 5way mode
 	};
 
 	//* Spotlight event handlers
@@ -403,7 +421,7 @@ enyo.Spotlight = new function() {
 	this.onSpotlightFocused = function(oEvent) {};
 
 	this.onSpotlightBlur = function(oEvent) {
-		if (_oCurrent) {
+		if (this.hasCurrent()) {
 			oEvent.originator.removeClass('spotlight');
 		}
 	};
@@ -449,6 +467,7 @@ enyo.Spotlight = new function() {
 	this.getPointerMode       = function()                { return _bPointerMode;           };
 	this.getCurrent           = function()                { return _oCurrent;               };
 	this.setCurrent           = function(oControl)        { return _setCurrent(oControl);   };
+	this.hasCurrent           = function()                { return _oCurrent !== null;      };
 	this.getLastEvent         = function()                { return _oLastEvent;             };
 	this.getLastControl       = function()                { return _oLastControl;           };
 	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;         };
@@ -522,14 +541,14 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection) {
-		if (!_bCanFocus) { return false; }               // Focusing is disabled when entering pointer mode
+		if (this.isFrozen()) { return false; }           // Current cannot change while in frozen mode
+		if (!_bCanFocus)     { return false; }           // Focusing is disabled when entering pointer mode
 
 		if (_oCurrent && !this.isSpottable(oControl)) {  // Control is not spottable and something is already
 			return false;
 		}
-		if (_oCurrent && oControl !== _oCurrent) {       // Blur last control before spotting new one
-			_dispatchEvent('onSpotlightBlur', null);
-		}
+		
+		if (oControl !== _oCurrent) { this.unspot(); }   // Blur last control before spotting new one
 
 		oControl = oControl || this.getCurrent();
 		if (!this.isSpottable(oControl)) {
@@ -545,11 +564,11 @@ enyo.Spotlight = new function() {
 
 	// Dispatches spotlight blur event to current control
 	this.unspot = function() {
-		if (_oCurrent) {
+		if (this.isFrozen()) { return false; }           // Current cannot change while in frozen mode
+		if (this.hasCurrent()) {
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
 		}
-
 		return false;
 	};
 
@@ -572,23 +591,34 @@ enyo.Spotlight = new function() {
 
 		return bChanged;
 	};
-	
-	// Disables switching to pointer mode
+
+	// Switching to pointer mode
 	this.disablePointerMode = function() { _bEnablePointerMode = false; };
+	this.enablePointerMode  = function() { _bEnablePointerMode = true;  };
 
-	// Enables switching to pointer mode
-	this.enablePointerMode = function() { _bEnablePointerMode = true; };
-
+	// Switching to muted mode (no "spotlight" css class is being set in dom)
 	this.mute    = function(oSender) { enyo.Spotlight.Muter.addMuteReason(oSender);    };
 	this.unmute  = function(oSender) { enyo.Spotlight.Muter.removeMuteReason(oSender); };
-	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted(); };
-
+	this.isMuted = function()        { return enyo.Spotlight.Muter.isMuted();          };
+	
+	// Switching to verbose mode
 	this.verbose = function(bVerbose) {
 		_bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
 		return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
 	};
 	
-}();
+	// Switching to frozen mode (current cannot change while frozen)
+	this.freeze = function() {
+		if (!this.hasCurrent()) { throw 'Can not enter frozen mode until something is spotted'; }
+		_bFrozen = true;
+		_oCurrent.addClass('spotlight');
+		return 'SPOTLIGHT: Frozen on ' + _oCurrent.toString(); 
+	};
+	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  };
+	this.isFrozen = function() { return _bFrozen;  };
+
+	_initialize();
+};
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
 enyo.dispatcher.features.push(function(oEvent) {

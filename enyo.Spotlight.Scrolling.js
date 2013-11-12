@@ -17,13 +17,6 @@ enyo.Spotlight.Scrolling = new function() {
 
 	this.processMouseWheel = function(oEvent, fCallback, oContext) {
 		_nDelta += oEvent.wheelDeltaY;
-		//enyo.log('wheel', _nDelta);
-
-		// When no spottable elements are present in the app, rely on default events
-		if (oContext == enyo.Spotlight && oContext.getCurrent()) {
-			oEvent.preventDefault();
-			return;
-		}
 
 		if (_nDelta >= this.frequency) {
 			_nDelta = 0;
@@ -32,6 +25,5 @@ enyo.Spotlight.Scrolling = new function() {
 			_nDelta = 0;
 			return fCallback.apply(oContext, [oEvent, false]);
 		}
-
 	};
 };
