@@ -43,7 +43,6 @@ enyo.kind({
 					if (oEvent.originator !== oSender) {
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
 					}
-				//	return true;	// prevent default ???????? Why whould we need to prevent default here? Why? Why? I think not! Lex.
 			}
 		},
 
@@ -66,10 +65,10 @@ enyo.kind({
 		},
 
 		/******************************/
-
+		
 		onSpotlightFocused: function(oSender, oEvent) {
 			// console.log('FOCUSED', oSender.name);
-			if (enyo.Spotlight.getPointerMode()) { return true; }
+			if (enyo.Spotlight.isInitialized() && enyo.Spotlight.getPointerMode()) { return true; }
 			this._initComponent(oSender);
 
 			var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
