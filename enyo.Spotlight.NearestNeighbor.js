@@ -138,7 +138,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 		_getDistance = function(delta) {
 			return Math.pow(delta.dx*delta.dx + delta.dy*delta.dy, 0.5) || 0.1;
 		},
-
+		
 		_getAngle = function(nSlope) {
 			return Math.atan(nSlope) * 180/Math.PI || 0.1;
 		};

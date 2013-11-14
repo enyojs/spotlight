@@ -20,6 +20,8 @@ enyo.kind({
 				{name: 'button4', spotlight: true, kind: 'Button', content: 'Button4'}
 			]},
 			{name: 'c13', spotlight: 'container', classes: 'container', components: [
+				{name: 'c131', spotlight: 'container', classes: 'container', components: [
+				]},
 			]},
 			{name: 'button5', spotlight: true, kind: 'Button', content: 'Button5'}
 		]},
