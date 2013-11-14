@@ -508,7 +508,7 @@ enyo.Spotlight = new function() {
 			if (this.hasChildren(aChildren[n])) { return true; }
 		}
 		return false;
-	},
+	};
 
 	// Returns spottable chldren along with position of self
 	this.getSiblings = function(oControl) {
