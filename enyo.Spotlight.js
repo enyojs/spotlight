@@ -119,7 +119,7 @@ enyo.Spotlight = new function() {
 
 		// Get decorator for a control
 		_getDecorator = function(oSender) {
-			if (oSender.spotlight == 'container') {   // Process containers
+			if (_oThis.isContainer(oSender)) {   // Process containers
 				return enyo.Spotlight.Decorator['Container'];
 			}
 
@@ -184,9 +184,9 @@ enyo.Spotlight = new function() {
 		},
 		
 		_highlight = function(oControl) {
-			if (_oThis.isMuted())                  { return; }  // Not highlighting when muted
-			if (oControl.spotlight == 'container') { return; }  // Not highlighting containers
-			if (_oLastControl == null)             { return; }  // Not highlighting first non-container control - see this.initialize()
+			if (_oThis.isMuted())             { return; }  // Not highlighting when muted
+			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
+			if (_oLastControl == null)        { return; }  // Not highlighting first non-container control - see this.initialize()
 
 			oControl.addClass('spotlight');
 		},
@@ -428,7 +428,7 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onSpotlightPoint = function(oEvent) {
-		if (oEvent.originator.spotlight != 'container') {
+		if (!this.isContainer(oEvent.originator)) {
 			this.spot(oEvent.originator);
 		}
 	};
@@ -476,15 +476,38 @@ enyo.Spotlight = new function() {
 
 	this.isSpottable = function(oControl) {
 		oControl = oControl || this.getCurrent();
-		if (!oControl) { return; }
-		var bSpottable = (
-			!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
-			typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
-			oControl.spotlight                          && // Control has spotlight=true or 'container'
-			oControl.getAbsoluteShowing()               && // Control is visible
-			!(oControl.disabled)                           // Control is not disabled
-		);
+		if (!oControl) { return false; }
+		var bSpottable = false;
+		
+		if (this.isContainer(oControl)) {
+			bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
+		} else {
+			bSpottable = (
+				!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
+				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
+				oControl.spotlight                          && // Control has spotlight=true or 'container'
+				oControl.getAbsoluteShowing()               && // Control is visible
+				!(oControl.disabled)                           // Control is not disabled
+			);
+		}
 		return bSpottable;
+	};
+	
+	// Is oControl.spotlight == "container"
+	this.isContainer = function(oControl) {
+		if (!oControl) { return false; }
+		return oControl.spotlight == 'container';
+	};
+	
+	// Is there at least one descendant of oControl (or oControl itself) that has spotlight = "true"
+	this.hasChildren = function(oControl) {
+		if (!oControl) { return false; }
+		if (!this.isContainer(oControl) && this.isSpottable(oControl)) { return true; }
+		var n, aChildren = oControl.children;
+		for (n=0; n<aChildren.length; n++) {
+			if (this.hasChildren(aChildren[n])) { return true; }
+		}
+		return false;
 	};
 
 	// Returns spottable chldren along with position of self
@@ -494,6 +517,7 @@ enyo.Spotlight = new function() {
 		var n,
 			o = {},
 			oParent = this.getParent(oControl) || oControl.parent;
+			
 		o.siblings = this.getChildren(oParent);
 
 		for (n=0; n<o.siblings.length; n++) {
@@ -504,7 +528,7 @@ enyo.Spotlight = new function() {
 
 		return o;
 	};
-
+	
 	// Returns all spottable children
 	this.getChildren = function(oControl) {
 		oControl = oControl || this.getCurrent();
