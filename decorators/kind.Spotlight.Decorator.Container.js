@@ -49,6 +49,7 @@ enyo.kind({
 		// Was last spotted control the container's child?
 		_hadFocus: function(oSender) {
 			var oLastControl = enyo.Spotlight.getLastControl();
+			if (!enyo.Spotlight.isSpottable(oLastControl)) { return false; } // Because oLastControl might have been DHD'd
 			return enyo.Spotlight.Util.isChild(oSender, oLastControl);
 		},
 
@@ -73,12 +74,12 @@ enyo.kind({
 
 			var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
 
-			if (this._hadFocus(oSender)) {												// Focus came from within
+			if (this._hadFocus(oSender)) {                                              // Focus came from within
 				if (s5WayEventType) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				this._focusLeave(oSender, s5WayEventType);
-			} else {																	// Focus came from without
+			} else {                                                                    // Focus came from without
 				var oLastFocusedChild = this.getLastFocusedChild(oSender);
 				if (oLastFocusedChild) {
 					enyo.Spotlight.spot(oLastFocusedChild);
