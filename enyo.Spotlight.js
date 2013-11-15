@@ -228,7 +228,7 @@ enyo.Spotlight = new function() {
 		_highlight = function(oControl) {
 			if (_oThis.isMuted())             { return; }  // Not highlighting when muted
 			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
-			if (_oLastControl == null)        { return; }  // Not highlighting first non-container control - see this.initialize()
+			if (!_oThis.isInitialized())        { return; }  // Not highlighting first non-container control - see this.initialize()
 
 			oControl.addClass('spotlight');
 		},
@@ -618,6 +618,9 @@ enyo.Spotlight = new function() {
 			enyo.warn('SPOTLIGHT: can\'t spot: focus is disabled');                 //
 			return false;                                                           //
 		}
+		if (_oCurrent === oControl) {                                               // Do nothing when trying to spot same thing twice
+			return false;                                                           //
+		}                                                                           //
 
 		var oOriginal = oControl;
 		if (!this.isSpottable(oControl)) {                                          // If control is not spottable, find it's spottable child
