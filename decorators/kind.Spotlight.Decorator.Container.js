@@ -42,7 +42,8 @@ enyo.kind({
 				case 'onSpotlightFocus':
 					if (oEvent.originator !== oSender) {
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
-					}
+					} 
+					break;
 			}
 		},
 
@@ -66,7 +67,10 @@ enyo.kind({
 		},
 
 		/******************************/
-		
+		onSpotlightFocus: function(oSender, oEvent) {
+			oSender._spotlight = oSender._spotlight || {};
+			oSender._spotlight.containerFocusDir = oEvent.dir;
+		},
 		onSpotlightFocused: function(oSender, oEvent) {
 			// console.log('FOCUSED', oSender.name);
 			if (enyo.Spotlight.isInitialized() && enyo.Spotlight.getPointerMode()) { return true; }
@@ -74,12 +78,12 @@ enyo.kind({
 
 			var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
 
-			if (this._hadFocus(oSender)) {                                              // Focus came from within
+			if (this._hadFocus(oSender) && oSender._spotlight.containerFocusDir) {   // Focus came from inside AND this was a 5-way move
 				if (s5WayEventType) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				this._focusLeave(oSender, s5WayEventType);
-			} else {                                                                    // Focus came from without
+			} else {                            // Focus came from outside or this was a programmic spot
 				var oLastFocusedChild = this.getLastFocusedChild(oSender);
 				if (oLastFocusedChild) {
 					enyo.Spotlight.spot(oLastFocusedChild);
