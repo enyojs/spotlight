@@ -24,8 +24,8 @@ enyo.kind({
 						{name: 'button5', spotlight: true, kind: 'Button', content: 'Hide My Ansestor',    ontap: 'hideAnsestor'   }
 					]}
 				]}
-			]},
-		]},
+			]}
+		]}
 	],
 	
 	restore         : function() { location.reload(); },
