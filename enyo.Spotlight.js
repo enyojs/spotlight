@@ -24,6 +24,7 @@ enyo.Spotlight = new function() {
 		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), if focus has been moved in between
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
 		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
+		_oDefaultDisappear              = null,     // Contains control specified in defaultSpotlightDisappear property of _oCurrent
 
 		_nPrevClientX                   = null,
 		_nPrevClientY                   = null,
@@ -42,14 +43,52 @@ enyo.Spotlight = new function() {
 				}
 			};
 		},
-
+		
 		// Create control-specific spotlight state storage
 		_initializeControl = function(oControl) {
 			if (typeof oControl._spotlight == 'undefined') {
 				oControl._spotlight = {};
 			}
 		},
-
+		
+		_setDefaultDisappearControl = function() {
+			_oDefaultDisappear = enyo.Spotlight.Util.getDefaultDirectionControl(                   // Get control specified in defaultSpotlightDisappear
+				'disappear',                                                                       // of _oCurrent. Gotta get it before it desappears :)
+				_oCurrent                                                                          //
+			);
+		},
+		
+		// Observer
+		_onDisappear = function() {
+			if (_onDisappear.isOff) { return; }                                                     // Only handle disappearance once
+			_onDisappear.isOff = true;                                                              //
+			var oControl = _oDefaultDisappear;
+			if (!oControl) {                                                                        // Nothing is set in defaultSpotlightDisappear
+				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
+				if (!oControl) { throw 'SPOTLIGHT: No spottable controls found'; }                  // Prevent unmanageable case when _oCurrent is undefined
+			}
+			
+			_oThis.setPointerMode(false);                                                           // So that containers can process spot()
+			_oThis.spot(oControl);                                                                  // Spot first child of the app
+		},
+		
+		// Add observers on control's parent chain
+		_observeDisappearance = function(bObserve, oControl, bInAncestor) {
+			if (!oControl) { return; }                                                               // Terminal case
+			var sMethod = bObserve ? 'addObserver' : 'removeObserver';
+			if (!bInAncestor) {                                                                      // When processing _oCurrent itself
+				if (bObserve) {                                                                      // When adding observer to _oCurrent itself
+					_onDisappear.isOff = false;                                                      // Set one-time-call flag of _onDisappear function
+					_setDefaultDisappearControl();                                                   // Capture defaultSpotlightDisappear control
+				}
+				oControl[sMethod]('disabled',  _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+				oControl[sMethod]('destroyed', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+			}
+			oControl[sMethod]('showing', _onDisappear);                                              // Have to add-remove hadler to all ancestors for showing
+			
+			_observeDisappearance(bObserve, oControl.parent, true);
+		},
+		
 		// Set currently spotted control. 
 		_setCurrent = function(oControl) {
 			if (_oCurrent === oControl) { return true; }
@@ -60,7 +99,10 @@ enyo.Spotlight = new function() {
 				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
 
+			_observeDisappearance(false, _oCurrent);
 			_oCurrent = oControl;
+			_observeDisappearance(true, _oCurrent);
+				
 			_log('CURRENT =', _oCurrent.toString());
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
@@ -186,7 +228,7 @@ enyo.Spotlight = new function() {
 		_highlight = function(oControl) {
 			if (_oThis.isMuted())             { return; }  // Not highlighting when muted
 			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
-			if (_oLastControl == null)        { return; }  // Not highlighting first non-container control - see this.initialize()
+			if (!_oThis.isInitialized())        { return; }  // Not highlighting first non-container control - see this.initialize()
 
 			oControl.addClass('spotlight');
 		},
@@ -278,11 +320,6 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onScroll = function(oEvent, bUp) {
-		this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-		if (_comeBackFromPointerMode()) {
-			return true;
-		}
-
 		var sEventName = 'onSpotlightScroll' + (bUp ? 'Up' : 'Down');
 		return _dispatchEvent(sEventName, {domEvent: oEvent});
 	};
@@ -305,7 +342,10 @@ enyo.Spotlight = new function() {
 				_oLastMouseMoveTarget = oTarget;
 				_bCanFocus = true;
 				_oPointed  = oTarget;
-				_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+				
+				if (!this.isContainer() && this.isSpottable(oTarget)) {
+					_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+				}
 				
 				if (oTarget.spotlight !== true) {
 					_bCanFocus = false;
@@ -566,24 +606,35 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection) {
-		if (this.isFrozen()) { return false; }           // Current cannot change while in frozen mode
-		if (!_bCanFocus)     { return false; }           // Focusing is disabled when entering pointer mode
+		if (!oControl) {                                                            // Cannot spot null
+			enyo.warn('SPOTLIGHT: can\'t spot because argument is not an object');  //
+			return false;                                                           //
+		}
+		if (this.isFrozen()) {                                                      // Current cannot change while in frozen mode
+			enyo.warn('SPOTLIGHT: can\'t spot in frozen mode');                     //
+			return false;                                                           //
+		}
+		if (!_bCanFocus) {                                                          // Focusing is disabled when entering pointer mode
+			enyo.warn('SPOTLIGHT: can\'t spot: focus is disabled');                 //
+			return false;                                                           //
+		}
+		if (_oCurrent === oControl) {                                               // Do nothing when trying to spot same thing twice
+			return false;                                                           //
+		}                                                                           //
 
-		if (_oCurrent && !this.isSpottable(oControl)) {  // Control is not spottable and something is already
-			return false;
+		var oOriginal = oControl;
+		if (!this.isSpottable(oControl)) {                                          // If control is not spottable, find it's spottable child
+			oControl = this.getFirstChild(oControl);                                //
 		}
 		
-		if (oControl !== _oCurrent) { this.unspot(); }   // Blur last control before spotting new one
-
-		oControl = oControl || this.getCurrent();
-		if (!this.isSpottable(oControl)) {
-			oControl = this.getFirstChild(oControl);
-		}
 		if (oControl) {
-			_highlight(oControl);
-			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);
+			this.unspot();                                                          // Blur last control before spotting new one
+			_highlight(oControl);                                                   // Add spotlight class 
+			_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);        // Dispatch focus to new control
 			return true;
 		}
+		enyo.warn('SPOTLIGHT: can\'t spot: ' + oOriginal.toString() + ' is not spottable and has no spottable descendants');
+		
 		return false;
 	};
 

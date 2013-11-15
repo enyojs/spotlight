@@ -11,7 +11,7 @@ enyo.Spotlight.Util = new function() {
 			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
 			oControl = enyo.Spotlight.getCurrent();
 		}
-
+		
 		oData            = oData ? enyo.clone(oData) : {};
 		oData.type       = sEvent;
 		oData.originator = oControl;
@@ -119,7 +119,6 @@ enyo.Spotlight.Util = new function() {
 	this.getDefaultDirectionControl = function(sDirection, oControl) {
 		var sProperty = 'defaultSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase(),
 			oNeighbor;
-
 		if (typeof oControl[sProperty] == 'string') {
 			oNeighbor = oControl.owner.$[oControl[sProperty]];
 			if (typeof oNeighbor != 'undefined') {
