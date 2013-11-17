@@ -90,7 +90,7 @@ enyo.kind({
 		onSpotlightRight: function(oSender, oEvent) {
 			var nCurrent = this.getCurrent(oSender);
 			if (nCurrent === null) { return true; }
-			if (nCurrent < oSender.getCount() - 1) {
+			if (nCurrent < oSender.getCount() - 1 && nCurrent + 1 >= 0) {
 				this.setCurrent(oSender, nCurrent + 1, true);
 				return true;
 			}
@@ -99,12 +99,15 @@ enyo.kind({
 
 		onSpotlightPoint: function(oSender, oEvent) {
 			this.setCurrent(oSender, oEvent.index);
-			return true;
 		},
 
 		getCurrent: function(oSender) {
 			if (typeof oSender._nCurrentSpotlightItem == 'undefined') {
-				return 0;
+				if(enyo.Spotlight.getPointerMode()){
+					return 0 - oSender.itemsPerRow;
+				} else {
+					return 0;
+				}
 			}
 			return oSender._nCurrentSpotlightItem;
 		},
