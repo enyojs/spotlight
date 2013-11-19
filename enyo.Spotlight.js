@@ -121,9 +121,9 @@ enyo.Spotlight = new function() {
 		},
 
 		// Artificially trigger events on current control, like click
-		_dispatchEvent = function(sEvent, oData, oControl) {
+		_dispatchEvent = function(sEvent, oData, oControl, sDOMType) {
 			oControl = oControl || _oThis.getCurrent();
-			return enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl);
+			return enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl, sDOMType);
 		},
 
 		// Moves to a nearest neightbor based on 5Way Spotlight event
@@ -401,6 +401,14 @@ enyo.Spotlight = new function() {
 
 	this.onClick = function(oEvent) {
 		_oLast5WayControl = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
+
+		// Prevent browser-simulated "click" events when pressing enter on a focused form control from being processed;
+		// We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
+		if ((oEvent.clientX === 0) && (oEvent.clientY === 0) && 
+			(oEvent.type == "click" || oEvent.type == "tap")) {
+			return true;
+		}
+
 		if (this.getPointerMode()) { return false; } // Allow click to bubble
 
 		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
@@ -449,7 +457,7 @@ enyo.Spotlight = new function() {
 
 		aChildren = this.getChildren(oEvent.originator);
 		if (aChildren.length === 0) {
-			return _dispatchEvent('ontap', null, oEvent.originator);
+			return _dispatchEvent('ontap', null, oEvent.originator, "tap");
 		} else {
 			return this.spot(aChildren[0]);
 		}
@@ -618,9 +626,6 @@ enyo.Spotlight = new function() {
 			enyo.warn('SPOTLIGHT: can\'t spot: focus is disabled');                 //
 			return false;                                                           //
 		}
-		if (_oCurrent === oControl) {                                               // Do nothing when trying to spot same thing twice
-			return false;                                                           //
-		}                                                                           //
 
 		var oOriginal = oControl;
 		if (!this.isSpottable(oControl)) {                                          // If control is not spottable, find it's spottable child
