@@ -121,9 +121,9 @@ enyo.Spotlight = new function() {
 		},
 
 		// Artificially trigger events on current control, like click
-		_dispatchEvent = function(sEvent, oData, oControl, sDOMType) {
+		_dispatchEvent = function(sEvent, oData, oControl) {
 			oControl = oControl || _oThis.getCurrent();
-			return enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl, sDOMType);
+			return enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl);
 		},
 
 		// Moves to a nearest neightbor based on 5Way Spotlight event
@@ -457,7 +457,7 @@ enyo.Spotlight = new function() {
 
 		aChildren = this.getChildren(oEvent.originator);
 		if (aChildren.length === 0) {
-			return _dispatchEvent('ontap', null, oEvent.originator, "tap");
+			return _dispatchEvent('tap', {customEvent: false}, oEvent.originator);
 		} else {
 			return this.spot(aChildren[0]);
 		}

@@ -4,14 +4,7 @@
  */
 
 enyo.Spotlight.Util = new function() {
-	/** 
-		Dispatches an event with name sEvent (which includes the "on" prefix) to oControl if
-		specified, otherwise to the current spotlighted control.  oData is used as the event
-		payload, otherwise an empty hash is sent.  The sDOMType parameter is optional, and
-		provides the non-"on"-prefixed type necessary to properly simulate a DOM event (or 
-		normalized DOM event like 'tap').  Events are subject to capture filtering.
-	*/
-	this.dispatchEvent = function(sEvent, oData, oControl, sDOMType) {
+	this.dispatchEvent = function(sEvent, oData, oControl) {
 		if (!oControl || oControl.destroyed) { return; }
 		
 		if (enyo.Spotlight.isFrozen()) {
@@ -20,19 +13,13 @@ enyo.Spotlight.Util = new function() {
 		}
 		
 		oData            = oData ? enyo.clone(oData) : {};
-		oData.type       = sDOMType || sEvent;
+		oData.type       = sEvent;
 		oData.originator = oControl;
 		oData.originator.timestamp = oData.timeStamp;
-		oData.dispatchTarget = oControl;
-		oData.preventDispatch = false;
+		oData.target     = oControl.hasNode();
+		oData.customEvent = (oData.customEvent === undefined) ? true : oData.customEvent;
 
-		// Allow filtering by the dispatcher capture feature
-		enyo.dispatcher.captureFilter(oControl, oData, !!sDOMType);
-		if (oData.preventDispatch) {
-			return true;
-		}
-
-		return oControl.dispatchBubble(sEvent, oData, oControl);
+		return enyo.dispatcher.dispatch(oData);
 	};
 
 	// Attach event hook to capture events coming from within the container
