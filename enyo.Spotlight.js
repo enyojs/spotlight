@@ -63,7 +63,7 @@ enyo.Spotlight = new function() {
 			if (_onDisappear.isOff) { return; }                                                     // Only handle disappearance once
 			_onDisappear.isOff = true;                                                              //
 			var oControl = _oDefaultDisappear;
-			if (!oControl) {                                                                        // Nothing is set in defaultSpotlightDisappear
+			if (!oControl || !_oThis.isSpottable(oControl)) {                                       // Nothing is set in defaultSpotlightDisappear
 				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
 				if (!oControl) { throw 'SPOTLIGHT: No spottable controls found'; }                  // Prevent unmanageable case when _oCurrent is undefined
 			}
