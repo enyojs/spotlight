@@ -60,8 +60,9 @@ enyo.Spotlight = new function() {
 		
 		// Observer
 		_onDisappear = function() {
-			if (_oThis.isSpottable(_oCurrent) || _onDisappear.isOff) { return; }                    // Check if it actually disappeared, and then only handle
-			_onDisappear.isOff = true;                                                              // disappearance once
+			if (_onDisappear.isOff) { return; }                                                     // Only handle disappearance once
+			if (_oThis.isSpottable(_oCurrent)) { return; }                                          // Ignore if control is still spotable
+			_onDisappear.isOff = true;                                                              
 			var oControl = _oDefaultDisappear;
 			if (!oControl) {                                                                        // Nothing is set in defaultSpotlightDisappear
 				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
@@ -232,11 +233,6 @@ enyo.Spotlight = new function() {
 			oControl.addClass('spotlight');
 		},
 
-		// Spot last 5-way control when returning from pointer mode
-		_comeBackFromPointerMode = function() {
-			_oThis.spot(_oLast5WayControl);
-		},
-		
 		// enyo.logs messages in verbose mode
 		_log = function() {
 			if (_bVerbose) {
@@ -272,13 +268,16 @@ enyo.Spotlight = new function() {
 				case 'keydown':
 				case 'keyup':
 					//Update pointer mode based on special keycode from Input Manager for magic remote show/hide
-					if (oEvent.keyCode == 1537) { 
-						this.setPointerMode(false);
-						_comeBackFromPointerMode();
-						return true; 
-					} else if (oEvent.keyCode == 1536) {
-						this.setPointerMode(true);
-						return true; 
+					switch (oEvent.keyCode) {
+						case 1536:
+							// Pointer shown event; set pointer mode true
+							this.setPointerMode(true);
+							return true; 
+						case 1537: 
+							// Pointer hidden event; set pointer mode false and spot last 5-way control
+							this.setPointerMode(false);
+							_oThis.spot(_oLast5WayControl);
+							return true; 
 					}
 					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
@@ -418,10 +417,10 @@ enyo.Spotlight = new function() {
 	this.onSpotlightKeyUp    = function(oEvent) {};
 	this.onSpotlightKeyDown  = function(oEvent) {
 		if (_isArrowKey(oEvent.keyCode)) {
-			var wasPointerMode = this.getPointerMode();
+			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-			if (wasPointerMode) {
-				_comeBackFromPointerMode();
+			if (bWasPointerMode) {
+				_oThis.spot(_oLast5WayControl);
 				return true;
 			}
 		}
@@ -625,9 +624,7 @@ enyo.Spotlight = new function() {
 				this.unspot();                                                          // Blur last control before spotting new one
 				_oCurrent = oControl;
 				_oLast5WayControl = oControl;
-				if (_bVerbose) {
-					_log("Pointer mode, next 5-way: " + oControl.id);
-				}
+				_log("Pointer mode, next 5-way: " + oControl.id);
 			} else {
 				this.unspot();                                                          // Blur last control before spotting new one
 				_highlight(oControl);                                                   // Add spotlight class 
