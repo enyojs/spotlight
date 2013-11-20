@@ -274,9 +274,12 @@ enyo.Spotlight = new function() {
 							this.setPointerMode(true);
 							return true; 
 						case 1537: 
-							// Pointer hidden event; set pointer mode false and spot last 5-way control
+							// Pointer hidden event; set pointer mode false
 							this.setPointerMode(false);
-							_oThis.spot(_oLast5WayControl);
+							// Spot last 5-way control, only if there's not already focus on screen
+							if (!_oLastMouseMoveTarget) {
+								_oThis.spot(_oLast5WayControl);
+							}
 							return true; 
 					}
 					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
@@ -419,7 +422,8 @@ enyo.Spotlight = new function() {
 		if (_isArrowKey(oEvent.keyCode)) {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-			if (bWasPointerMode) {
+			if (bWasPointerMode && !_oLastMouseMoveTarget) {
+				// Spot last 5-way control, only if there's not already focus on screen
 				_oThis.spot(_oLast5WayControl);
 				return true;
 			}

@@ -50,7 +50,7 @@ enyo.kind({
 		// Was last spotted control the container's child?
 		_hadFocus: function(oSender) {
 			var oLastControl = enyo.Spotlight.getLastControl();
-			if (!oSender._spotlight.bEnorceOutsideIn) { return false; }  // Programmatically sptted containers are always treated as not having focus
+			if (oSender._spotlight.bEnorceOutsideIn) { return false; }  // Programmatically sptted containers are always treated as not having focus
 			if (!enyo.Spotlight.isSpottable(oLastControl)) { return false; } // Because oLastControl might have been DHD'd
 			return enyo.Spotlight.Util.isChild(oSender, oLastControl);
 		},
