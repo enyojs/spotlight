@@ -413,7 +413,7 @@ enyo.Spotlight = new function() {
 
 		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
 		oEvent.preventDefault();
-		return true; // Because we should never see mouse events in 5way mode
+		return !oEvent.fromSpotlight; // Because we should never see mouse events in 5way mode unles we simulated them
 	};
 
 	//* Spotlight event handlers
@@ -457,7 +457,7 @@ enyo.Spotlight = new function() {
 
 		aChildren = this.getChildren(oEvent.originator);
 		if (aChildren.length === 0) {
-			return _dispatchEvent('tap', {customEvent: false}, oEvent.originator);
+			return _dispatchEvent('tap', {customEvent: false, preventDefault: enyo.nop, fromSpotlight:true}, oEvent.originator);
 		} else {
 			return this.spot(aChildren[0]);
 		}
