@@ -482,6 +482,8 @@ enyo.Spotlight = new function() {
 	this.onSpotlightPoint = function(oEvent) {
 		if (!this.isContainer(oEvent.originator)) {
 			this.spot(oEvent.originator, null, true);
+		} else {
+			this.unspot();
 		}
 	};
 
