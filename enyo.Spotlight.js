@@ -266,6 +266,8 @@ enyo.Spotlight = new function() {
 				case 'ontap':
 					return this.onClick(oEvent);
 				case 'mousewheel':
+					// Don't dispatch spotlight mousewheel events if we're in pointer mode and not currently spotting something
+					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return true; }
 					return enyo.Spotlight.Scrolling.processMouseWheel(oEvent, this.onScroll, this);
 				case 'keydown':
 				case 'keyup':
