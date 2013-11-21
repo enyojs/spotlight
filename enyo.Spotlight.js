@@ -280,8 +280,21 @@ enyo.Spotlight = new function() {
 							if (!_oLastMouseMoveTarget) {
 								_oThis.spot(_oLast5WayControl);
 							}
-							return true; 
+							return true;
 					}
+					// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
+					if (_isArrowKey(oEvent.keyCode)) {
+						var bWasPointerMode = this.getPointerMode();
+						this.setPointerMode(false);
+						if (bWasPointerMode && !_oLastMouseMoveTarget) {
+							// Spot last 5-way control, only if there's not already focus on screen
+							_oThis.spot(_oLast5WayControl);
+							return true;
+						}
+					}
+					// Don't dispatch spotlight key events if we're in pointer mode and not currently spotting something
+					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return true; }
+
 					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
 			}
@@ -290,6 +303,7 @@ enyo.Spotlight = new function() {
 
 	// Receive accelerated keyup and keydown from accelerator
 	this.onAcceleratedKey = function(oEvent) {
+
 		oEvent.domEvent = oEvent;
 		oEvent.allowDomDefault = function() {
 			oEvent.preventDefault = function() {
@@ -336,7 +350,7 @@ enyo.Spotlight = new function() {
 		this.setPointerMode(true);  // Preserving explicit setting of mode for future features
 		if (this.getPointerMode()) {
 			var oTarget = _getTarget(oEvent.target.id);
-			if (oTarget) {
+			if (oTarget && !this.isContainer(oTarget)) {
 				
 				if (
 					oTarget === _oLastMouseMoveTarget && (
@@ -348,10 +362,8 @@ enyo.Spotlight = new function() {
 				_oLastMouseMoveTarget = oTarget;
 				_oPointed  = oTarget;
 				
-				if (!this.isContainer() && this.isSpottable(oTarget)) {
+				if (this.isSpottable(oTarget)) {
 					_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-				} else {
-					this.unspot();
 				}
 			} else {
 				_oLastMouseMoveTarget = null;
@@ -427,18 +439,9 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightKeyUp    = function(oEvent) {};
 	this.onSpotlightKeyDown  = function(oEvent) {
-		if (_isArrowKey(oEvent.keyCode)) {
-			var bWasPointerMode = this.getPointerMode();
-			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-			if (bWasPointerMode && !_oLastMouseMoveTarget) {
-				// Spot last 5-way control, only if there's not already focus on screen
-				_oThis.spot(_oLast5WayControl);
-				return true;
-			}
-		}
 
 		switch (oEvent.keyCode) {
-			case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
+			case 13: console.log("select", oEvent.target.id); return _dispatchEvent('onSpotlightSelect', oEvent);
 			case 37: return _dispatchEvent('onSpotlightLeft',   oEvent);
 			case 38: return _dispatchEvent('onSpotlightUp',     oEvent);
 			case 39: return _dispatchEvent('onSpotlightRight',  oEvent);
