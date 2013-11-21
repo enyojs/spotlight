@@ -12,7 +12,7 @@ enyo.Spotlight.Util = new function() {
 			oControl = enyo.Spotlight.getCurrent();
 		}
 		
-		oData            = oData ? enyo.clone(oData) : {};
+		oData            = oData ? (enyo.clone(oData) || {}) : {};
 		oData.type       = sEvent;
 		oData.originator = oControl;
 		oData.originator.timestamp = oData.timeStamp;

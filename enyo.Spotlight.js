@@ -138,10 +138,10 @@ enyo.Spotlight = new function() {
 				_oThis.spot(oControl, sDirection);
 			} else {
 				var oParent = _oThis.getParent();
-				if (typeof oParent.spotlight == 'undefined' || oParent.spotlightModal) {  // Reached the end of spottable world
+				if (!oParent || oParent.spotlightModal) {  // Reached the end of spottable world
 					_oThis.spot(_oLastControl);
 				} else {
-					_oThis.spot(_oThis.getParent(), sDirection);
+					_oThis.spot(oParent, sDirection);
 				}
 			}
 		},
@@ -571,7 +571,7 @@ enyo.Spotlight = new function() {
 		if (!oControl) { return; }
 		var n,
 			o = {},
-			oParent = this.getParent(oControl) || oControl.parent;
+			oParent = this.getParent(oControl) || _oRoot;
 			
 		o.siblings = this.getChildren(oParent);
 
@@ -603,7 +603,7 @@ enyo.Spotlight = new function() {
 		return aChildren;
 	};
 
-	// Returns closest spottable parent
+	// Returns closest spottable parent, or null if there is none
 	this.getParent = function(oControl) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
@@ -615,7 +615,6 @@ enyo.Spotlight = new function() {
 				break;
 			}
 		}
-		oSpottableParent = oSpottableParent || oControl;
 		return oSpottableParent;
 	};
 
