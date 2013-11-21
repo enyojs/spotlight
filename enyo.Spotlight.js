@@ -24,6 +24,7 @@ enyo.Spotlight = new function() {
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
 		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
 		_oDefaultDisappear              = null,     // Contains control specified in defaultSpotlightDisappear property of _oCurrent
+		_bFocusOnScreen                 = false,    // Whether focus is currently visible on screen or not
 
 		_nMouseMoveCount                = 0,        // Number of consecutive mousemoves; require >1 to switch to pointer mode
 		_nPrevClientX                   = null,
@@ -231,6 +232,7 @@ enyo.Spotlight = new function() {
 			if (!_oThis.isInitialized())        { return; }  // Not highlighting first non-container control - see this.initialize()
 
 			oControl.addClass('spotlight');
+			_bFocusOnScreen = true;
 		},
 
 		// enyo.logs messages in verbose mode
@@ -367,7 +369,9 @@ enyo.Spotlight = new function() {
 				}
 			} else {
 				_oLastMouseMoveTarget = null;
-				this.unspot();
+				if (_bFocusOnScreen) {
+					this.unspot();
+				}
 			}
 		}
 	};
@@ -479,6 +483,7 @@ enyo.Spotlight = new function() {
 	this.onSpotlightBlur = function(oEvent) {
 		if (this.hasCurrent()) {
 			oEvent.originator.removeClass('spotlight');
+			_bFocusOnScreen = false;
 		}
 	};
 
@@ -639,6 +644,7 @@ enyo.Spotlight = new function() {
 				this.unspot();                                                          // Blur last control before spotting new one
 				_oCurrent = oControl;
 				_oLast5WayControl = oControl;
+				_oLastMouseMoveTarget = null;
 				_log("Pointer mode, next 5-way: " + oControl.id);
 			} else {
 				this.unspot();                                                          // Blur last control before spotting new one
