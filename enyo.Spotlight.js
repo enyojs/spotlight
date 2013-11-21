@@ -441,7 +441,7 @@ enyo.Spotlight = new function() {
 	this.onSpotlightKeyDown  = function(oEvent) {
 
 		switch (oEvent.keyCode) {
-			case 13: console.log("select", oEvent.target.id); return _dispatchEvent('onSpotlightSelect', oEvent);
+			case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
 			case 37: return _dispatchEvent('onSpotlightLeft',   oEvent);
 			case 38: return _dispatchEvent('onSpotlightUp',     oEvent);
 			case 39: return _dispatchEvent('onSpotlightRight',  oEvent);
