@@ -64,7 +64,7 @@ enyo.Spotlight = new function() {
 			if (_oThis.isSpottable(_oCurrent)) { return; }                                          // Ignore if control is still spotable
 			_onDisappear.isOff = true;                                                              
 			var oControl = _oDefaultDisappear;
-			if (!oControl) {                                                                        // Nothing is set in defaultSpotlightDisappear
+			if (!oControl || !_oThis.isSpottable(oControl)) {                                       // Nothing is set in defaultSpotlightDisappear
 				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
 				if (!oControl) { throw 'SPOTLIGHT: No spottable controls found'; }                  // Prevent unmanageable case when _oCurrent is undefined
 			}
@@ -138,10 +138,10 @@ enyo.Spotlight = new function() {
 				_oThis.spot(oControl, sDirection);
 			} else {
 				var oParent = _oThis.getParent();
-				if (typeof oParent.spotlight == 'undefined' || oParent.spotlightModal) {  // Reached the end of spottable world
+				if (!oParent || oParent.spotlightModal) {  // Reached the end of spottable world
 					_oThis.spot(_oLastControl);
 				} else {
-					_oThis.spot(_oThis.getParent(), sDirection);
+					_oThis.spot(oParent, sDirection);
 				}
 			}
 		},
@@ -280,8 +280,21 @@ enyo.Spotlight = new function() {
 							if (!_oLastMouseMoveTarget) {
 								_oThis.spot(_oLast5WayControl);
 							}
-							return true; 
+							return true;
 					}
+					// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
+					if (_isArrowKey(oEvent.keyCode)) {
+						var bWasPointerMode = this.getPointerMode();
+						this.setPointerMode(false);
+						if (bWasPointerMode && !_oLastMouseMoveTarget) {
+							// Spot last 5-way control, only if there's not already focus on screen
+							_oThis.spot(_oLast5WayControl);
+							return true;
+						}
+					}
+					// Don't dispatch spotlight key events if we're in pointer mode and not currently spotting something
+					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return true; }
+
 					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
 			}
@@ -290,6 +303,7 @@ enyo.Spotlight = new function() {
 
 	// Receive accelerated keyup and keydown from accelerator
 	this.onAcceleratedKey = function(oEvent) {
+
 		oEvent.domEvent = oEvent;
 		oEvent.allowDomDefault = function() {
 			oEvent.preventDefault = function() {
@@ -336,7 +350,7 @@ enyo.Spotlight = new function() {
 		this.setPointerMode(true);  // Preserving explicit setting of mode for future features
 		if (this.getPointerMode()) {
 			var oTarget = _getTarget(oEvent.target.id);
-			if (oTarget) {
+			if (oTarget && !this.isContainer(oTarget)) {
 				
 				if (
 					oTarget === _oLastMouseMoveTarget && (
@@ -348,10 +362,8 @@ enyo.Spotlight = new function() {
 				_oLastMouseMoveTarget = oTarget;
 				_oPointed  = oTarget;
 				
-				if (!this.isContainer() && this.isSpottable(oTarget)) {
+				if (this.isSpottable(oTarget)) {
 					_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-				} else {
-					this.unspot();
 				}
 			} else {
 				_oLastMouseMoveTarget = null;
@@ -402,11 +414,19 @@ enyo.Spotlight = new function() {
 
 	this.onClick = function(oEvent) {
 		_oLast5WayControl = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
+
+		// Prevent browser-simulated "click" events when pressing enter on a focused form control from being processed;
+		// We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
+		if ((oEvent.clientX === 0) && (oEvent.clientY === 0) && 
+			(oEvent.type == "click" || oEvent.type == "tap")) {
+			return true;
+		}
+
 		if (this.getPointerMode()) { return false; } // Allow click to bubble
 
 		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
 		oEvent.preventDefault();
-		return true; // Because we should never see mouse events in 5way mode
+		return !oEvent.fromSpotlight; // Because we should never see mouse events in 5way mode unles we simulated them
 	};
 
 	//* Spotlight event handlers
@@ -419,15 +439,6 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightKeyUp    = function(oEvent) {};
 	this.onSpotlightKeyDown  = function(oEvent) {
-		if (_isArrowKey(oEvent.keyCode)) {
-			var bWasPointerMode = this.getPointerMode();
-			this.setPointerMode(false);  // Preserving explicit setting of mode for future features
-			if (bWasPointerMode && !_oLastMouseMoveTarget) {
-				// Spot last 5-way control, only if there's not already focus on screen
-				_oThis.spot(_oLast5WayControl);
-				return true;
-			}
-		}
 
 		switch (oEvent.keyCode) {
 			case 13: return _dispatchEvent('onSpotlightSelect', oEvent);
@@ -453,7 +464,7 @@ enyo.Spotlight = new function() {
 
 		aChildren = this.getChildren(oEvent.originator);
 		if (aChildren.length === 0) {
-			return _dispatchEvent('ontap', null, oEvent.originator);
+			return _dispatchEvent('tap', {customEvent: false, preventDefault: enyo.nop, fromSpotlight:true}, oEvent.originator);
 		} else {
 			return this.spot(aChildren[0]);
 		}
@@ -560,7 +571,7 @@ enyo.Spotlight = new function() {
 		if (!oControl) { return; }
 		var n,
 			o = {},
-			oParent = this.getParent(oControl) || oControl.parent;
+			oParent = this.getParent(oControl) || _oRoot;
 			
 		o.siblings = this.getChildren(oParent);
 
@@ -592,7 +603,7 @@ enyo.Spotlight = new function() {
 		return aChildren;
 	};
 
-	// Returns closest spottable parent
+	// Returns closest spottable parent, or null if there is none
 	this.getParent = function(oControl) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
@@ -604,7 +615,6 @@ enyo.Spotlight = new function() {
 				break;
 			}
 		}
-		oSpottableParent = oSpottableParent || oControl;
 		return oSpottableParent;
 	};
 
@@ -618,6 +628,7 @@ enyo.Spotlight = new function() {
 			enyo.warn('SPOTLIGHT: can\'t spot in frozen mode');                     //
 			return false;                                                           //
 		}
+
 		var oOriginal = oControl;
 		if (!this.isSpottable(oControl)) {                                          // If control is not spottable, find it's spottable child
 			oControl = this.getFirstChild(oControl);                                //

@@ -12,11 +12,14 @@ enyo.Spotlight.Util = new function() {
 			oControl = enyo.Spotlight.getCurrent();
 		}
 		
-		oData            = oData ? enyo.clone(oData) : {};
+		oData            = oData ? (enyo.clone(oData) || {}) : {};
 		oData.type       = sEvent;
 		oData.originator = oControl;
 		oData.originator.timestamp = oData.timeStamp;
-		return oControl.dispatchBubble(sEvent, oData, oControl);
+		oData.target     = oControl.hasNode();
+		oData.customEvent = (oData.customEvent === undefined) ? true : oData.customEvent;
+
+		return enyo.dispatcher.dispatch(oData);
 	};
 
 	// Attach event hook to capture events coming from within the container
