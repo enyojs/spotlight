@@ -267,7 +267,7 @@ enyo.Spotlight = new function() {
 					return this.onClick(oEvent);
 				case 'mousewheel':
 					// Don't dispatch spotlight mousewheel events if we're in pointer mode and not currently spotting something
-					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return true; }
+					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return false; }
 					return enyo.Spotlight.Scrolling.processMouseWheel(oEvent, this.onScroll, this);
 				case 'keydown':
 				case 'keyup':
@@ -276,7 +276,7 @@ enyo.Spotlight = new function() {
 						case 1536:
 							// Pointer shown event; set pointer mode true
 							this.setPointerMode(true);
-							return true; 
+							return false; 
 						case 1537: 
 							// Pointer hidden event; set pointer mode false
 							this.setPointerMode(false);
@@ -284,7 +284,7 @@ enyo.Spotlight = new function() {
 							if (!_oLastMouseMoveTarget) {
 								_oThis.spot(_oLast5WayControl);
 							}
-							return true;
+							return false;
 					}
 					// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
 					if (_isArrowKey(oEvent.keyCode)) {
@@ -293,11 +293,11 @@ enyo.Spotlight = new function() {
 						if (bWasPointerMode && !_oLastMouseMoveTarget) {
 							// Spot last 5-way control, only if there's not already focus on screen
 							_oThis.spot(_oLast5WayControl);
-							return true;
+							return false;
 						}
 					}
 					// Don't dispatch spotlight key events if we're in pointer mode and not currently spotting something
-					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return true; }
+					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return false; }
 
 					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
