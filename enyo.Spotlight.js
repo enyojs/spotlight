@@ -499,20 +499,29 @@ enyo.Spotlight = new function() {
 	/******************* PUBLIC METHODS *********************/
 	
 	// Initializes spotlight's flags and root
-	this.initialize = function(oRoot) {
+	this.initialize = function(oParams) {
 		if (this.isInitialized()) { return; }        // Prevent double init'ion, for example, it may be init'd in app.rendered before enyo.rendered.
 		
-		_oRoot = oRoot;
+		if (oParams.spot) {
+			this.spot(oParams.spot);
+		}
+
+		if (!oParams.root) { return; }
+
+		_oRoot = oParams.root;
 		_interceptEvents();                          // Capture spotlight events at root level of the app
 		
-		var oFirst = this.getFirstChild(oRoot);
+		var oFirst = _oCurrent || this.getFirstChild(_oRoot);	// Spot the first child of the app, unless the app has already specified which control to spot
+
 		if (oFirst) {
-			this.spot(oFirst);
+			if (!_oCurrent) {
+				this.spot(oFirst);
+			}
 			_bInitialized = true;                    // Set initialization flag
 			return true;
 		}
 		
-		throw 'Spotlight initialization failed. No spottable children found in ' + oRoot.toString(); 
+		throw 'Spotlight initialization failed. No spottable children found in ' + _oRoot.toString(); 
 	};
 	
 	// Does spotlight have _oCurrent and last5waycontrol?
@@ -723,7 +732,7 @@ enyo.dispatcher.features.push(function(oEvent) {
 
 // Initialization
 enyo.rendered(function(oRoot) {
-	enyo.Spotlight.initialize(oRoot);
+	enyo.Spotlight.initialize({root: oRoot});
 });
 
 
