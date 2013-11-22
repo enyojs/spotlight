@@ -511,7 +511,7 @@ enyo.Spotlight = new function() {
 		_oRoot = oParams.root;
 		_interceptEvents();                          // Capture spotlight events at root level of the app
 		
-		var oFirst = _oCurrent || this.getFirstChild(oRoot);	// Spot the first child of the app, unless the app has already specified which control to spot
+		var oFirst = _oCurrent || this.getFirstChild(_oRoot);	// Spot the first child of the app, unless the app has already specified which control to spot
 
 		if (oFirst) {
 			if (!_oCurrent) {
@@ -521,7 +521,7 @@ enyo.Spotlight = new function() {
 			return true;
 		}
 		
-		throw 'Spotlight initialization failed. No spottable children found in ' + oRoot.toString(); 
+		throw 'Spotlight initialization failed. No spottable children found in ' + _oRoot.toString(); 
 	};
 	
 	// Does spotlight have _oCurrent and last5waycontrol?
