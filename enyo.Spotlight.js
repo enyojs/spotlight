@@ -505,9 +505,11 @@ enyo.Spotlight = new function() {
 		_oRoot = oRoot;
 		_interceptEvents();                          // Capture spotlight events at root level of the app
 		
-		var oFirst = this.getFirstChild(oRoot);
+		var oFirst = _oCurrent || this.getFirstChild(oRoot);	// Spot the first child of the app, unless the app has already called spot and set up a current
 		if (oFirst) {
-			this.spot(oFirst);
+			if (!_oCurrent) {
+				this.spot(oFirst);
+			}
 			_bInitialized = true;                    // Set initialization flag
 			return true;
 		}
