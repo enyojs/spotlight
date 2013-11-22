@@ -42,14 +42,16 @@ enyo.kind({
 				case 'onSpotlightFocus':
 					if (oEvent.originator !== oSender) {
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
-					}
-				//	return true;	// prevent default ???????? Why whould we need to prevent default here? Why? Why? I think not! Lex.
+					} 
+					break;
 			}
 		},
 
 		// Was last spotted control the container's child?
 		_hadFocus: function(oSender) {
 			var oLastControl = enyo.Spotlight.getLastControl();
+			if (oSender._spotlight.bEnorceOutsideIn) { return false; }  // Programmatically sptted containers are always treated as not having focus
+			if (!enyo.Spotlight.isSpottable(oLastControl)) { return false; } // Because oLastControl might have been DHD'd
 			return enyo.Spotlight.Util.isChild(oSender, oLastControl);
 		},
 
@@ -66,20 +68,23 @@ enyo.kind({
 		},
 
 		/******************************/
-
+		onSpotlightFocus: function(oSender, oEvent) {
+			oSender._spotlight = oSender._spotlight || {};
+			oSender._spotlight.bEnorceOutsideIn = !oEvent.dir;
+		},
 		onSpotlightFocused: function(oSender, oEvent) {
 			// console.log('FOCUSED', oSender.name);
-			if (enyo.Spotlight.getPointerMode()) { return true; }
+			if (enyo.Spotlight.isInitialized() && enyo.Spotlight.getPointerMode()) { return true; }
 			this._initComponent(oSender);
 
 			var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
 
-			if (this._hadFocus(oSender)) {												// Focus came from within
+			if (this._hadFocus(oSender)) {   // Focus came from inside AND this was a 5-way move
 				if (s5WayEventType) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
 				this._focusLeave(oSender, s5WayEventType);
-			} else {																	// Focus came from without
+			} else {                            // Focus came from outside or this was a programmic spot
 				var oLastFocusedChild = this.getLastFocusedChild(oSender);
 				if (oLastFocusedChild) {
 					enyo.Spotlight.spot(oLastFocusedChild);
