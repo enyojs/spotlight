@@ -733,8 +733,6 @@ enyo.dispatcher.features.push(function(oEvent) {
 
 // Initialization
 enyo.rendered(function(oRoot) {
-	console.log('INIT', oRoot.toString());
-	enyo.Spotlight.verbose();
 	enyo.Spotlight.initialize(oRoot);
 });
 
