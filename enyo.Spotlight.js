@@ -10,6 +10,7 @@ enyo.Spotlight = new function() {
 
 	var _oThis                          = this,     // Reference to this to be inherited by private closures below
 		_oRoot                          = null,     // Topmost component instance where spotlight events are caught
+		_oDefaultControl                = null,     // Is being set by spot() if it is being called before initialize() to be spotted in initialize()
 		_oPointed                       = null,     // Currently pointed control
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent and _oLast5WayControl?
@@ -240,6 +241,11 @@ enyo.Spotlight = new function() {
 			if (_bVerbose) {
 				enyo.log('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
 			}
+		},
+		
+		// enyo.warns messages
+		_warn = function() {
+			enyo.warn('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
 		};
 
 	//* Generic event handlers
@@ -499,27 +505,18 @@ enyo.Spotlight = new function() {
 	/******************* PUBLIC METHODS *********************/
 	
 	// Initializes spotlight's flags and root
-	this.initialize = function(oParams) {
-		if (this.isInitialized()) { return; }        // Prevent double init'ion, for example, it may be init'd in app.rendered before enyo.rendered.
+	this.initialize = function(oRoot) {
+		if (this.isInitialized()) { return false; }             // Prevent double init'ion, for example, it may be init'd in app.rendered before enyo.rendered.
 		
-		if (oParams.spot) {
-			this.spot(oParams.spot);
-		}
-
-		if (!oParams.root) { return; }
-
-		_oRoot = oParams.root;
-		_interceptEvents();                          // Capture spotlight events at root level of the app
+		_oRoot = oRoot;                                         // Set root
+		_interceptEvents();                                     // Capture spotlight events at root level of the app
+		_bInitialized = true;                                   // From this point on, isInitialized() returns true. Need it to be true for spot() to spot
 		
-		var oFirst = _oCurrent || this.getFirstChild(_oRoot);	// Spot the first child of the app, unless the app has already specified which control to spot
-
-		if (oFirst) {
-			if (!_oCurrent) {
-				this.spot(oFirst);
-			}
-			_bInitialized = true;                    // Set initialization flag
-			return true;
+		if (_oDefaultControl) {
+			if (this.spot(_oDefaultControl)) { return true; }
 		}
+		
+		if (this.spot(this.getFirstChild(_oRoot))) { return true; }
 		
 		throw 'Spotlight initialization failed. No spottable children found in ' + _oRoot.toString(); 
 	};
@@ -558,7 +555,7 @@ enyo.Spotlight = new function() {
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing()               && // Control is visible
-				!(oControl.disabled)                           // Control is not disabled
+				!oControl.disabled                             // Control is not disabled
 			);
 		}
 		return bSpottable;
@@ -636,42 +633,58 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection, bWasPoint) {
+		if (!this.isInitialized()) {                                                // If spotlight is not yet initialized
+			_oDefaultControl = oControl;                                            // Preserve control to be spotted on initialize
+			return true;
+		}
+		
 		if (!oControl) {                                                            // Cannot spot null
-			enyo.warn('SPOTLIGHT: can\'t spot because argument is not an object');  //
+			_warn('can\'t spot because argument is not an object');                 //
 			return false;                                                           //
 		}
+		
+		if (!(oControl instanceof enyo.Control)) {                                  // Can only spot enyo.Controls
+			_warn('argument is not enyo.Control');                                  //
+			return false;
+		}
+		
+		if (!oControl.isDescendantOf(_oRoot)) {                                     // Can only spot descendants of _oRoot 
+			_warn(oControl.toString() + ' is not in tree of ' + _oRoot.toString()); //
+			return false;
+		}
+		
 		if (this.isFrozen()) {                                                      // Current cannot change while in frozen mode
-			enyo.warn('SPOTLIGHT: can\'t spot in frozen mode');                     //
+			_warn('can\'t spot in frozen mode');                                    //
 			return false;                                                           //
 		}
-
+		
 		var oOriginal = oControl;
 		if (!this.isSpottable(oControl)) {                                          // If control is not spottable, find it's spottable child
 			oControl = this.getFirstChild(oControl);                                //
 		}
 		
 		if (oControl) {
-			if (this.getPointerMode() && !bWasPoint) {
-				this.unspot();                                                          // Blur last control before spotting new one
-				_oCurrent = oControl;
-				_oLast5WayControl = oControl;
+			if (this.getPointerMode() && !bWasPoint && this.hasCurrent()) {
+				this.unspot();                                                      // Blur last control before spotting new one
+				_oCurrent             = oControl;
+				_oLast5WayControl     = oControl;
 				_oLastMouseMoveTarget = null;
 				_log("Pointer mode, next 5-way: " + oControl.id);
 			} else {
-				this.unspot();                                                          // Blur last control before spotting new one
-				_highlight(oControl);                                                   // Add spotlight class 
-				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);        // Dispatch focus to new control
+				this.unspot();                                                      // Blur last control before spotting new one
+				_highlight(oControl);                                               // Add spotlight class 
+				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);    // Dispatch focus to new control
 			}
 			return true;
 		}
-		enyo.warn('SPOTLIGHT: can\'t spot: ' + oOriginal.toString() + ' is not spottable and has no spottable descendants');
+		_warn('can\'t spot: ' + oOriginal.toString() + ' is not spottable and has no spottable descendants');
 		
 		return false;
 	};
 
 	// Dispatches spotlight blur event to current control
 	this.unspot = function() {
-		if (this.isFrozen()) { return false; }           // Current cannot change while in frozen mode
+		if (this.isFrozen()) { return false; }                                       // Current cannot change while in frozen mode
 		if (this.hasCurrent()) {
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
@@ -732,7 +745,8 @@ enyo.dispatcher.features.push(function(oEvent) {
 
 // Initialization
 enyo.rendered(function(oRoot) {
-	enyo.Spotlight.initialize({root: oRoot});
+	// enyo.Spotlight.verbose();
+	enyo.Spotlight.initialize(oRoot);
 });
 
 
