@@ -510,17 +510,13 @@ enyo.Spotlight = new function() {
 		
 		_oRoot = oRoot;                                         // Set root
 		_interceptEvents();                                     // Capture spotlight events at root level of the app
+		_bInitialized = true;                                   // From this point on, isInitialized() returns true. Need it to be true for spot() to spot
 		
-		var oFirst = (
-			_oDefaultControl ||                                 // If _oDefaultControl has been set before initialize, set it to spot
-			this.getFirstChild(_oRoot)                          // Otherwise, spot first child of root
-		);
-
-		if (oFirst) {
-			_bInitialized = true;                               // From this point on, isInitialized() returns true
-			this.spot(oFirst);
-			return true;
+		if (_oDefaultControl) {
+			if (this.spot(_oDefaultControl)) { return true; }
 		}
+		
+		if (this.spot(this.getFirstChild(_oRoot))) { return true; }
 		
 		throw 'Spotlight initialization failed. No spottable children found in ' + _oRoot.toString(); 
 	};
@@ -749,6 +745,7 @@ enyo.dispatcher.features.push(function(oEvent) {
 
 // Initialization
 enyo.rendered(function(oRoot) {
+	// enyo.Spotlight.verbose();
 	enyo.Spotlight.initialize(oRoot);
 });
 
