@@ -241,6 +241,11 @@ enyo.Spotlight = new function() {
 			if (_bVerbose) {
 				enyo.log('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
 			}
+		},
+		
+		// enyo.warns messages
+		_warn = function() {
+			enyo.warn('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
 		};
 
 	//* Generic event handlers
@@ -638,11 +643,22 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (!oControl) {                                                            // Cannot spot null
-			enyo.warn('SPOTLIGHT: can\'t spot because argument is not an object');  //
+			_warn('can\'t spot because argument is not an object');                 //
 			return false;                                                           //
 		}
+		
+		if (!(oControl instanceof enyo.Control)) {                                  // Can only spot enyo.Controls
+			_warn('argument is not enyo.Control');                                  //
+			return false;
+		}
+		
+		if (!oControl.isDescendantOf(_oRoot)) {                                     // Can only spot descendants of _oRoot 
+			_warn(oControl.toString() + ' is not in tree of ' + _oRoot.toString()); //
+			return false;
+		}
+		
 		if (this.isFrozen()) {                                                      // Current cannot change while in frozen mode
-			enyo.warn('SPOTLIGHT: can\'t spot in frozen mode');                     //
+			_warn('can\'t spot in frozen mode');                                    //
 			return false;                                                           //
 		}
 		
@@ -665,7 +681,7 @@ enyo.Spotlight = new function() {
 			}
 			return true;
 		}
-		enyo.warn('SPOTLIGHT: can\'t spot: ' + oOriginal.toString() + ' is not spottable and has no spottable descendants');
+		_warn('can\'t spot: ' + oOriginal.toString() + ' is not spottable and has no spottable descendants');
 		
 		return false;
 	};
