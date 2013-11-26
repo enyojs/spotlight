@@ -433,8 +433,6 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onClick = function(oEvent) {
-		_oLast5WayControl = this.getCurrent(); // Will come back form pointer mode to last 5way'd or clicked control
-
 		// Prevent browser-simulated "click" events when pressing enter on a focused form control from being processed;
 		// We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
 		if ((oEvent.clientX === 0) && (oEvent.clientY === 0) && 
@@ -677,7 +675,6 @@ enyo.Spotlight = new function() {
 		if (oControl) {
 			if (this.getPointerMode() && !bWasPoint && this.hasCurrent()) {
 				this.unspot();
-				_setCurrent(oControl);
 				_oLast5WayControl     = oControl;
 				_oLastMouseMoveTarget = null;
 				_log("Pointer mode, next 5-way: " + oControl.id);
