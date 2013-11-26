@@ -666,8 +666,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (oControl == _oCurrent) {                                                  // Not spotting currently spotted control
-			_highlight(oControl);                               
-			return false;
+			_highlight(oControl);
 		}
 		
 		var oOriginal = oControl;
