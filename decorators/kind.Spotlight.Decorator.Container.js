@@ -80,6 +80,7 @@ enyo.kind({
 			var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
 
 			if (this._hadFocus(oSender)) {   // Focus came from inside AND this was a 5-way move
+				// console.log('FROM INSIDE', s5WayEventType);
 				if (s5WayEventType) {
 					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
 				}
