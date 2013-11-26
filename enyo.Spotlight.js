@@ -230,7 +230,7 @@ enyo.Spotlight = new function() {
 		_highlight = function(oControl) {
 			if (_oThis.isMuted())             { return; }  // Not highlighting when muted
 			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
-			if (!_oThis.isInitialized())        { return; }  // Not highlighting first non-container control - see this.initialize()
+			if (!_oThis.isInitialized())      { return; }  // Not highlighting first non-container control - see this.initialize()
 
 			oControl.addClass('spotlight');
 			_bFocusOnScreen = true;
@@ -276,7 +276,6 @@ enyo.Spotlight = new function() {
 					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return false; }
 					return enyo.Spotlight.Scrolling.processMouseWheel(oEvent, this.onScroll, this);
 				case 'keydown':
-				case 'keyup':
 					//Update pointer mode based on special keycode from Input Manager for magic remote show/hide
 					switch (oEvent.keyCode) {
 						case 1536:
@@ -296,6 +295,12 @@ enyo.Spotlight = new function() {
 					if (_isArrowKey(oEvent.keyCode)) {
 						var bWasPointerMode = this.getPointerMode();
 						this.setPointerMode(false);
+						
+						if (!this.getCurrent()) {
+							this.spot(this.getFirstChild(_oRoot));
+							return false;
+						}
+						
 						if (bWasPointerMode && !_oLastMouseMoveTarget) {
 							// Spot last 5-way control, only if there's not already focus on screen
 							_oThis.spot(_oLast5WayControl);
@@ -304,7 +309,10 @@ enyo.Spotlight = new function() {
 					}
 					// Don't dispatch spotlight key events if we're in pointer mode and not currently spotting something
 					if (this.getPointerMode() && !_oLastMouseMoveTarget) { return false; }
-
+					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
+					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
+					
+				case 'keyup':
 					enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 					return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
 			}
@@ -517,8 +525,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (this.spot(this.getFirstChild(_oRoot))) { return true; }
-		
-		throw 'Spotlight initialization failed. No spottable children found in ' + _oRoot.toString(); 
+		_warn('Spotlight initialization failed. No spottable children found in ' + _oRoot.toString());
 	};
 	
 	// Does spotlight have _oCurrent and last5waycontrol?
@@ -633,47 +640,52 @@ enyo.Spotlight = new function() {
 
 	// Dispatches focus event to the control or it's first spottable child
 	this.spot = function(oControl, sDirection, bWasPoint) {
-		if (!this.isInitialized()) {                                                // If spotlight is not yet initialized
-			_oDefaultControl = oControl;                                            // Preserve control to be spotted on initialize
+		if (!this.isInitialized()) {                                                  // If spotlight is not yet initialized
+			_oDefaultControl = oControl;                                              // Preserve control to be spotted on initialize
 			return true;
 		}
 		
-		if (!oControl) {                                                            // Cannot spot null
-			_warn('can\'t spot because argument is not an object');                 //
-			return false;                                                           //
+		if (!oControl) {                                                              // Cannot spot null
+			_warn('can\'t spot because argument is not an object');                   //
+			return false;                                                             //
 		}
 		
-		if (!(oControl instanceof enyo.Control)) {                                  // Can only spot enyo.Controls
-			_warn('argument is not enyo.Control');                                  //
+		if (!(oControl instanceof enyo.Control)) {                                    // Can only spot enyo.Controls
+			_warn('argument is not enyo.Control');                                    //
 			return false;
 		}
 		
-		if (!oControl.isDescendantOf(_oRoot)) {                                     // Can only spot descendants of _oRoot 
-			_warn(oControl.toString() + ' is not in tree of ' + _oRoot.toString()); //
+		if (!oControl.isDescendantOf(_oRoot)) {                                       // Can only spot descendants of _oRoot 
+			_warn(oControl.toString() + ' is not in tree of ' + _oRoot.toString());   //
 			return false;
 		}
 		
-		if (this.isFrozen()) {                                                      // Current cannot change while in frozen mode
-			_warn('can\'t spot in frozen mode');                                    //
-			return false;                                                           //
+		if (this.isFrozen()) {                                                        // Current cannot change while in frozen mode
+			_warn('can\'t spot in frozen mode');                                      //
+			return false;                                                             //
+		}
+		
+		if (oControl == _oCurrent) {                                                  // Not spotting currently spotted control
+			_highlight(oControl);                               
+			return false;
 		}
 		
 		var oOriginal = oControl;
-		if (!this.isSpottable(oControl)) {                                          // If control is not spottable, find it's spottable child
-			oControl = this.getFirstChild(oControl);                                //
+		if (!this.isSpottable(oControl)) {                                            // If control is not spottable, find it's spottable child
+			oControl = this.getFirstChild(oControl);                                  //
 		}
 		
 		if (oControl) {
 			if (this.getPointerMode() && !bWasPoint && this.hasCurrent()) {
-				this.unspot();                                                      // Blur last control before spotting new one
-				_oCurrent             = oControl;
+				this.unspot();
+				_setCurrent(oControl);
 				_oLast5WayControl     = oControl;
 				_oLastMouseMoveTarget = null;
 				_log("Pointer mode, next 5-way: " + oControl.id);
 			} else {
-				this.unspot();                                                      // Blur last control before spotting new one
-				_highlight(oControl);                                               // Add spotlight class 
-				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);    // Dispatch focus to new control
+				this.unspot();                                                        // Blur last control before spotting new one
+				_highlight(oControl);                                                 // Add spotlight class 
+				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);      // Dispatch focus to new control
 			}
 			return true;
 		}
@@ -684,7 +696,7 @@ enyo.Spotlight = new function() {
 
 	// Dispatches spotlight blur event to current control
 	this.unspot = function() {
-		if (this.isFrozen()) { return false; }                                       // Current cannot change while in frozen mode
+		if (this.isFrozen()) { return false; }                                        // Current cannot change while in frozen mode
 		if (this.hasCurrent()) {
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
