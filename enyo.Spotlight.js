@@ -13,13 +13,12 @@ enyo.Spotlight = new function() {
 		_oDefaultControl                = null,     // Is being set by spot() if it is being called before initialize() to be spotted in initialize()
 		_oPointed                       = null,     // Currently pointed control
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
-		_bInitialized                   = false,    // Does spotlight have _oCurrent and _oLast5WayControl?
+		_bInitialized                   = false,    // Does spotlight have _oCurrent
 		_oCurrent                       = null,     // Currently spotlighted element
 		_oDecorators                    = {},       // For further optimization
 		_oLastEvent                     = null,     // Last event received by Spotlight
 		_oLast5WayEvent                 = null,     // Last 5way event received by Spotlight
 		_oLastControl                   = null,     // Last non-container (spotlight:true) control that was _oCurrent
-		_oLast5WayControl               = null,     // Last non-container (spotlight:true) control that became _oCurrent by means of 5way navigation
 		_bEnablePointerMode             = true,     // For things like input boxes we need a way to disable pointer mode while cursor is in
 		_oDepressedControl              = null,     // Keeping state consistency between onMouseDown() and onMouseUp(), if focus has been moved in between
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
@@ -110,9 +109,6 @@ enyo.Spotlight = new function() {
 
 			if (oControl.spotlight === true) {
 				_oLastControl = oControl;
-				if (!_oThis.getPointerMode() || !_oLast5WayControl) {
-					_oThis.setLast5WayControl(oControl);
-				}
 			}
 
 			_dispatchEvent('onSpotlightFocused');
@@ -287,7 +283,7 @@ enyo.Spotlight = new function() {
 							this.setPointerMode(false);
 							// Spot last 5-way control, only if there's not already focus on screen
 							if (!_oLastMouseMoveTarget) {
-								_oThis.spot(_oLast5WayControl);
+								_oThis.spot(_oLastControl);
 							}
 							return false;
 					}
@@ -303,7 +299,7 @@ enyo.Spotlight = new function() {
 						
 						if (bWasPointerMode && !_oLastMouseMoveTarget) {
 							// Spot last 5-way control, only if there's not already focus on screen
-							_oThis.spot(_oLast5WayControl);
+							_oThis.spot(_oLastControl);
 							return false;
 						}
 					}
@@ -545,7 +541,6 @@ enyo.Spotlight = new function() {
 	this.getLastEvent         = function()                { return _oLastEvent;             };
 	this.getLastControl       = function()                { return _oLastControl;           };
 	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;         };
-	this.setLast5WayControl   = function(oControl)        { _oLast5WayControl = oControl;   };
 
 	this.isSpottable = function(oControl) {
 		oControl = oControl || this.getCurrent();
@@ -673,11 +668,11 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (oControl) {
-			if (this.getPointerMode() && !bWasPoint && this.hasCurrent()) {
-				this.unspot();
-				_oLast5WayControl     = oControl;
-				_oLastMouseMoveTarget = null;
-				_log("Pointer mode, next 5-way: " + oControl.id);
+			if (this.getPointerMode() && !bWasPoint && this.hasCurrent()) {	          // When the user calls spot programmatically in pointer mode, we don't actually
+				this.unspot();                                                        // focus a new control, since that would cause the focus to move out from
+				_oLastControl = oControl;                                             // under the pointer; instead we just unspot and set up the _oLastControl 
+				_oLastMouseMoveTarget = null;                                         // used when resuming 5-way focus on an arrow key press
+				_log("Spot called in pointer mode; 5-way will resume from: " + oControl.id);
 			} else {
 				this.unspot();                                                        // Blur last control before spotting new one
 				_highlight(oControl);                                                 // Add spotlight class 
