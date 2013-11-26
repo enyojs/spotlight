@@ -525,7 +525,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (this.spot(this.getFirstChild(_oRoot))) { return true; }
-		_warn('Spotlight initialization failed. No spottable children found in ' + _oRoot.toString());
+		//_warn('Spotlight initialization failed. No spottable children found in ' + _oRoot.toString());
 	};
 	
 	// Does spotlight have _oCurrent and last5waycontrol?
@@ -646,7 +646,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (!oControl) {                                                              // Cannot spot null
-			_warn('can\'t spot because argument is not an object');                   //
+			//_warn('can\'t spot because argument is not an object');                   //
 			return false;                                                             //
 		}
 		
