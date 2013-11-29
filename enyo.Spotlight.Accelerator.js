@@ -23,6 +23,9 @@ enyo.Spotlight.Accelerator = new function() {
 	this.processKey = function(oEvent, fCallback, oContext) {
 		switch (oEvent.type) {
 			case 'keydown':
+				if (oEvent.target && (oEvent.target.nodeName === "INPUT" || oEvent.target.nodeName === "TEXTAREA"  || (oEvent.target.nodeName === "DIV" && oEvent.target.contentEditable === "true"))) {
+					break;
+				}
 			case 'pagehold':
 			case 'pageholdpulse':
 				if (oEvent.keyCode != _nKey) {
