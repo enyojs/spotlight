@@ -34,9 +34,9 @@ enyo.Spotlight = new function() {
 
 	var // Event hook to the owner to catch Spotlight Events
 		_interceptEvents = function() {
-			_oThis.rootDispatchFunction = _oRoot.dispatchEvent;
-			_oRoot.dispatchEvent = function(sEventName, oEvent, oSender) {
-				if (_oThis.rootDispatchFunction.apply(_oRoot, [sEventName, oEvent, oSender])) {
+			_oThis.rootDispatchFunction = enyo.master.dispatchEvent;
+			enyo.master.dispatchEvent = function(sEventName, oEvent, oSender) {
+				if (_oThis.rootDispatchFunction.apply(enyo.master, [sEventName, oEvent, oSender])) {
 					return true;
 				}
 				if (!oEvent.delegate) {
@@ -292,7 +292,7 @@ enyo.Spotlight = new function() {
 							return false;
 					}
 					// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
-					if (_isArrowKey(oEvent.keyCode)) {
+					if (_isArrowKey(oEvent.keyCode) || (oEvent.keyCode == 13)) {
 						var bWasPointerMode = this.getPointerMode();
 						this.setPointerMode(false);
 						
@@ -301,9 +301,11 @@ enyo.Spotlight = new function() {
 							return false;
 						}
 						
-						if (bWasPointerMode && !_oLastMouseMoveTarget) {
+						if (bWasPointerMode) {
 							// Spot last 5-way control, only if there's not already focus on screen
-							_oThis.spot(_oLastControl);
+							if (!_oLastMouseMoveTarget) {
+								_oThis.spot(_oLastControl);
+							}
 							return false;
 						}
 					}
@@ -652,18 +654,9 @@ enyo.Spotlight = new function() {
 			return false;
 		}
 		
-		if (!oControl.isDescendantOf(_oRoot)) {                                       // Can only spot descendants of _oRoot 
-			_warn(oControl.toString() + ' is not in tree of ' + _oRoot.toString());   //
-			return false;
-		}
-		
 		if (this.isFrozen()) {                                                        // Current cannot change while in frozen mode
 			_warn('can\'t spot in frozen mode');                                      //
 			return false;                                                             //
-		}
-		
-		if (oControl == _oCurrent) {                                                  // Not spotting currently spotted control
-			_highlight(oControl);
 		}
 		
 		var oOriginal = oControl;
@@ -672,7 +665,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (oControl) {
-			if (this.getPointerMode() && !bWasPoint && this.hasCurrent()) {	          // When the user calls spot programmatically in pointer mode, we don't actually
+			if (this.getPointerMode() && !bWasPoint) {	                              // When the user calls spot programmatically in pointer mode, we don't actually
 				this.unspot();                                                        // focus a new control, since that would cause the focus to move out from
 				_oLastControl = oControl;                                             // under the pointer; instead we just unspot and set up the _oLastControl 
 				_oLastMouseMoveTarget = null;                                         // used when resuming 5-way focus on an arrow key press
