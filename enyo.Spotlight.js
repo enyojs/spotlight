@@ -29,7 +29,10 @@ enyo.Spotlight = new function() {
 		_nMouseMoveCount                = 0,        // Number of consecutive mousemoves; require >1 to switch to pointer mode
 		_nPrevClientX                   = null,
 		_nPrevClientY                   = null,
-		_oLastMouseMoveTarget           = null;
+		_oLastMouseMoveTarget           = null,
+
+		_nPointerHiddenTime             = 0,        // Timestamp at the last point the pointer was hidden
+		_nPointerHiddenToKeyTimeout     = 300;      // Amount of time in ms to require after hiding pointer before 5-way keys are processed
 
 
 	var // Event hook to the owner to catch Spotlight Events
@@ -289,6 +292,7 @@ enyo.Spotlight = new function() {
 							if (!_oLastMouseMoveTarget) {
 								_oThis.spot(_oLastControl);
 							}
+							_nPointerHiddenTime = oEvent.timeStamp;
 							return false;
 					}
 					// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
@@ -300,12 +304,14 @@ enyo.Spotlight = new function() {
 							this.spot(this.getFirstChild(_oRoot));
 							return false;
 						}
+
+						if (oEvent.timeStamp < (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout)) {
+							return false;
+						}
 						
-						if (bWasPointerMode) {
+						if (bWasPointerMode && !_oLastMouseMoveTarget) {
 							// Spot last 5-way control, only if there's not already focus on screen
-							if (!_oLastMouseMoveTarget) {
-								_oThis.spot(_oLastControl);
-							}
+							_oThis.spot(_oLastControl);
 							return false;
 						}
 					}
