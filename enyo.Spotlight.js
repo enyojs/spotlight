@@ -248,7 +248,7 @@ enyo.Spotlight = new function() {
 			_bFocusOnScreen = true;
 		},
 		
-		_isPointingAway     = function()           { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; }
+		_isPointingAway     = function()           { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
 		_isTimestampExpired = function(nTimestamp) { return nTimestamp >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
 		_setTimestamp       = function(nTimestamp) { _nPointerHiddenTime = nTimestamp; },
 
