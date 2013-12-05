@@ -115,6 +115,8 @@ enyo.Spotlight = new function() {
 			_oCurrent = oControl;
 			_observeDisappearance(true, _oCurrent);
 				
+			_highlight(oControl);                                                 // Add spotlight class 
+
 			_log('CURRENT =', _oCurrent.toString());
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
@@ -365,9 +367,7 @@ enyo.Spotlight = new function() {
 				}
 			} else {
 				_oLastMouseMoveTarget = null;
-				if (_bFocusOnScreen) {
-					this.unspot();
-				}
+				this.unspot();
 			}
 		}
 	};
@@ -575,6 +575,9 @@ enyo.Spotlight = new function() {
 	this.getLastControl       = function()                { return _oLastControl;           };
 	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;         };
 
+	// Deprecated; provided for backward-compatibility
+	this.setLast5WayControl   = function(oControl)        { _oLastControl = oControl;       };
+
 	this.isSpottable = function(oControl) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return false; }
@@ -698,7 +701,6 @@ enyo.Spotlight = new function() {
 				_log("Spot called in pointer mode; 5-way will resume from: " + oControl.id);
 			} else {
 				this.unspot();                                                        // Blur last control before spotting new one
-				_highlight(oControl);                                                 // Add spotlight class 
 				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);      // Dispatch focus to new control
 			}
 			return true;
@@ -711,7 +713,7 @@ enyo.Spotlight = new function() {
 	// Dispatches spotlight blur event to current control
 	this.unspot = function() {
 		if (this.isFrozen()) { return false; }                                        // Current cannot change while in frozen mode
-		if (this.hasCurrent()) {
+		if (this.hasCurrent() && _bFocusOnScreen) {
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
 		}
