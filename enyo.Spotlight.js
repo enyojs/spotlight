@@ -75,6 +75,7 @@ enyo.Spotlight = new function() {
 			if (!oControl || !_oThis.isSpottable(oControl)) {                                       // Nothing is set in defaultSpotlightDisappear
 				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
 				if (!oControl) { 
+					_oLastControl = null;
 					_oCurrent = null;                                                       // NULL CASE :(, just like when no spottable children found on init
 					return;
 				}
@@ -452,15 +453,15 @@ enyo.Spotlight = new function() {
 			this.setPointerMode(false);
 			
 			if (!this.getCurrent()) {                            // Spot first available control on bootstrap
-				this.spot(this.getFirstChild(_oRoot));
+				this.spot(_oLastControl || this.getFirstChild(_oRoot));
 				return false;
 			}
 			
-			if (!_isTimestampExpired(oEvent.timeStamp)) {        // Does this immediately follow KEY_POINTER_HIDE
+			if (!_isTimestampExpired(oEvent.timeStamp) && !_oLastMouseMoveTarget) {        // Does this immediately follow KEY_POINTER_HIDE
 				return false;
 			}
 			
-			if (bWasPointerMode && !_oLastMouseMoveTarget) {     // Spot last 5-way control, only if there's not already focus on screen
+			if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {     // Spot last 5-way control, only if there's not already focus on screen
 				_oThis.spot(_oLastControl);
 				return false;
 			}
