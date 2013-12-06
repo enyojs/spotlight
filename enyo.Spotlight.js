@@ -24,7 +24,7 @@ enyo.Spotlight = new function() {
 		_bVerbose                       = false,    // In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
 		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
 		_oDefaultDisappear              = null,     // Contains control specified in defaultSpotlightDisappear property of _oCurrent
-		_bFocusOnScreen                 = false,    // Whether focus is currently visible on screen or not
+		_bFocusOnScreen                 = false,    // Whether focus is currently visible on screen or not (hasCurrent && !pointingAway) ??
 
 		_nMouseMoveCount                = 0,        // Number of consecutive mousemoves; require >1 to switch to pointer mode
 		_nPrevClientX                   = null,
@@ -250,6 +250,11 @@ enyo.Spotlight = new function() {
 			_bFocusOnScreen = true;
 		},
 		
+		_unhighlight = function(oControl) {
+			oControl.removeClass('spotlight');
+			_bFocusOnScreen = false;
+		},
+		
 		_isPointingAway     = function()           { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
 		_isTimestampExpired = function(nTimestamp) { return nTimestamp >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
 		_setTimestamp       = function(nTimestamp) { _nPointerHiddenTime = nTimestamp; },
@@ -379,7 +384,7 @@ enyo.Spotlight = new function() {
 		if (this.isFrozen()) {
 			if (_oPointed != _oCurrent) {
 				this.unfreeze();
-				this.spot(_oPointed);
+				this.spot(_oPointed, null, true);
 				return true;
 			}
 		}
@@ -417,13 +422,8 @@ enyo.Spotlight = new function() {
 	// Called by onEvent() to process tap and click events
 	this.onClick = function(oEvent) {
 		// Prevent browser-simulated "click" events when pressing enter on a focused form control from being processed;
-		// We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
-		if ((oEvent.clientX === 0) && (oEvent.clientY === 0) && 
-			(oEvent.type == "click" || oEvent.type == "tap")) {
-			return true;
-		}
-
-		if (this.getPointerMode()) { return false; } // Allow click to bubble
+		if (enyo.Spotlight.Util.isSimulatedClick(oEvent)) { return true;  } // Prevent browser-simulated "click" events when pressing enter on a focused form control
+		if (this.getPointerMode())                        { return false; } // Allow click to bubble
 
 		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
 		oEvent.preventDefault();
@@ -525,8 +525,7 @@ enyo.Spotlight = new function() {
 
 	this.onSpotlightBlur = function(oEvent) {
 		if (this.hasCurrent()) {
-			oEvent.originator.removeClass('spotlight');
-			_bFocusOnScreen = false;
+			_unhighlight(oEvent.originator);
 		}
 	};
 
@@ -694,13 +693,12 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (oControl) {
+			this.unspot();
 			if (this.getPointerMode() && !bWasPoint) {	                              // When the user calls spot programmatically in pointer mode, we don't actually
-				this.unspot();                                                        // focus a new control, since that would cause the focus to move out from
 				_oLastControl = oControl;                                             // under the pointer; instead we just unspot and set up the _oLastControl 
 				_oLastMouseMoveTarget = null;                                         // used when resuming 5-way focus on an arrow key press
 				_log("Spot called in pointer mode; 5-way will resume from: " + oControl.id);
 			} else {
-				this.unspot();                                                        // Blur last control before spotting new one
 				_dispatchEvent('onSpotlightFocus', {dir: sDirection}, oControl);      // Dispatch focus to new control
 			}
 			return true;
@@ -759,7 +757,6 @@ enyo.Spotlight = new function() {
 	this.freeze = function() {
 		if (!this.hasCurrent()) { throw 'Can not enter frozen mode until something is spotted'; }
 		_bFrozen = true;
-		_oCurrent.addClass('spotlight');
 		return 'SPOTLIGHT: Frozen on ' + _oCurrent.toString(); 
 	};
 	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  };
@@ -776,7 +773,6 @@ enyo.rendered(function(oRoot) {
 	// enyo.Spotlight.verbose();
 	enyo.Spotlight.initialize(oRoot);
 });
-
 
 
 
