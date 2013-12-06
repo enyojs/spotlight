@@ -130,6 +130,14 @@ enyo.Spotlight.Util = new function() {
 		}
 		return null;
 	};
+	
+	// We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
+	this.isSimulatedClick = function(oEvent) {
+		return (
+			oEvent.clientX === 0 && oEvent.clientY === 0 && 
+			(oEvent.type == 'click' || oEvent.type == 'tap')
+		);
+	};
 };
 
 // use faster classList interface if it exists
