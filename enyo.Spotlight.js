@@ -75,6 +75,7 @@ enyo.Spotlight = new function() {
 			if (!oControl || !_oThis.isSpottable(oControl)) {                                       // Nothing is set in defaultSpotlightDisappear
 				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
 				if (!oControl) { 
+					_oLastControl = null;
 					_oCurrent = null;                                                       // NULL CASE :(, just like when no spottable children found on init
 					return;
 				}
@@ -452,7 +453,7 @@ enyo.Spotlight = new function() {
 			this.setPointerMode(false);
 			
 			if (!this.getCurrent()) {                            // Spot first available control on bootstrap
-				this.spot(this.getFirstChild(_oRoot));
+				this.spot(this.getFirstChild(_oLastControl || _oRoot));
 				return false;
 			}
 			
