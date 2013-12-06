@@ -456,11 +456,11 @@ enyo.Spotlight = new function() {
 				return false;
 			}
 			
-			if (!_isTimestampExpired(oEvent.timeStamp)) {        // Does this immediately follow KEY_POINTER_HIDE
+			if (!_isTimestampExpired(oEvent.timeStamp) && !_oLastMouseMoveTarget) {        // Does this immediately follow KEY_POINTER_HIDE
 				return false;
 			}
 			
-			if (bWasPointerMode && !_oLastMouseMoveTarget) {     // Spot last 5-way control, only if there's not already focus on screen
+			if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {     // Spot last 5-way control, only if there's not already focus on screen
 				_oThis.spot(_oLastControl);
 				return false;
 			}
