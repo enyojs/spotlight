@@ -453,7 +453,7 @@ enyo.Spotlight = new function() {
 			this.setPointerMode(false);
 			
 			if (!this.getCurrent()) {                            // Spot first available control on bootstrap
-				this.spot(this.getFirstChild(_oLastControl || _oRoot));
+				this.spot(_oLastControl || this.getFirstChild(_oRoot));
 				return false;
 			}
 			
