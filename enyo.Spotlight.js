@@ -423,7 +423,7 @@ enyo.Spotlight = new function() {
 	this.onClick = function(oEvent) {
 		// Prevent browser-simulated "click" events when pressing enter on a focused form control from being processed;
 		if (enyo.Spotlight.Util.isSimulatedClick(oEvent)) { return true;  } // Prevent browser-simulated "click" events when pressing enter on a focused form control
- 		if (this.getPointerMode())                        { return false; } // Allow click to bubble
+		if (this.getPointerMode())                        { return false; } // Allow click to bubble
 
 		// In 5Way mode we are simulating enter key down/up based on mousedown/up, so suppress click
 		oEvent.preventDefault();
