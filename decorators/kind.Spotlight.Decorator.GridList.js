@@ -44,7 +44,7 @@ enyo.kind({
 
 		onSpotlightSelect: function(oSender, oEvent) {
 			if (this.getCurrent(oSender) !== null) {
-				enyo.Spotlight.Util.dispatchEvent('ontap', {index: this.getCurrent(oSender)}, oSender.$.generator.$.selection);
+				oSender.$.generator.$.selection.bubble("ontap", {index: this.getCurrent(oSender)});
 				this.setCurrent(oSender, this.getCurrent(oSender), true);
 			} else {
 				this.setCurrent(oSender, 0, true);
