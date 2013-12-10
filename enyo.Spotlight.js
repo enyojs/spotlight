@@ -158,11 +158,6 @@ enyo.Spotlight = new function() {
 			}
 		},
 		
-		// Is nKeyCode an arrow?
-		_isArrowKey = function(nKeyCode) {
-			return enyo.indexOf(nKeyCode, [37, 38, 39, 40]) > -1;
-		},
-		
 		// Is nKeyCode an arrow or enter
 		_is5WayKey = function(nKeyCode) {
 			return enyo.indexOf(nKeyCode, [37, 38, 39, 40, 13]) > -1;
