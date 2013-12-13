@@ -4,7 +4,9 @@
  */
 
 enyo.Spotlight.Util = new function() {
-	this.dispatchEvent = function(sEvent, oData, oControl) {
+	this.dispatchEvent = function(sEvent, oInData, oControl) {
+		var oData;
+
 		if (!oControl || oControl.destroyed) { return; }
 		
 		if (enyo.Spotlight.isFrozen()) {
@@ -12,7 +14,12 @@ enyo.Spotlight.Util = new function() {
 			oControl = enyo.Spotlight.getCurrent();
 		}
 		
-		oData            = oData ? (enyo.clone(oData) || {}) : {};
+		if (oInData) {
+			oData = enyo.clone(oInData);
+		} else {
+			oData = {};
+		}
+
 		oData.type       = sEvent;
 		oData.originator = oControl;
 		oData.originator.timestamp = oData.timeStamp;
