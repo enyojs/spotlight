@@ -158,11 +158,6 @@ enyo.Spotlight = new function() {
 			}
 		},
 		
-		// Is nKeyCode an arrow?
-		_isArrowKey = function(nKeyCode) {
-			return enyo.indexOf(nKeyCode, [37, 38, 39, 40]) > -1;
-		},
-		
 		// Is nKeyCode an arrow or enter
 		_is5WayKey = function(nKeyCode) {
 			return enyo.indexOf(nKeyCode, [37, 38, 39, 40, 13]) > -1;
@@ -171,7 +166,7 @@ enyo.Spotlight = new function() {
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
-			if (_isArrowKey(oSpotlightEvent.keyCode)) {      // Prevent default to keep the browser from scrolling the page, etc.,
+			if (_is5WayKey(oSpotlightEvent.keyCode)) {      // Prevent default to keep the browser from scrolling the page, etc.,
 				oSpotlightEvent.domEvent.preventDefault();   // unless Event.allowDomDefault is explicitly called on the event
 			}
 		},
