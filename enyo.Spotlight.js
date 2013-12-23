@@ -353,7 +353,7 @@ enyo.Spotlight = new function() {
 			var oTarget = _getTarget(oEvent.target.id);
 			if (oTarget && !this.isContainer(oTarget)) {
 				
-				if (
+				if (oTarget === this.getCurrent() &&
 					oTarget === _oLastMouseMoveTarget && (
 						oEvent.index === undefined || 
 						oEvent.index === _oLastMouseMoveTarget._nCurrentSpotlightItem
@@ -385,6 +385,20 @@ enyo.Spotlight = new function() {
 			}
 		}
 		
+		// Logic to handling focus when mouse down in 5 Way mode.
+		var oTarget = _getTarget(oEvent.target.id);
+		if (oTarget !== this.getCurrent()) {
+			if (this.isContainer(oTarget) || !_oThis.isSpottable(oTarget)) {
+				this.unspot();
+				this.setPointerMode(true);
+				return true;
+			} else {
+				if (!this.isContainer(oTarget)) {
+					this.spot(oTarget, null, true);	// Change spot to target under cursor
+				}
+			}
+		}
+
 		if (this.getPointerMode()) { return false; } // Allow mousedown to bubble
 
 		// Simulate an Enter key from Magic Remote click in 5Way mode
