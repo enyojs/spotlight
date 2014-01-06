@@ -251,9 +251,9 @@ enyo.Spotlight = new function() {
 			_bFocusOnScreen = false;
 		},
 		
-		_isPointingAway     = function()           { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
-		_isTimestampExpired = function(nTimestamp) { return nTimestamp >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
-		_setTimestamp       = function(nTimestamp) { _nPointerHiddenTime = nTimestamp; },
+		_isPointingAway     = function() { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
+		_isTimestampExpired = function() { return enyo.perfNow >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
+		_setTimestamp       = function() { _nPointerHiddenTime = enyo.perfNow; },
 
 		// enyo.logs messages in verbose mode
 		_log = function() {
@@ -438,7 +438,7 @@ enyo.Spotlight = new function() {
 				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
 					_oThis.spot(_oLastControl);
 				}
-				_setTimestamp(oEvent.timeStamp);
+				_setTimestamp();
 				return false;
 		}
 		
@@ -447,12 +447,12 @@ enyo.Spotlight = new function() {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 			
-			if (!this.getCurrent()) {                            // Spot first available control on bootstrap
+			if (!this.getCurrent()) {                                                // Spot first available control on bootstrap
 				this.spot(_oLastControl || this.getFirstChild(_oRoot));
 				return false;
 			}
 			
-			if (!_isTimestampExpired(oEvent.timeStamp) && !_oLastMouseMoveTarget) {        // Does this immediately follow KEY_POINTER_HIDE
+			if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {                  // Does this immediately follow KEY_POINTER_HIDE
 				return false;
 			}
 			
