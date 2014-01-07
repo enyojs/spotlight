@@ -44,6 +44,10 @@ enyo.kind({
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
 					} 
 					break;
+				case 'onSpotlightKeyDown':
+					// Inform other controls that spotlight 5-way event was generated within a container
+					oEvent.spotSentFromContainer = true;
+					break;
 			}
 		},
 
