@@ -252,8 +252,8 @@ enyo.Spotlight = new function() {
 		},
 		
 		_isPointingAway     = function() { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
-		_isTimestampExpired = function() { return enyo.perfNow >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
-		_setTimestamp       = function() { _nPointerHiddenTime = enyo.perfNow; },
+		_isTimestampExpired = function() { return enyo.perfNow() >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
+		_setTimestamp       = function() { _nPointerHiddenTime = enyo.perfNow(); },
 
 		// enyo.logs messages in verbose mode
 		_log = function() {
