@@ -586,7 +586,8 @@ enyo.Spotlight = new function() {
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing()               && // Control is visible
-				!oControl.disabled                             // Control is not disabled
+				!oControl.disabled                          && // Control is not disabled
+				!oControl.spotlightDisabled					   // Control does not have spotlight disabled
 			);
 		}
 		return bSpottable;
@@ -600,7 +601,7 @@ enyo.Spotlight = new function() {
 	
 	// Is there at least one descendant of oControl (or oControl itself) that has spotlight = "true"
 	this.hasChildren = function(oControl) {
-		if (!oControl) { return false; }
+		if (!oControl || oControl.spotlightDisabled) { return false; }
 		if (!this.isContainer(oControl) && this.isSpottable(oControl)) { return true; }
 		var n, aChildren = oControl.children;
 		for (n=0; n<aChildren.length; n++) {
@@ -636,12 +637,14 @@ enyo.Spotlight = new function() {
 			aChildren = [],
 			oNext;
 
-		for (n=0; n<oControl.children.length; n++) {
-			oNext = oControl.children[n];
-			if (this.isSpottable(oNext)) {
-				aChildren.push(oNext);
-			} else {
-				aChildren = aChildren.concat(this.getChildren(oNext));
+		if (!oControl.spotlightDisabled) {
+			for (n=0; n<oControl.children.length; n++) {
+				oNext = oControl.children[n];
+				if (this.isSpottable(oNext)) {
+					aChildren.push(oNext);
+				} else {
+					aChildren = aChildren.concat(this.getChildren(oNext));
+				}
 			}
 		}
 		return aChildren;

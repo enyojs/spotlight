@@ -44,6 +44,10 @@ enyo.kind({
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
 					} 
 					break;
+				case 'onSpotlightKeyDown':
+					// Inform other controls that spotlight 5-way event was generated within a container
+					oEvent.spotSentFromContainer = true;
+					break;
 			}
 		},
 
@@ -82,7 +86,7 @@ enyo.kind({
 			if (this._hadFocus(oSender)) {   // Focus came from inside AND this was a 5-way move
 				// console.log('FROM INSIDE', s5WayEventType);
 				if (s5WayEventType) {
-					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
+					enyo.Spotlight.Util.dispatchEvent(s5WayEventType, {spotSentFromContainer:true}, oSender);
 				}
 				this._focusLeave(oSender, s5WayEventType);
 			} else {                            // Focus came from outside or this was a programmic spot
@@ -91,7 +95,7 @@ enyo.kind({
 					enyo.Spotlight.spot(oLastFocusedChild);
 				} else {
 					if (s5WayEventType) {
-						enyo.Spotlight.Util.dispatchEvent(s5WayEventType, null, oSender);
+						enyo.Spotlight.Util.dispatchEvent(s5WayEventType, {spotSentFromContainer:true}, oSender);
 						return true;
 					}
 				}
