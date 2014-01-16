@@ -159,14 +159,27 @@ enyo.Spotlight = new function() {
 		},
 		
 		// Is nKeyCode an arrow or enter
-		_is5WayKey = function(nKeyCode) {
-			return enyo.indexOf(nKeyCode, [37, 38, 39, 40, 13]) > -1;
+		_is5WayKey = function(oEvent) {
+			// console.log("_is5WayKey:oEvent", oEvent);
+			var isInput = oEvent && oEvent.target && oEvent.target.nodeName && 
+				// (oEvent.keyCode != 13) &&
+				(
+					oEvent.target.nodeName === "INPUT" || 
+					oEvent.target.nodeName === "TEXTAREA"
+				);
+			return (enyo.indexOf(oEvent.keyCode, [37, 38, 39, 40, 13]) > -1) && !isInput;
+			// return (enyo.indexOf(oEvent.keyCode, [37, 38, 39, 40, 13]) > -1);
+			// && 
+				// (!oEvent.target || (oEvent.target == document.body));
 		},
+		// _is5WayKey = function(nKeyCode) {
+		// 	return enyo.indexOf(nKeyCode, [37, 38, 39, 40, 13]) > -1;
+		// },
 		
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
-			if (_is5WayKey(oSpotlightEvent.keyCode)) {      // Prevent default to keep the browser from scrolling the page, etc.,
+			if (_is5WayKey(oSpotlightEvent)) {      // Prevent default to keep the browser from scrolling the page, etc.,
 				oSpotlightEvent.domEvent.preventDefault();   // unless Event.allowDomDefault is explicitly called on the event
 			}
 		},
@@ -443,7 +456,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
-		if (_is5WayKey(oEvent.keyCode)) {
+		if (_is5WayKey(oEvent)) {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 			
