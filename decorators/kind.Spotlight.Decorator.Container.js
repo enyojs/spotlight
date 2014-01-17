@@ -42,7 +42,7 @@ enyo.kind({
 				case 'onSpotlightFocus':
 					if (oEvent.originator !== oSender) {
 						enyo.Spotlight.Decorator.Container.setLastFocusedChild(oSender, oEvent.originator);
-					} 
+					}
 					break;
 				case 'onSpotlightKeyDown':
 					// Inform other controls that spotlight 5-way event was generated within a container
@@ -117,10 +117,14 @@ enyo.kind({
 		// Set last focused child
 		setLastFocusedChild: function(oSender, oChild) {
 			if (!enyo.Spotlight.isSpottable(oChild)) {
+				oChild = this.getFirstChild(oChild);
+			}
+			if (oChild) {
+				oSender._spotlight = oSender._spotlight || {};
+				oSender._spotlight.lastFocusedChild = oChild;
+			} else {
 				enyo.warn('Spotlight Container' + oSender.name + ' has not spottable lastFocusedChild ' + oChild.name);
 			}
-			oSender._spotlight = oSender._spotlight || {};
-			oSender._spotlight.lastFocusedChild = oChild;
 		}
 	}
 });
