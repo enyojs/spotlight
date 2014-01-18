@@ -160,21 +160,19 @@ enyo.Spotlight = new function() {
 		
 		// Is nKeyCode an arrow or enter
 		_is5WayKey = function(oEvent) {
-			// console.log("_is5WayKey:oEvent", oEvent);
-			var isInput = oEvent && oEvent.target && oEvent.target.nodeName && 
-				// (oEvent.keyCode != 13) &&
+			// Lets check for an event, a target, the keycode, and which node we're in.
+			// If we receive an [Enter] while we're inside an Input or Textarea node,
+			// don't treat [Enter] as a 5-way key.
+			if (oEvent && oEvent.target && oEvent.target.nodeName && 
+				(oEvent.keyCode == 13) &&
 				(
 					oEvent.target.nodeName === "INPUT" || 
 					oEvent.target.nodeName === "TEXTAREA"
-				);
-			return (enyo.indexOf(oEvent.keyCode, [37, 38, 39, 40, 13]) > -1) && !isInput;
-			// return (enyo.indexOf(oEvent.keyCode, [37, 38, 39, 40, 13]) > -1);
-			// && 
-				// (!oEvent.target || (oEvent.target == document.body));
+				)) {
+				return false;
+			}
+			return (enyo.indexOf(oEvent.keyCode, [37, 38, 39, 40, 13]) > -1);
 		},
-		// _is5WayKey = function(nKeyCode) {
-		// 	return enyo.indexOf(nKeyCode, [37, 38, 39, 40, 13]) > -1;
-		// },
 		
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
