@@ -252,10 +252,9 @@ enyo.Spotlight = new function() {
 			_bFocusOnScreen = false;
 		},
 		
-		_isPointingAway     = function()           { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
-		_isTimestampExpired = function(nTimestamp) { return nTimestamp >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
-		_setTimestamp       = function(nTimestamp) { _nPointerHiddenTime = nTimestamp; },
-
+		_isPointingAway     = function() { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
+		_isTimestampExpired = function() { return enyo.perfNow() >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
+		_setTimestamp       = function() { _nPointerHiddenTime = enyo.perfNow(); },
 		// enyo.logs messages in verbose mode
 		_log = function() {
 			if (_bVerbose) {
@@ -322,7 +321,6 @@ enyo.Spotlight = new function() {
 
 	// Spotlight events bubbled back up to the App
 	this.onSpotlightEvent = function(oEvent) {
-		// if (oEvent.type && oEvent.type.indexOf('onSpotlight') != 0) { return true; }
 		_oLastEvent = oEvent;
 		if (_delegateSpotlightEvent(oEvent)) { return false; } // If decorator's onSpotlight<Event> method returns true - kill Spotlight event
 
@@ -441,7 +439,7 @@ enyo.Spotlight = new function() {
 				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
 					_oThis.spot(_oLastControl);
 				}
-				_setTimestamp(oEvent.timeStamp);
+				_setTimestamp();
 				return false;
 		}
 		
@@ -450,12 +448,12 @@ enyo.Spotlight = new function() {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 			
-			if (!this.getCurrent()) {                            // Spot first available control on bootstrap
+			if (!this.getCurrent()) {                                                // Spot first available control on bootstrap
 				this.spot(_oLastControl || this.getFirstChild(_oRoot));
 				return false;
 			}
 			
-			if (!_isTimestampExpired(oEvent.timeStamp) && !_oLastMouseMoveTarget) {        // Does this immediately follow KEY_POINTER_HIDE
+			if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {                  // Does this immediately follow KEY_POINTER_HIDE
 				return false;
 			}
 			
@@ -589,7 +587,8 @@ enyo.Spotlight = new function() {
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing(true)           && // Control is visible
-				!oControl.disabled                             // Control is not disabled
+				!oControl.disabled                          && // Control is not disabled
+				!oControl.spotlightDisabled                    // Control does not have spotlight disabled
 			);
 		}
 		return bSpottable;
@@ -603,7 +602,7 @@ enyo.Spotlight = new function() {
 	
 	// Is there at least one descendant of oControl (or oControl itself) that has spotlight = "true"
 	this.hasChildren = function(oControl) {
-		if (!oControl) { return false; }
+		if (!oControl || oControl.spotlightDisabled) { return false; }
 		if (!this.isContainer(oControl) && this.isSpottable(oControl)) { return true; }
 		var n, aChildren = oControl.children;
 		for (n=0; n<aChildren.length; n++) {
@@ -639,12 +638,14 @@ enyo.Spotlight = new function() {
 			aChildren = [],
 			oNext;
 
-		for (n=0; n<oControl.children.length; n++) {
-			oNext = oControl.children[n];
-			if (this.isSpottable(oNext)) {
-				aChildren.push(oNext);
-			} else {
-				aChildren = aChildren.concat(this.getChildren(oNext));
+		if (!oControl.spotlightDisabled) {
+			for (n=0; n<oControl.children.length; n++) {
+				oNext = oControl.children[n];
+				if (this.isSpottable(oNext)) {
+					aChildren.push(oNext);
+				} else {
+					aChildren = aChildren.concat(this.getChildren(oNext));
+				}
 			}
 		}
 		return aChildren;
