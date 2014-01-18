@@ -106,19 +106,18 @@ enyo.Spotlight = new function() {
 		
 		// Set currently spotted control. 
 		_setCurrent = function(oControl) {
-
 			_initializeControl(oControl);
 
 			if (!_oThis.isSpottable(oControl)) {
 				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
+			
+			_highlight(oControl);                                                 // Add spotlight class 
 
 			_observeDisappearance(false, _oCurrent);
 			_oCurrent = oControl;
 			_observeDisappearance(true, _oCurrent);
 				
-			_highlight(oControl);                                                 // Add spotlight class 
-
 			_log('CURRENT =', _oCurrent.toString());
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
@@ -261,7 +260,7 @@ enyo.Spotlight = new function() {
 			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
 			if (!_oThis.isInitialized())      { return; }  // Not highlighting first non-container control - see this.initialize()
 
-			enyo.Spotlight.bench.spotted = true;
+			// enyo.Spotlight.bench.stop();
 			oControl.addClass('spotlight');
 			_bFocusOnScreen = true;
 		},
@@ -354,7 +353,6 @@ enyo.Spotlight = new function() {
 			case 'onSpotlightUp'        : return this.onSpotlightUp(oEvent);
 			case 'onSpotlightDown'      : return this.onSpotlightDown(oEvent);
 			case 'onSpotlightSelect'    : return this.onSpotlightSelect(oEvent);
-			// case 'onSpotlightPoint'     : return this.onSpotlightPoint(oEvent);
 		}
 	};
 
@@ -383,9 +381,6 @@ enyo.Spotlight = new function() {
 				_oPointed  = oTarget;
 				
 				this.spot(oTarget, null, true);
-				// if (this.isSpottable(oTarget)) {
-				// 	_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-				// }
 			} else {
 				_oLastMouseMoveTarget = null;
 				this.unspot();
@@ -553,12 +548,6 @@ enyo.Spotlight = new function() {
 			_oLastMouseMoveTarget = null;
 		}
 	};
-
-	// this.onSpotlightPoint = function(oEvent) {
-	// 	if (!this.isContainer(oEvent.originator)) {
-	// 		this.spot(oEvent.originator, null, true);
-	// 	}
-	// };
 
 	//* Public
 	/******************* PUBLIC METHODS *********************/
@@ -803,20 +792,20 @@ enyo.rendered(function(oRoot) {
 });
 
 
-enyo.Spotlight.bench = new function() {
-	var _oBench = null;
-	
-	this.start = function() {
-		if (!_oBench) {
-			_oBench = enyo.dev.bench({name: 'bench1', average: true});
-		}
-		_oBench.start();
-	}
-	
-	this.stop = function() {
-		_oBench.stop();
-	}
-}
+// enyo.Spotlight.bench = new function() {
+// 	var _oBench = null;
+// 	
+// 	this.start = function() {
+// 		if (!_oBench) {
+// 			_oBench = enyo.dev.bench({name: 'bench1', average: true});
+// 		}
+// 		_oBench.start();
+// 	}
+// 	
+// 	this.stop = function() {
+// 		_oBench.stop();
+// 	}
+// }
 
 
 
