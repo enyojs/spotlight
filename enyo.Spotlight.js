@@ -242,6 +242,7 @@ enyo.Spotlight = new function() {
 			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
 			if (!_oThis.isInitialized())      { return; }  // Not highlighting first non-container control - see this.initialize()
 
+			enyo.Spotlight.bench.spotted = true;
 			oControl.addClass('spotlight');
 			_bFocusOnScreen = true;
 		},
@@ -251,9 +252,9 @@ enyo.Spotlight = new function() {
 			_bFocusOnScreen = false;
 		},
 		
-		_isPointingAway     = function() { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
-		_isTimestampExpired = function() { return enyo.perfNow() >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
-		_setTimestamp       = function() { _nPointerHiddenTime = enyo.perfNow(); },
+		_isPointingAway     = function()           { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
+		_isTimestampExpired = function(nTimestamp) { return nTimestamp >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
+		_setTimestamp       = function(nTimestamp) { _nPointerHiddenTime = nTimestamp; },
 
 		// enyo.logs messages in verbose mode
 		_log = function() {
@@ -274,7 +275,7 @@ enyo.Spotlight = new function() {
 	this.onEvent = function(oEvent) {
 		if (this.isInitialized()) {                      // Events only processed when Spotlight initialized with a root
 			switch (oEvent.type) {
-				case 'mousemove':
+				case 'move':
 					// Only register mousemove if the x/y actually changed, avoid mousemove while scrolling, etc.
 					// We require two mousemove events to switch to pointer mode, since the device can send an errant mousemove
 					// when pressing a 5-way key for the first time
@@ -321,6 +322,7 @@ enyo.Spotlight = new function() {
 
 	// Spotlight events bubbled back up to the App
 	this.onSpotlightEvent = function(oEvent) {
+		// if (oEvent.type && oEvent.type.indexOf('onSpotlight') != 0) { return true; }
 		_oLastEvent = oEvent;
 		if (_delegateSpotlightEvent(oEvent)) { return false; } // If decorator's onSpotlight<Event> method returns true - kill Spotlight event
 
@@ -335,7 +337,7 @@ enyo.Spotlight = new function() {
 			case 'onSpotlightUp'        : return this.onSpotlightUp(oEvent);
 			case 'onSpotlightDown'      : return this.onSpotlightDown(oEvent);
 			case 'onSpotlightSelect'    : return this.onSpotlightSelect(oEvent);
-			case 'onSpotlightPoint'     : return this.onSpotlightPoint(oEvent);
+			// case 'onSpotlightPoint'     : return this.onSpotlightPoint(oEvent);
 		}
 	};
 
@@ -363,9 +365,10 @@ enyo.Spotlight = new function() {
 				_oLastMouseMoveTarget = oTarget;
 				_oPointed  = oTarget;
 				
-				if (this.isSpottable(oTarget)) {
-					_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-				}
+				this.spot(oTarget, null, true);
+				// if (this.isSpottable(oTarget)) {
+				// 	_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
+				// }
 			} else {
 				_oLastMouseMoveTarget = null;
 				this.unspot();
@@ -438,7 +441,7 @@ enyo.Spotlight = new function() {
 				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
 					_oThis.spot(_oLastControl);
 				}
-				_setTimestamp();
+				_setTimestamp(oEvent.timeStamp);
 				return false;
 		}
 		
@@ -447,12 +450,12 @@ enyo.Spotlight = new function() {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 			
-			if (!this.getCurrent()) {                                                // Spot first available control on bootstrap
+			if (!this.getCurrent()) {                            // Spot first available control on bootstrap
 				this.spot(_oLastControl || this.getFirstChild(_oRoot));
 				return false;
 			}
 			
-			if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {                  // Does this immediately follow KEY_POINTER_HIDE
+			if (!_isTimestampExpired(oEvent.timeStamp) && !_oLastMouseMoveTarget) {        // Does this immediately follow KEY_POINTER_HIDE
 				return false;
 			}
 			
@@ -525,11 +528,11 @@ enyo.Spotlight = new function() {
 		}
 	};
 
-	this.onSpotlightPoint = function(oEvent) {
-		if (!this.isContainer(oEvent.originator)) {
-			this.spot(oEvent.originator, null, true);
-		}
-	};
+	// this.onSpotlightPoint = function(oEvent) {
+	// 	if (!this.isContainer(oEvent.originator)) {
+	// 		this.spot(oEvent.originator, null, true);
+	// 	}
+	// };
 
 	//* Public
 	/******************* PUBLIC METHODS *********************/
@@ -585,9 +588,8 @@ enyo.Spotlight = new function() {
 				!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
-				oControl.getAbsoluteShowing()               && // Control is visible
-				!oControl.disabled                          && // Control is not disabled
-				!oControl.spotlightDisabled					   // Control does not have spotlight disabled
+				oControl.getAbsoluteShowing(true)           && // Control is visible
+				!oControl.disabled                             // Control is not disabled
 			);
 		}
 		return bSpottable;
@@ -601,7 +603,7 @@ enyo.Spotlight = new function() {
 	
 	// Is there at least one descendant of oControl (or oControl itself) that has spotlight = "true"
 	this.hasChildren = function(oControl) {
-		if (!oControl || oControl.spotlightDisabled) { return false; }
+		if (!oControl) { return false; }
 		if (!this.isContainer(oControl) && this.isSpottable(oControl)) { return true; }
 		var n, aChildren = oControl.children;
 		for (n=0; n<aChildren.length; n++) {
@@ -637,14 +639,12 @@ enyo.Spotlight = new function() {
 			aChildren = [],
 			oNext;
 
-		if (!oControl.spotlightDisabled) {
-			for (n=0; n<oControl.children.length; n++) {
-				oNext = oControl.children[n];
-				if (this.isSpottable(oNext)) {
-					aChildren.push(oNext);
-				} else {
-					aChildren = aChildren.concat(this.getChildren(oNext));
-				}
+		for (n=0; n<oControl.children.length; n++) {
+			oNext = oControl.children[n];
+			if (this.isSpottable(oNext)) {
+				aChildren.push(oNext);
+			} else {
+				aChildren = aChildren.concat(this.getChildren(oNext));
 			}
 		}
 		return aChildren;
@@ -773,6 +773,21 @@ enyo.rendered(function(oRoot) {
 	enyo.Spotlight.initialize(oRoot);
 });
 
+
+enyo.Spotlight.bench = new function() {
+	var _oBench = null;
+	
+	this.start = function() {
+		if (!_oBench) {
+			_oBench = enyo.dev.bench({name: 'bench1', average: true});
+		}
+		_oBench.start();
+	}
+	
+	this.stop = function() {
+		_oBench.stop();
+	}
+}
 
 
 
