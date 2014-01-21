@@ -158,15 +158,33 @@ enyo.Spotlight = new function() {
 			}
 		},
 		
-		// Is nKeyCode an arrow or enter
-		_is5WayKey = function(nKeyCode) {
-			return enyo.indexOf(nKeyCode, [37, 38, 39, 40, 13]) > -1;
+		// Is oEvent.keyCode an arrow or enter
+		_is5WayKey = function(oEvent) {
+			// 13==Enter, 16777221==KeypadEnter
+			return (enyo.indexOf(oEvent.keyCode, [37, 38, 39, 40, 13, 16777221]) > -1);
 		},
-		
+
+		// Is the key that was pressed, one that is supposed to be ignored by the event's originator?
+		// This checks for whether the originator of the event, had any keyCodes specified, that it was supposed to ignore;
+		// returning true if it was supposed to ignore the oEvent.keyCode, or false if not.
+		_isIgnoredKey = function(oEvent) {
+			var oOriginator = enyo.$[oEvent.target.id];
+			if (oOriginator && oOriginator.spotlightIgnoredKeys) {
+				var aKeys = oOriginator.spotlightIgnoredKeys;
+				if (!enyo.isArray(aKeys)) {
+					aKeys = [aKeys];
+				}
+				if (enyo.indexOf(oEvent.keyCode, aKeys) > -1) {
+					return true;
+				}
+			}
+			return false;
+		},
+
 		// Prevent default on dom event associated with spotlight event
 		// This is only for 5Way keydown events
 		_preventDomDefault = function(oSpotlightEvent) {
-			if (_is5WayKey(oSpotlightEvent.keyCode)) {      // Prevent default to keep the browser from scrolling the page, etc.,
+			if (_is5WayKey(oSpotlightEvent)) {      // Prevent default to keep the browser from scrolling the page, etc.,
 				oSpotlightEvent.domEvent.preventDefault();   // unless Event.allowDomDefault is explicitly called on the event
 			}
 		},
@@ -428,6 +446,11 @@ enyo.Spotlight = new function() {
 	
 	// Called by onEvent() to process keydown
 	this.onKeyDown = function(oEvent) {
+
+		if (_isIgnoredKey(oEvent)) {
+			return true;
+		}
+
 		//Update pointer mode based on special keycode from Input Manager for magic remote show/hide
 		switch (oEvent.keyCode) {
 			case KEY_POINTER_SHOW:                               // Pointer shown event; set pointer mode true
@@ -443,7 +466,7 @@ enyo.Spotlight = new function() {
 		}
 		
 		// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
-		if (_is5WayKey(oEvent.keyCode)) {
+		if (_is5WayKey(oEvent)) {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 			
@@ -468,6 +491,9 @@ enyo.Spotlight = new function() {
 	};
 	
 	this.onKeyUp = function(oEvent) {
+		if (_isIgnoredKey(oEvent)) {
+			return true;
+		}
 		enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 		return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
 	};
