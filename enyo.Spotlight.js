@@ -89,21 +89,19 @@ enyo.Spotlight = new function() {
 		// Add observers on control's parent chain
 		_observeDisappearance = function(bObserve, oControl, bInAncestor) {
 			if (!oControl) { return; }                                                               // Terminal case
-			setTimeout(function() {
-				var sMethod = bObserve ? 'addObserver' : 'removeObserver';
-				if (!bInAncestor) {                                                                      // When processing _oCurrent itself
-					if (bObserve) {                                                                      // When adding observer to _oCurrent itself
-						_onDisappear.isOff = false;                                                      // Set one-time-call flag of _onDisappear function
-						_setDefaultDisappearControl();                                                   // Capture defaultSpotlightDisappear control
-					}
-					oControl[sMethod]('disabled',  _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
-					oControl[sMethod]('destroyed', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
-					oControl[sMethod]('spotlight', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+			var sMethod = bObserve ? 'addObserver' : 'removeObserver';
+			if (!bInAncestor) {                                                                      // When processing _oCurrent itself
+				if (bObserve) {                                                                      // When adding observer to _oCurrent itself
+					_onDisappear.isOff = false;                                                      // Set one-time-call flag of _onDisappear function
+					_setDefaultDisappearControl();                                                   // Capture defaultSpotlightDisappear control
 				}
-				oControl[sMethod]('showing', _onDisappear);                                              // Have to add-remove hadler to all ancestors for showing
-			
-				_observeDisappearance(bObserve, oControl.parent, true);
-			}, 1);
+				oControl[sMethod]('disabled',  _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+				oControl[sMethod]('destroyed', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+				oControl[sMethod]('spotlight', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+			}
+			oControl[sMethod]('showing', _onDisappear);                                              // Have to add-remove hadler to all ancestors for showing
+		
+			_observeDisappearance(bObserve, oControl.parent, true);
 		},
 		
 		// Set currently spotted control. 
@@ -115,10 +113,14 @@ enyo.Spotlight = new function() {
 			}
 			
 			_highlight(oControl);                                                 // Add spotlight class 
-
-			_observeDisappearance(false, _oCurrent);
+			
+			var oExCurrent = _oCurrent;
+			
 			_oCurrent = oControl;
-			_observeDisappearance(true, _oCurrent);
+			setTimeout(function() {                                               // Set observers asynchronously to allow paint happen faster
+				_observeDisappearance(false, oExCurrent);
+				_observeDisappearance(true, _oCurrent);
+			}, 1);
 				
 			_log('CURRENT =', _oCurrent.toString());
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
