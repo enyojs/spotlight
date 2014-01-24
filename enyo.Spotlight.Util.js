@@ -56,7 +56,7 @@ enyo.Spotlight.Util = new function() {
 		return false;
 	};
 
-	this.getAbsoluteBounds = function(oControl) {
+	this.getAbsoluteBounds = function(oControl, bMatrix3d) {
 		var oLeft           = 0,
 			oTop            = 0,
 			oMatch          = null,
@@ -65,9 +65,12 @@ enyo.Spotlight.Util = new function() {
 			nHeight         = oNode.offsetHeight,
 			sTransformProp  = enyo.dom.getStyleTransformProp(),
 			oXRegEx         = /translateX\((-?\d+)px\)/i,
-			oYRegEx         = /translateY\((-?\d+)px\)/i;
+			oYRegEx         = /translateY\((-?\d+)px\)/i,
+			oM3RegEx       = /(?!matrix3d\()(-?\d+|-?\d+\.\d+)(?=[,\)])/g,
+			style           = "";
 
-		if (oNode.offsetParent) {
+		// Fix here per offsetParent is skip node of strategy client which is having matrix3d scroll position
+		if ((!bMatrix3d && oNode.offsetParent) || (bMatrix3d && oNode.parentNode)) {
 			do {
 				// Fix for FF (GF-2036), offsetParent is working differently between FF and chrome
 				if (enyo.platform.firefox) {
@@ -77,17 +80,30 @@ enyo.Spotlight.Util = new function() {
 					oLeft += oNode.offsetLeft - (oNode.offsetParent ? oNode.offsetParent.scrollLeft : 0);
 					oTop  += oNode.offsetTop  - (oNode.offsetParent ? oNode.offsetParent.scrollTop  : 0);
 				}
+				style = oNode.style[sTransformProp];
 				if (sTransformProp) {
-					oMatch = oNode.style[sTransformProp].match(oXRegEx);
+					oMatch = style.match(oXRegEx);
 					if (oMatch && typeof oMatch[1] != 'undefined' && oMatch[1]) {
 						oLeft += parseInt(oMatch[1], 10);
 					}
-					oMatch = oNode.style[sTransformProp].match(oYRegEx);
+					oMatch = style.match(oYRegEx);
 					if (oMatch && typeof oMatch[1] != 'undefined' && oMatch[1]) {
 						oTop += parseInt(oMatch[1], 10);
 					}
+					// Consider Matrix3D 
+					// ex) matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, -5122.682003906055, 1, 1)
+					oMatch = style.match(oM3RegEx);
+					if (bMatrix3d && oMatch && oMatch.length === 16) {
+						if (typeof oMatch[12] != 'undefined' && oMatch[12] !== "0") {
+							oLeft += parseFloat(oMatch[12]);
+						}
+						if (typeof oMatch[13] != 'undefined' && oMatch[13] !== "0") {
+							oTop += parseFloat(oMatch[13]);
+						}
+					}
 				}
-			} while ((oNode = oNode.offsetParent));
+				if (!oNode.offsetParent) { break; }
+			} while ((oNode = bMatrix3d ? oNode.parentNode : oNode.offsetParent));
 		}
 		return {
 			top     : oTop,
@@ -98,7 +114,6 @@ enyo.Spotlight.Util = new function() {
 			width   : nWidth
 		};
 	};
-
 	this.hasClass = function(o, s) {
 		if (!o || !o.className) { return; }
 		return (' ' + o.className + ' ').indexOf(' ' + s + ' ') >= 0;
