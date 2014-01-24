@@ -75,6 +75,7 @@ enyo.Spotlight = new function() {
 			if (!oControl || !_oThis.isSpottable(oControl)) {                                       // Nothing is set in defaultSpotlightDisappear
 				oControl = _oThis.getFirstChild(_oRoot);                                            // Find first spottable in the app 
 				if (!oControl) { 
+					_unhighlight(_oLastControl);
 					_oLastControl = null;
 					_oCurrent = null;                                                       // NULL CASE :(, just like when no spottable children found on init
 					return;
