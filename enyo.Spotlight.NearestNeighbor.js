@@ -170,7 +170,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			nBestMatch    = 0,
 			nBestDistance = 0,
 
-			oBounds1      = enyo.Spotlight.Util.getAbsoluteBounds(oControl, true),
+			oBounds1      = oControl.getAbsoluteBounds(),
 			oBounds2      = null,
 			o             = enyo.Spotlight.getSiblings(oControl),
 			nLen          = o.siblings.length,
