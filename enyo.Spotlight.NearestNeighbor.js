@@ -170,7 +170,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			nBestMatch    = 0,
 			nBestDistance = 0,
 
-			oBounds1      = enyo.Spotlight.Util.getAbsoluteBounds(oControl),
+			oBounds1      = oControl.getAbsoluteBounds(),
 			oBounds2      = null,
 			o             = enyo.Spotlight.getSiblings(oControl),
 			nLen          = o.siblings.length,
@@ -182,7 +182,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			oSibling = o.siblings[n];
 			if (oSibling === oControl) { continue; }
 
-			oBounds2 = enyo.Spotlight.Util.getAbsoluteBounds(oSibling);
+			oBounds2 = oSibling.getAbsoluteBounds();
 
 			// If control is in half plane specified by direction
 			if (_isInHalfPlane(sDirection, oBounds1, oBounds2)) {
