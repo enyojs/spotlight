@@ -1,6 +1,7 @@
 enyo.depends(
 	'version.js',
 	'enyo.Spotlight.js',
+	'enyo.Spotlight.Container.js',
 	'enyo.Spotlight.Util.js',
 	'enyo.Spotlight.Accelerator.js',
 	'enyo.Spotlight.Scrolling.js',
