@@ -192,9 +192,6 @@ if (window.onyx && onyx.Picker) {
 					return true;
 				}
 				enyo.Spotlight.Util.removeClass(this._getButton(oSender).hasNode(), 'spotlight');
-			},
-
-			onSpotlightPoint: function(oSender, oEvent) {
 			}
 		}
 	});

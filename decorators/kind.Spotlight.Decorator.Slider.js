@@ -51,9 +51,6 @@ if (window.onyx && onyx.Slider) {
 				if (!this._getSelected(oSender, true))  { return false; }
 				oSender.animateTo(oSender.value + oSender.increment);
 				return true;
-			},
-
-			onSpotlightPoint: function(oSender, oEvent) {
 			}
 		}
 	});
