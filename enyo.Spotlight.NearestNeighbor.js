@@ -177,7 +177,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			oSibling      = null,
 			nPrecedence,
 			nDistance;
-			
+
 		for (n=0; n<nLen; n++) {
 			oSibling = o.siblings[n];
 			if (oSibling === oControl) { continue; }
