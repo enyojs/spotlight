@@ -113,22 +113,22 @@ enyo.kind({
 		},
 
 		setCurrent: function(oSender, n, bScrollIntoView) {
-			var nCurrent = this.getCurrent(oSender);
-
-			if (nCurrent !== null) {
-				this._blurNode(oSender, nCurrent);
-			}
-
+			var nCurrent = this.getCurrent(oSender);			
 			if (n !== null) {
-				this._focusNode(oSender, n);
-				oSender._nCurrentSpotlightItem = n;
-				if (bScrollIntoView) {
-					var nd = this._getNodeParent(oSender, n);
-					if (!oSender.$.strategy.isInView(nd)) {
-						oSender.animateToNode(nd, true);
+				var nd = enyo.Spotlight.getPointerMode() || this._getNodeParent(oSender, n);
+				if (nd) {
+					if (nCurrent !== null) {
+						this._blurNode(oSender, nCurrent);
 					}
+					this._focusNode(oSender, n);
+					oSender._nCurrentSpotlightItem = n;
+					if (bScrollIntoView) {
+						if (!oSender.$.strategy.isInView(nd)) {
+							oSender.animateToNode(nd, true);
+						}
+					}
+					enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 				}
-				enyo.Spotlight.Util.dispatchEvent('onSpotlightItemFocus', {index: n}, oSender);
 			}
 			enyo.Spotlight.Util.removeClass(oSender.node, 'spotlight');
 		}
