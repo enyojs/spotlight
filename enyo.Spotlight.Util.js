@@ -10,7 +10,7 @@ enyo.Spotlight.Util = new function() {
 		if (!oControl || oControl.destroyed) { return; }
 		
 		if (enyo.Spotlight.isFrozen()) {
-			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
+			if (sEvent == 'onSpotlightBlur') { return; }
 			oControl = enyo.Spotlight.getCurrent();
 		}
 		
