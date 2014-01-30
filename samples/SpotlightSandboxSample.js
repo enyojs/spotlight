@@ -55,7 +55,7 @@ enyo.kind({
 	},
 	
 	mousedown: function(inSender, inEvent) {
-		enyo.Spotlight.TestMode.disable()
+		enyo.Spotlight.TestMode.disable();
 		// check if resizing
 		this.resizing = this.isResizing(inEvent);
 
@@ -68,7 +68,7 @@ enyo.kind({
 	},
 	
 	mouseup: function(oSender, oEvent) {
-		enyo.Spotlight.TestMode.enable()
+		enyo.Spotlight.TestMode.enable();
 	},
 	
 	drag: function(inSender, inEvent) {
