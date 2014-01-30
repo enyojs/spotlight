@@ -20,7 +20,7 @@ enyo.kind({
 		}
 	},
 	addBarracuda: function() {
-		var b = this.$.container.createComponent({kind: 'Barracuda'}, {iii: this.container.children.length}).render();
+		var b = this.$.container.createComponent({kind: 'Barracuda'}).render();
 		b.applyStyle('z-index:'+this.$.container.getClientControls().length+';');
 	}
 });
