@@ -139,4 +139,4 @@ enyo.Spotlight.Container = new function() {
 		}
 	};
 	
-}
+};

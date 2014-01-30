@@ -15,7 +15,6 @@ enyo.Spotlight = new function() {
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent
 		_oCurrent                       = null,     // Currently spotlighted element
-		_oDecorators                    = {},       // For further optimization
 		_oLastEvent                     = null,     // Last event received by Spotlight
 		_oLast5WayEvent                 = null,     // Last 5way event received by Spotlight
 		_oLastControl                   = null,     // Last non-container (spotlight:true) control that was _oCurrent
@@ -192,7 +191,7 @@ enyo.Spotlight = new function() {
 		// If originator is container, delegate processing of event to enyo.Spotlight.Container.onSpotlight*
 		// Return values: if found method to delegate, return it's return value otherwise return true
 		_delegateContainerEvent = function(oEvent) {
-			if (oEvent.type && oEvent.type.indexOf('onSpotlight') == 0) {
+			if (oEvent.type && oEvent.type.indexOf('onSpotlight') === 0) {
 				if (_oThis.isContainer(oEvent.originator)) {
 					if (typeof enyo.Spotlight.Container[oEvent.type] == 'function') {
 						return enyo.Spotlight.Container[oEvent.type](oEvent.originator, oEvent);
