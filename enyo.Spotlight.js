@@ -580,7 +580,7 @@ enyo.Spotlight = new function() {
 	this.isInitialized = function() { return _bInitialized; };
 
 	this.setPointerMode  = function(bPointerMode) {
-		if (_bPointerMode != bPointerMode) {
+		if ((_bPointerMode != bPointerMode) && (!enyo.platform.touch)) {
 			_bPointerMode = bPointerMode;
 			_log('Pointer mode', _bPointerMode);
 			_nMouseMoveCount = 0;
