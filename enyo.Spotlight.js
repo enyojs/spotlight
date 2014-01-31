@@ -548,6 +548,7 @@ enyo.Spotlight = new function() {
 	this.onSpotlightBlur = function(oEvent) {
 		if (this.hasCurrent()) {
 			_unhighlight(oEvent.originator);
+			_oLastMouseMoveTarget = null;
 		}
 	};
 
