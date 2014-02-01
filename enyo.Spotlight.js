@@ -100,25 +100,28 @@ enyo.Spotlight = new function() {
 				oControl[sMethod]('spotlight', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
 			}
 			oControl[sMethod]('showing', _onDisappear);                                              // Have to add-remove hadler to all ancestors for showing
-			
+		
 			_observeDisappearance(bObserve, oControl.parent, true);
 		},
 		
 		// Set currently spotted control. 
 		_setCurrent = function(oControl) {
-
 			_initializeControl(oControl);
 
 			if (!_oThis.isSpottable(oControl)) {
 				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
-
-			_observeDisappearance(false, _oCurrent);
-			_oCurrent = oControl;
-			_observeDisappearance(true, _oCurrent);
-				
+			
 			_highlight(oControl);                                                 // Add spotlight class 
-
+			
+			var oExCurrent = _oCurrent;
+			
+			_oCurrent = oControl;
+			setTimeout(function() {                                               // Set observers asynchronously to allow paint happen faster
+				_observeDisappearance(false, oExCurrent);
+				_observeDisappearance(true, _oCurrent);
+			}, 1);
+				
 			_log('CURRENT =', _oCurrent.toString());
 			enyo.Signals.send('onSpotlightCurrentChanged', {current: oControl});
 
@@ -261,6 +264,7 @@ enyo.Spotlight = new function() {
 			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
 			if (!_oThis.isInitialized())      { return; }  // Not highlighting first non-container control - see this.initialize()
 
+			// enyo.Spotlight.bench.stop();
 			oControl.addClass('spotlight');
 			_bFocusOnScreen = true;
 		},
@@ -273,7 +277,6 @@ enyo.Spotlight = new function() {
 		_isPointingAway     = function() { return _oThis.getPointerMode() && !_oLastMouseMoveTarget; },
 		_isTimestampExpired = function() { return enyo.perfNow() >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout); },
 		_setTimestamp       = function() { _nPointerHiddenTime = enyo.perfNow(); },
-
 		// enyo.logs messages in verbose mode
 		_log = function() {
 			if (_bVerbose) {
@@ -293,7 +296,7 @@ enyo.Spotlight = new function() {
 	this.onEvent = function(oEvent) {
 		if (this.isInitialized()) {                      // Events only processed when Spotlight initialized with a root
 			switch (oEvent.type) {
-				case 'mousemove':
+				case 'move':
 					// Only register mousemove if the x/y actually changed, avoid mousemove while scrolling, etc.
 					// We require two mousemove events to switch to pointer mode, since the device can send an errant mousemove
 					// when pressing a 5-way key for the first time
@@ -354,7 +357,6 @@ enyo.Spotlight = new function() {
 			case 'onSpotlightUp'        : return this.onSpotlightUp(oEvent);
 			case 'onSpotlightDown'      : return this.onSpotlightDown(oEvent);
 			case 'onSpotlightSelect'    : return this.onSpotlightSelect(oEvent);
-			case 'onSpotlightPoint'     : return this.onSpotlightPoint(oEvent);
 		}
 	};
 
@@ -382,9 +384,7 @@ enyo.Spotlight = new function() {
 				_oLastMouseMoveTarget = oTarget;
 				_oPointed  = oTarget;
 				
-				if (this.isSpottable(oTarget)) {
-					_dispatchEvent('onSpotlightPoint', oEvent, oTarget);
-				}
+				this.spot(oTarget, null, true);
 			} else {
 				_oLastMouseMoveTarget = null;
 				this.unspot();
@@ -553,12 +553,6 @@ enyo.Spotlight = new function() {
 		}
 	};
 
-	this.onSpotlightPoint = function(oEvent) {
-		if (!this.isContainer(oEvent.originator)) {
-			this.spot(oEvent.originator, null, true);
-		}
-	};
-
 	//* Public
 	/******************* PUBLIC METHODS *********************/
 	
@@ -613,9 +607,9 @@ enyo.Spotlight = new function() {
 				!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
-				oControl.getAbsoluteShowing()               && // Control is visible
+				oControl.getAbsoluteShowing(true)           && // Control is visible
 				!oControl.disabled                          && // Control is not disabled
-				!oControl.spotlightDisabled					   // Control does not have spotlight disabled
+				!oControl.spotlightDisabled                    // Control does not have spotlight disabled
 			);
 		}
 		return bSpottable;
@@ -801,6 +795,21 @@ enyo.rendered(function(oRoot) {
 	enyo.Spotlight.initialize(oRoot);
 });
 
+
+// enyo.Spotlight.bench = new function() {
+// 	var _oBench = null;
+// 	
+// 	this.start = function() {
+// 		if (!_oBench) {
+// 			_oBench = enyo.dev.bench({name: 'bench1', average: true});
+// 		}
+// 		_oBench.start();
+// 	}
+// 	
+// 	this.stop = function() {
+// 		_oBench.stop();
+// 	}
+// }
 
 
 
