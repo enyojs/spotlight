@@ -148,11 +148,6 @@ The following events are dispatched by the main Spotlight module:
     `-enyo.Spotlight.Scrolling.frequency` (Default: 40)
 
 
-#### Pointer mode
-
-- **onSpotlightPoint**: Dispatched in response to `mousemove`, with coordinates
-    matching the bounds of the spottable control
-
 <br />     
 
 <a name="6_2"></a>
