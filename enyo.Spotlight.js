@@ -381,10 +381,10 @@ enyo.Spotlight = new function() {
 					)
 				) { return; } // ignore consecutive mouse moves on same target
 				
+				this.spot(oTarget, null, true);
 				_oLastMouseMoveTarget = oTarget;
 				_oPointed  = oTarget;
-				
-				this.spot(oTarget, null, true);
+
 			} else {
 				_oLastMouseMoveTarget = null;
 				this.unspot();
