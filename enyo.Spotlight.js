@@ -398,6 +398,7 @@ enyo.Spotlight = new function() {
 			var oTarget = _getTarget(oEvent.target.id);
 			if (oTarget != _oCurrent && !oEvent.defaultPrevented) {
 				this.unfreeze();
+				this.unspot();
 				if (oTarget) {
 					this.spot(oTarget, null, true);
 				}
