@@ -98,6 +98,7 @@ enyo.Spotlight = new function() {
 				oControl[sMethod]('disabled',  _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
 				oControl[sMethod]('destroyed', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
 				oControl[sMethod]('spotlight', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
+				oControl[sMethod]('generated', _onDisappear);                                        // Enough to check in _oCurrent only, no ancestors
 			}
 			oControl[sMethod]('showing', _onDisappear);                                              // Have to add-remove hadler to all ancestors for showing
 		
