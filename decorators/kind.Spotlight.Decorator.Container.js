@@ -117,7 +117,7 @@ enyo.kind({
 		// Set last focused child
 		setLastFocusedChild: function(oSender, oChild) {
 			if (!enyo.Spotlight.isSpottable(oChild)) {
-				oChild = this.getFirstChild(oChild);
+				oChild = enyo.Spotlight.getFirstChild(oChild);
 			}
 			if (oChild) {
 				oSender._spotlight = oSender._spotlight || {};
