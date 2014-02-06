@@ -288,6 +288,14 @@ enyo.Spotlight = new function() {
 		// enyo.warns messages
 		_warn = function() {
 			enyo.warn('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
+		},
+
+		_spotLastControl = function() {
+			if (_oThis.isSpottable(_oLastControl)) {
+				_oThis.spot(_oLastControl);	
+			} else {
+				_oThis.spot(_oThis.getFirstChild(_oRoot));
+			}
 		};
 
 	//* Generic event handlers
@@ -333,7 +341,6 @@ enyo.Spotlight = new function() {
 				//enyo.log('Dummy funciton');
 			};
 		};
-
 		switch (oEvent.type) {
 			case 'keydown'  : return _dispatchEvent('onSpotlightKeyDown', oEvent);
 			case 'keyup'    : return _dispatchEvent('onSpotlightKeyUp'  , oEvent);
@@ -461,7 +468,7 @@ enyo.Spotlight = new function() {
 			case KEY_POINTER_HIDE:                               // Pointer hidden event; set pointer mode false
 				this.setPointerMode(false);
 				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
-					_oThis.spot(_oLastControl);
+					_spotLastControl();
 				}
 				_setTimestamp();
 				return false;
@@ -471,9 +478,9 @@ enyo.Spotlight = new function() {
 		if (_is5WayKey(oEvent)) {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
-			
+
 			if (!this.getCurrent()) {                                                // Spot first available control on bootstrap
-				this.spot(_oLastControl || this.getFirstChild(_oRoot));
+				_spotLastControl();
 				return false;
 			}
 			
@@ -482,7 +489,7 @@ enyo.Spotlight = new function() {
 			}
 			
 			if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {     // Spot last 5-way control, only if there's not already focus on screen
-				_oThis.spot(_oLastControl);
+				_spotLastControl();
 				return false;
 			}
 		}
@@ -610,6 +617,7 @@ enyo.Spotlight = new function() {
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing(true)           && // Control is visible
 				!oControl.disabled                          && // Control is not disabled
+				oControl.generated                          && // Control is rendered
 				!oControl.spotlightDisabled                    // Control does not have spotlight disabled
 			);
 		}
