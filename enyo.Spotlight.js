@@ -604,7 +604,7 @@ enyo.Spotlight = new function() {
 			bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
 		} else {
 			bSpottable = (
-				!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
+				!oControl.destroyed                         && // Control has been destroyed, but not yet garbage collected
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing(true)           && // Control is visible
