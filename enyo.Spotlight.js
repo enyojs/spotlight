@@ -394,6 +394,11 @@ enyo.Spotlight = new function() {
 
 	// Called by onEvent() to process mousedown events
 	this.onMouseDown = function(oEvent) {
+
+		// Run mousemove logic first, in case content beneath cursor changed since
+		// last mousemove, e.g. animating controls
+		this.onMouseMove(oEvent);
+
 		// Logic to exit frozen mode when depressing control other then current
 		// And transfer spotlight directly to it
 		if (this.isFrozen()) {
