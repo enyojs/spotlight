@@ -449,7 +449,7 @@ enyo.Spotlight = new function() {
 	this.onKeyDown = function(oEvent) {
 
 		if (_isIgnoredKey(oEvent)) {
-			return true;
+			return false;
 		}
 
 		//Update pointer mode based on special keycode from Input Manager for magic remote show/hide
