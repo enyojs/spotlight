@@ -11,7 +11,6 @@ enyo.Spotlight = new function() {
 	var _oThis                          = this,     // Reference to this to be inherited by private closures below
 		_oRoot                          = null,     // Topmost component instance where spotlight events are caught
 		_oDefaultControl                = null,     // Is being set by spot() if it is being called before initialize() to be spotted in initialize()
-		_oPointed                       = null,     // Currently pointed control
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent
 		_oCurrent                       = null,     // Currently spotlighted element
@@ -391,7 +390,6 @@ enyo.Spotlight = new function() {
 				
 				this.spot(oTarget, null, true);
 				_oLastMouseMoveTarget = oTarget;
-				_oPointed  = oTarget;
 
 			} else {
 				_oLastMouseMoveTarget = null;
@@ -410,9 +408,13 @@ enyo.Spotlight = new function() {
 		// Logic to exit frozen mode when depressing control other then current
 		// And transfer spotlight directly to it
 		if (this.isFrozen()) {
-			if (_oPointed != _oCurrent) {
+			var oTarget = _getTarget(oEvent.target.id);
+			if (oTarget != _oCurrent && !oEvent.defaultPrevented) {
 				this.unfreeze();
-				this.spot(_oPointed, null, true);
+				this.unspot();
+				if (oTarget) {
+					this.spot(oTarget, null, true);
+				}
 				return true;
 			}
 		}
