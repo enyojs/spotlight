@@ -10,7 +10,7 @@ enyo.Spotlight.Util = new function() {
 		if (!oControl || oControl.destroyed) { return; }
 		
 		if (enyo.Spotlight.isFrozen()) {
-			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
+			if (sEvent == 'onSpotlightBlur') { return; }
 			oControl = enyo.Spotlight.getCurrent();
 		}
 		
@@ -56,47 +56,13 @@ enyo.Spotlight.Util = new function() {
 		return false;
 	};
 
+	/** 
+		Left for backward compatibility; users should call the getAbsoluteBounds instance
+		function of enyo.Control (or enyo.dom.getAbsoluteBounds for nodes) instead.
+	*/
 	this.getAbsoluteBounds = function(oControl) {
-		var oLeft           = 0,
-			oTop            = 0,
-			oMatch          = null,
-			oNode           = oControl instanceof enyo.Control ? oControl.hasNode() : oControl,
-			nWidth          = oNode.offsetWidth,
-			nHeight         = oNode.offsetHeight,
-			sTransformProp  = enyo.dom.getStyleTransformProp(),
-			oXRegEx         = /translateX\((-?\d+)px\)/i,
-			oYRegEx         = /translateY\((-?\d+)px\)/i;
-
-		if (oNode.offsetParent) {
-			do {
-				// Fix for FF (GF-2036), offsetParent is working differently between FF and chrome
-				if (enyo.platform.firefox) {
-					oLeft += oNode.offsetLeft;
-					oTop  += oNode.offsetTop;
-				} else {
-					oLeft += oNode.offsetLeft - (oNode.offsetParent ? oNode.offsetParent.scrollLeft : 0);
-					oTop  += oNode.offsetTop  - (oNode.offsetParent ? oNode.offsetParent.scrollTop  : 0);
-				}
-				if (sTransformProp) {
-					oMatch = oNode.style[sTransformProp].match(oXRegEx);
-					if (oMatch && typeof oMatch[1] != 'undefined' && oMatch[1]) {
-						oLeft += parseInt(oMatch[1], 10);
-					}
-					oMatch = oNode.style[sTransformProp].match(oYRegEx);
-					if (oMatch && typeof oMatch[1] != 'undefined' && oMatch[1]) {
-						oTop += parseInt(oMatch[1], 10);
-					}
-				}
-			} while ((oNode = oNode.offsetParent));
-		}
-		return {
-			top     : oTop,
-			left    : oLeft,
-			bottom  : document.body.offsetHeight - oTop  - nHeight,
-			right   : document.body.offsetWidth  - oLeft - nWidth,
-			height  : nHeight,
-			width   : nWidth
-		};
+		var node = oControl instanceof enyo.Control ? oControl.hasNode() : oControl;
+		return enyo.dom.getAbsoluteBounds(node);
 	};
 
 	this.hasClass = function(o, s) {
