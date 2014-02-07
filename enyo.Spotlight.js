@@ -394,6 +394,11 @@ enyo.Spotlight = new function() {
 
 	// Called by onEvent() to process mousedown events
 	this.onMouseDown = function(oEvent) {
+
+		// Run mousemove logic first, in case content beneath cursor changed since
+		// last mousemove, e.g. animating controls
+		this.onMouseMove(oEvent);
+
 		// Logic to exit frozen mode when depressing control other then current
 		// And transfer spotlight directly to it
 		if (this.isFrozen()) {
@@ -449,7 +454,7 @@ enyo.Spotlight = new function() {
 	this.onKeyDown = function(oEvent) {
 
 		if (_isIgnoredKey(oEvent)) {
-			return true;
+			return false;
 		}
 
 		//Update pointer mode based on special keycode from Input Manager for magic remote show/hide
@@ -604,7 +609,7 @@ enyo.Spotlight = new function() {
 			bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
 		} else {
 			bSpottable = (
-				!oControl._destroyed                        && // Control has been destroyed, but not yet garbage collected
+				!oControl.destroyed                         && // Control has been destroyed, but not yet garbage collected
 				typeof oControl.spotlight != 'undefined'    && // Control has spotlight property set
 				oControl.spotlight                          && // Control has spotlight=true or 'container'
 				oControl.getAbsoluteShowing(true)           && // Control is visible
