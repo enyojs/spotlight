@@ -486,7 +486,7 @@ enyo.Spotlight = new function() {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 
-			if (!this.getCurrent()) {                                                // Spot first available control on bootstrap
+			if (!this.isSpottable(this.getCurrent())) {                              // Spot first available control on bootstrap
 				_spotLastControl();
 				return false;
 			}
