@@ -295,6 +295,28 @@ enyo.Spotlight = new function() {
 			} else {
 				_oThis.spot(_oThis.getFirstChild(_oRoot));
 			}
+		},
+
+		_spotNearestToPointer = function(oEvent) {
+			var oNearest = enyo.Spotlight.NearestNeighbor.getNearestPointerNeighbor(_oRoot, _getSpotDirection(oEvent), _nPrevClientX, _nPrevClientY);
+			if (oNearest) {
+				_oThis.spot(oNearest);
+			} else {
+				_spotLastControl();
+			}
+		},
+
+		_getSpotDirection = function(oEvent) {
+			switch (oEvent.keyCode) {
+				case 37: 
+					return "LEFT";
+				case 38: 
+					return "UP";
+				case 39: 
+					return "RIGHT";
+				case 40: 
+					return "DOWN";
+			}
 		};
 
 	//* Generic event handlers
@@ -487,7 +509,7 @@ enyo.Spotlight = new function() {
 			this.setPointerMode(false);
 
 			if (!this.isSpottable(this.getCurrent())) {                              // Spot first available control on bootstrap
-				_spotLastControl();
+				_spotNearestToPointer(oEvent);
 				return false;
 			}
 			
@@ -496,7 +518,7 @@ enyo.Spotlight = new function() {
 			}
 			
 			if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {     // Spot last 5-way control, only if there's not already focus on screen
-				_spotLastControl();
+				_spotNearestToPointer(oEvent);
 				return false;
 			}
 		}
@@ -668,7 +690,7 @@ enyo.Spotlight = new function() {
 	};
 	
 	// Returns all spottable children
-	this.getChildren = function(oControl) {
+	this.getChildren = function(oControl, bExpandContainers) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
 		var n,
@@ -678,10 +700,10 @@ enyo.Spotlight = new function() {
 		if (!oControl.spotlightDisabled) {
 			for (n=0; n<oControl.children.length; n++) {
 				oNext = oControl.children[n];
-				if (this.isSpottable(oNext)) {
+				if (this.isSpottable(oNext) && ((bExpandContainers && !this.isContainer(oNext)) || !bExpandContainers)) {
 					aChildren.push(oNext);
 				} else {
-					aChildren = aChildren.concat(this.getChildren(oNext));
+					aChildren = aChildren.concat(this.getChildren(oNext, bExpandContainers));
 				}
 			}
 		}
