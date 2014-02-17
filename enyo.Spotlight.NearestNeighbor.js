@@ -193,8 +193,8 @@ enyo.Spotlight.NearestNeighbor = new function() {
 	//* @public
 	/**************************************************************/
 
-	this.getNearestPointerNeighbor = function(oRoot, sDirection, positionX, positionY) {
-		var oBounds = {left: positionX, top: positionY, width: 1, height: 1},
+	this.getNearestPointerNeighbor = function(oRoot, sDirection, nPositionX, nPositionY) {
+		var oBounds = {left: nPositionX, top: nPositionY, width: 1, height: 1},
 			o       = enyo.Spotlight.getChildren(oRoot, true);
 
 		return _calculateNearestNeighbor(o, sDirection, oBounds);

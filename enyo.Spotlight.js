@@ -297,6 +297,8 @@ enyo.Spotlight = new function() {
 			}
 		},
 
+		// Attempts to spot the control nearest the current pointer position.
+		// If no nearest control is found, the previous control is spotted.
 		_spotNearestToPointer = function(oEvent) {
 			var oNearest = enyo.Spotlight.NearestNeighbor.getNearestPointerNeighbor(_oRoot, _getSpotDirection(oEvent), _nPrevClientX, _nPrevClientY);
 			if (oNearest) {
@@ -306,6 +308,7 @@ enyo.Spotlight = new function() {
 			}
 		},
 
+		// Determines the intended direction of a keypress, given a keydown event.
 		_getSpotDirection = function(oEvent) {
 			switch (oEvent.keyCode) {
 				case 37: 
@@ -689,18 +692,23 @@ enyo.Spotlight = new function() {
 		return o;
 	};
 	
-	// Returns all spottable children
+	// Returns all spottable children. 
+	// If bExpandContainers is "true", spotlight = "container" controls will not be
+	// returned in the array of children, and the descandants of these controls will
+	// instead be examined (only spotlight = "true" controls will be returned).
 	this.getChildren = function(oControl, bExpandContainers) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
 		var n,
 			aChildren = [],
-			oNext;
+			oNext,
+			bValidControl;
 
 		if (!oControl.spotlightDisabled) {
 			for (n=0; n<oControl.children.length; n++) {
 				oNext = oControl.children[n];
-				if (this.isSpottable(oNext) && ((bExpandContainers && !this.isContainer(oNext)) || !bExpandContainers)) {
+				bValidControl = (bExpandContainers && !this.isContainer(oNext)) || !bExpandContainers;
+				if (this.isSpottable(oNext) && bValidControl) {
 					aChildren.push(oNext);
 				} else {
 					aChildren = aChildren.concat(this.getChildren(oNext, bExpandContainers));
