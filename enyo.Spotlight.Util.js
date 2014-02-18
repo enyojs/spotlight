@@ -10,7 +10,7 @@ enyo.Spotlight.Util = new function() {
 		if (!oControl || oControl.destroyed) { return; }
 		
 		if (enyo.Spotlight.isFrozen()) {
-			if (sEvent == 'onSpotlightBlur' || sEvent == 'onSpotlightPoint') { return; }
+			if (sEvent == 'onSpotlightBlur') { return; }
 			oControl = enyo.Spotlight.getCurrent();
 		}
 		
@@ -26,7 +26,16 @@ enyo.Spotlight.Util = new function() {
 		oData.target     = oControl.hasNode();
 		oData.customEvent = (oData.customEvent === undefined) ? true : oData.customEvent;
 
-		return enyo.dispatcher.dispatch(oData);
+		if (oData.target) {
+			// We attempt to dispatch all spotlight events through the low-level dispatcher,
+			// so that they can be filtered through features like the modal/capture feature
+			return enyo.dispatcher.dispatch(oData);
+		} else {
+			// However, if a control has been teardownRendered (and has no node) we still
+			// need to ensure it gets lifecycle events like onSpotlightBlur, so we dispatch
+			// directly to the control
+			return enyo.dispatcher.dispatchBubble(oData, oControl);
+		}
 	};
 
 	// Attach event hook to capture events coming from within the container
