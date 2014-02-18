@@ -500,12 +500,12 @@ enyo.Spotlight = new function() {
 			case KEY_POINTER_HIDE:                               // Pointer hidden event; set pointer mode false
 				this.setPointerMode(false);
 				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
-					_spotLastControl();
+					enyo.asyncMethod(this, function() { _spotLastControl(); });
 				}
 				_setTimestamp();
 				return false;
 		}
-		
+
 		// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
 		if (_is5WayKey(oEvent)) {
 			var bWasPointerMode = this.getPointerMode();
@@ -517,6 +517,7 @@ enyo.Spotlight = new function() {
 			}
 			
 			if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {                  // Does this immediately follow KEY_POINTER_HIDE
+				_spotNearestToPointer(oEvent);
 				return false;
 			}
 			
@@ -635,13 +636,15 @@ enyo.Spotlight = new function() {
 	// Deprecated; provided for backward-compatibility
 	this.setLast5WayControl   = function(oControl)        { _oLastControl = oControl;       };
 
-	this.isSpottable = function(oControl) {
+	this.isSpottable = function(oControl, bSkipContainers) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return false; }
 		var bSpottable = false;
 		
 		if (this.isContainer(oControl)) {
-			bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
+			if (!bSkipContainers) {
+				bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
+			}
 		} else {
 			bSpottable = (
 				!oControl.destroyed                         && // Control has been destroyed, but not yet garbage collected
@@ -693,25 +696,23 @@ enyo.Spotlight = new function() {
 	};
 	
 	// Returns all spottable children. 
-	// If bExpandContainers is "true", spotlight = "container" controls will not be
-	// returned in the array of children, and the descandants of these controls will
-	// instead be examined (only spotlight = "true" controls will be returned).
-	this.getChildren = function(oControl, bExpandContainers) {
+	// If bSpotlightTrueOnly is "true", only spotlight = "true" controls will
+	// be returned in the array of children. As a result, spotlight = "container"
+	// controls will not be included, but rather their descendants will be examined.
+	this.getChildren = function(oControl, bSpotlightTrueOnly) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
 		var n,
 			aChildren = [],
-			oNext,
-			bValidControl;
+			oNext;
 
 		if (!oControl.spotlightDisabled) {
 			for (n=0; n<oControl.children.length; n++) {
 				oNext = oControl.children[n];
-				bValidControl = (bExpandContainers && !this.isContainer(oNext)) || !bExpandContainers;
-				if (this.isSpottable(oNext) && bValidControl) {
+				if (this.isSpottable(oNext, bSpotlightTrueOnly)) {
 					aChildren.push(oNext);
 				} else {
-					aChildren = aChildren.concat(this.getChildren(oNext, bExpandContainers));
+					aChildren = aChildren.concat(this.getChildren(oNext, bSpotlightTrueOnly));
 				}
 			}
 		}
@@ -799,8 +800,10 @@ enyo.Spotlight = new function() {
 			_nPrevClientY !== oEvent.clientY
 		);
 
-		_nPrevClientX = oEvent.clientX;
-		_nPrevClientY = oEvent.clientY;
+		if (this.getPointerMode()) {
+			_nPrevClientX = oEvent.clientX;
+			_nPrevClientY = oEvent.clientY;
+		}
 
 		return bChanged;
 	};
