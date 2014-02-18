@@ -14,7 +14,6 @@ enyo.Spotlight = new function() {
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent
 		_oCurrent                       = null,     // Currently spotlighted element
-		_oDecorators                    = {},       // For further optimization
 		_oLastEvent                     = null,     // Last event received by Spotlight
 		_oLast5WayEvent                 = null,     // Last 5way event received by Spotlight
 		_oLastControl                   = null,     // Last non-container (spotlight:true) control that was _oCurrent
@@ -193,57 +192,16 @@ enyo.Spotlight = new function() {
 			}
 		},
 
-		// Get decorator for a control
-		_getDecorator = function(oSender) {
-			if (_oThis.isContainer(oSender)) {   // Process containers
-				return enyo.Spotlight.Decorator['Container'];
-			}
-
-			if (oSender.spotlightDecorate === false) {
-				return null;
-			}
-
-			if (typeof _oDecorators[oSender.kindName] != 'undefined') {
-				return _oDecorators[oSender.kindName];
-			}
-
-			var oDecorator = null,
-				oDecorates,
-				oDecoratesOld,
-				o;
-
-			// Process non-containers
-			for (var s in enyo.Spotlight.Decorator) {                                  // Loop through decorators namespace
-				o = enyo.Spotlight.Decorator[s];
-				oDecorates = enyo.getPath(o.decorates);
-				if (oDecorates && oSender instanceof oDecorates) {                     // If decorator applies to oSender
-					if (!oDecorator) {                                                 // If decorator was NOT set in previous iteration
-						oDecorator = o;                                                // Set it to the first value
-					} else {                                                           // If decorator WAS set in previous iteration
-						oDecoratesOld = enyo.getPath(oDecorator.decorates);
-						if (oDecorates.prototype instanceof oDecoratesOld) {           // IF oDecorates is closer to oSender in lineage
-							oDecorator = o;                                            // Set it as optimal decorator
-						}
+		// If originator is container, delegate processing of event to enyo.Spotlight.Container.onSpotlight*
+		// Return values: if found method to delegate, return it's return value otherwise return true
+		_delegateContainerEvent = function(oEvent) {
+			if (oEvent.type && oEvent.type.indexOf('onSpotlight') === 0) {
+				if (_oThis.isContainer(oEvent.originator)) {
+					if (typeof enyo.Spotlight.Container[oEvent.type] == 'function') {
+						return enyo.Spotlight.Container[oEvent.type](oEvent.originator, oEvent);
 					}
 				}
 			}
-
-			_oDecorators[oSender.kindName] = oDecorator;       // Hash decorator by sender kind
-			return oDecorator;
-		},
-
-		// If decorator present, delegate event to it's corresponding method
-		// Return values: if found method to delegate, return it's return value otherwise return true
-		_delegateSpotlightEvent = function(oEvent) {
-			if (!oEvent.type || oEvent.type.indexOf('onSpotlight') !== 0) { return false; }
-
-			var oSender    = oEvent.originator,
-				oDecorator = _getDecorator(oSender);
-
-			if (oDecorator && typeof oDecorator[oEvent.type] == 'function') {
-				return oDecorator[oEvent.type](oSender, oEvent);
-			}
-
 			return false;
 		},
 
@@ -376,19 +334,20 @@ enyo.Spotlight = new function() {
 	// Spotlight events bubbled back up to the App
 	this.onSpotlightEvent = function(oEvent) {
 		_oLastEvent = oEvent;
-		if (_delegateSpotlightEvent(oEvent)) { return false; } // If decorator's onSpotlight<Event> method returns true - kill Spotlight event
-
-		switch (oEvent.type) {
-			case 'onSpotlightKeyUp'     : return this.onSpotlightKeyUp(oEvent);
-			case 'onSpotlightKeyDown'   : return this.onSpotlightKeyDown(oEvent);
-			case 'onSpotlightFocus'     : return this.onSpotlightFocus(oEvent);
-			case 'onSpotlightFocused'   : return this.onSpotlightFocused(oEvent);
-			case 'onSpotlightBlur'      : return this.onSpotlightBlur(oEvent);
-			case 'onSpotlightLeft'      : return this.onSpotlightLeft(oEvent);
-			case 'onSpotlightRight'     : return this.onSpotlightRight(oEvent);
-			case 'onSpotlightUp'        : return this.onSpotlightUp(oEvent);
-			case 'onSpotlightDown'      : return this.onSpotlightDown(oEvent);
-			case 'onSpotlightSelect'    : return this.onSpotlightSelect(oEvent);
+		
+		if (!_delegateContainerEvent(oEvent)) {
+			switch (oEvent.type) {
+				case 'onSpotlightKeyUp'     : return this.onSpotlightKeyUp(oEvent);
+				case 'onSpotlightKeyDown'   : return this.onSpotlightKeyDown(oEvent);
+				case 'onSpotlightFocus'     : return this.onSpotlightFocus(oEvent);
+				case 'onSpotlightFocused'   : return this.onSpotlightFocused(oEvent);
+				case 'onSpotlightBlur'      : return this.onSpotlightBlur(oEvent);
+				case 'onSpotlightLeft'      : return this.onSpotlightLeft(oEvent);
+				case 'onSpotlightRight'     : return this.onSpotlightRight(oEvent);
+				case 'onSpotlightUp'        : return this.onSpotlightUp(oEvent);
+				case 'onSpotlightDown'      : return this.onSpotlightDown(oEvent);
+				case 'onSpotlightSelect'    : return this.onSpotlightSelect(oEvent);
+			}
 		}
 	};
 
