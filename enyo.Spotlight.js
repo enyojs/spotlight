@@ -295,6 +295,31 @@ enyo.Spotlight = new function() {
 			} else {
 				_oThis.spot(_oThis.getFirstChild(_oRoot));
 			}
+		},
+
+		// Attempts to spot the control nearest the current pointer position.
+		// If no nearest control is found, the previous control is spotted.
+		_spotNearestToPointer = function(oEvent) {
+			var oNearest = enyo.Spotlight.NearestNeighbor.getNearestPointerNeighbor(_oRoot, _getSpotDirection(oEvent), _nPrevClientX, _nPrevClientY);
+			if (oNearest) {
+				_oThis.spot(oNearest);
+			} else {
+				_spotLastControl();
+			}
+		},
+
+		// Determines the intended direction of a keypress, given a keydown event.
+		_getSpotDirection = function(oEvent) {
+			switch (oEvent.keyCode) {
+				case 37: 
+					return "LEFT";
+				case 38: 
+					return "UP";
+				case 39: 
+					return "RIGHT";
+				case 40: 
+					return "DOWN";
+			}
 		};
 
 	//* Generic event handlers
@@ -475,28 +500,29 @@ enyo.Spotlight = new function() {
 			case KEY_POINTER_HIDE:                               // Pointer hidden event; set pointer mode false
 				this.setPointerMode(false);
 				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
-					_spotLastControl();
+					enyo.asyncMethod(this, function() { _spotLastControl(); });
 				}
 				_setTimestamp();
 				return false;
 		}
-		
+
 		// Arrow keys immediately switch to 5-way mode, and re-spot focus on screen if it wasn't already
 		if (_is5WayKey(oEvent)) {
 			var bWasPointerMode = this.getPointerMode();
 			this.setPointerMode(false);
 
 			if (!this.isSpottable(this.getCurrent())) {                              // Spot first available control on bootstrap
-				_spotLastControl();
+				_spotNearestToPointer(oEvent);
 				return false;
 			}
 			
 			if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {                  // Does this immediately follow KEY_POINTER_HIDE
+				_spotNearestToPointer(oEvent);
 				return false;
 			}
 			
 			if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {     // Spot last 5-way control, only if there's not already focus on screen
-				_spotLastControl();
+				_spotNearestToPointer(oEvent);
 				return false;
 			}
 		}
@@ -610,13 +636,15 @@ enyo.Spotlight = new function() {
 	// Deprecated; provided for backward-compatibility
 	this.setLast5WayControl   = function(oControl)        { _oLastControl = oControl;       };
 
-	this.isSpottable = function(oControl) {
+	this.isSpottable = function(oControl, bSkipContainers) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return false; }
 		var bSpottable = false;
 		
 		if (this.isContainer(oControl)) {
-			bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
+			if (!bSkipContainers) {
+				bSpottable = this.hasChildren(oControl);           // Are there spotlight=true descendants?
+			}
 		} else {
 			bSpottable = (
 				!oControl.destroyed                         && // Control has been destroyed, but not yet garbage collected
@@ -667,8 +695,11 @@ enyo.Spotlight = new function() {
 		return o;
 	};
 	
-	// Returns all spottable children
-	this.getChildren = function(oControl) {
+	// Returns all spottable children. 
+	// If bSpotlightTrueOnly is "true", only spotlight = "true" controls will
+	// be returned in the array of children. As a result, spotlight = "container"
+	// controls will not be included, but rather their descendants will be examined.
+	this.getChildren = function(oControl, bSpotlightTrueOnly) {
 		oControl = oControl || this.getCurrent();
 		if (!oControl) { return; }
 		var n,
@@ -678,10 +709,10 @@ enyo.Spotlight = new function() {
 		if (!oControl.spotlightDisabled) {
 			for (n=0; n<oControl.children.length; n++) {
 				oNext = oControl.children[n];
-				if (this.isSpottable(oNext)) {
+				if (this.isSpottable(oNext, bSpotlightTrueOnly)) {
 					aChildren.push(oNext);
 				} else {
-					aChildren = aChildren.concat(this.getChildren(oNext));
+					aChildren = aChildren.concat(this.getChildren(oNext, bSpotlightTrueOnly));
 				}
 			}
 		}
@@ -769,8 +800,10 @@ enyo.Spotlight = new function() {
 			_nPrevClientY !== oEvent.clientY
 		);
 
-		_nPrevClientX = oEvent.clientX;
-		_nPrevClientY = oEvent.clientY;
+		if (this.getPointerMode()) {
+			_nPrevClientX = oEvent.clientX;
+			_nPrevClientY = oEvent.clientY;
+		}
 
 		return bChanged;
 	};
