@@ -9,6 +9,5 @@ enyo.depends(
 	'enyo.Spotlight.Muter.js',
 	'enyo.Spotlight.States.js',
 	'enyo.Spotlight.TestMode.js',
-	'decorators',
 	'css'
 );
