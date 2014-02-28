@@ -206,7 +206,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
 		// Check to see if default direction is specified
 		var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
-		if (oNeighbor) { return oNeighbor; }
+		if (oNeighbor && enyo.Spotlight.isSpottable(oNeighbor)) { return oNeighbor; }
 
 		// If default control in the directin of navigation is not specified, calculate it
 
