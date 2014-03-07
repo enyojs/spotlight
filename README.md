@@ -15,6 +15,8 @@
 7. [Extending Spotlight](#7)
 	1. [Spotlight Decorators](#7.1)
 	2. [Extending Controls](#7.2)
+8. [Control Parameters](#8)
+9. [Copyright and License Information](#9)
 
 <a name="1"></a>
 ## 1. WHAT IS SPOTLIGHT? ##
@@ -56,8 +58,8 @@ set its `spotlight` property to `TRUE`, like so:
 
     {name: 'mybutton', tag: 'button', spotlight: true}
 
-Note that Enyo UI libraries such as _Moonstone_ are built with default Spotlight 
-support, such that any control can be focused using pointer or 5-way keys without 
+Note that Enyo UI libraries such as _Moonstone_ are built with default Spotlight
+support, such that any control can be focused using pointer or 5-way keys without
 setting any special flags or configuration.  In general, setting the `spotlight:true`
 flag explicitly is only required when building custom UI controls or libraries.
 
@@ -82,7 +84,7 @@ We've created a [demo](samples/ContainerSample.html) to display Nearest Neighbor
 ## 4. CONTAINERS ##
 
 In order to organize controls into navigation groups, we have created Spotlight
-containers. 
+containers.
 
 A good example use case for containers is a set of radio buttons that must be
 navigable separate from the rest of the app's controls.
@@ -97,7 +99,7 @@ To define a container, set a control's `spotlight` property to `"container"`:
     {name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}
 
 In a way, containers may be thought of as the branches--and `spotlight:true`
-controls as the leaves--of the Spotlight navigation tree. 
+controls as the leaves--of the Spotlight navigation tree.
 
 We've created a [demo](samples/ContainerSample.html) to display container behavior.
 
@@ -145,12 +147,12 @@ The following events are dispatched by the main Spotlight module:
 - **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
     bubbling to app level right after its originator is set as current
 - **onSpotlightScrollUp**: Dispatched when `mousewheel` event delta exceeds
-    `enyo.Spotlight.Scrolling.frequency` (Default: 40)  
+    `enyo.Spotlight.Scrolling.frequency` (Default: 40)
 - **onSpotlightScrollDown**: Dispatched when `mousewheel` negative event delta exceeds
     `-enyo.Spotlight.Scrolling.frequency` (Default: 40)
 
 
-<br />     
+<br />
 
 <a name="6_2"></a>
 ### 6.2. Preventing or Allowing Default DOM events ###
@@ -163,7 +165,7 @@ Spotlight, scrolling is handled using components such as Scroller.
 Of course, there are some cases where you may want to allow the default browser
 behavior.  For example, in text inputs, you may want to allow the cursor to move
 to the next character when the right arrow key is pressed, without any
-interference from JavaScript. 
+interference from JavaScript.
 
 For such cases, we have included an **Allow DOM Default** feature.  The events
 `onSpotlightKeyDown`, `onSpotlightLeft`, `onSpotlightRight`, `onSpotlightUp`,
@@ -177,8 +179,8 @@ with an added `allowDomDefault` method:
 In the above handler, if the Spotlight event is allowed to propagate, it will
 allow the original DOM `keydown` to trigger default browser behavior. (See
 [Figure A](#A)).
-   
-<br />  
+
+<br />
 
 <a name="6.3"></a>
 ### 6.3. Sequence of Spotlight Events ###
@@ -277,7 +279,7 @@ scroll event when returning from pointer mode.
 <a name="6.6"></a>
 ### 6.6. Default 5-way controls ###
 
-Sometimes Nearest Neighbor algorithm is just not enough. 
+Sometimes Nearest Neighbor algorithm is just not enough.
 Application UI specs may require you to specify where spotlight focus should move in response to 5-way event.
 
 For cases like that Spotlight has convenience properties:
@@ -293,7 +295,7 @@ Spotlight will move focus to control, which name is specified in the property:
 
 	{name: 'control1', spotlight: true, defaultSpotlightRight: 'control2'},
 	{name: 'control2', spotlight: true, defaultSpotlightRight: 'control1'}
-	 
+
 In this example, focus will be passed back and forth between both controls with every right arrow button press.
 
 <a name="7"></a>
@@ -320,3 +322,24 @@ for examples.
 **spotlightIgnoredKeys: [number | array]** - Is used to specifiy a set of keys to be ignored by spotlight when originate at component.
 
 
+<a name="9"></a>
+## 9. COPYRIGHT AND LICENSE INFORMATION
+
+Unless otherwise specified, all content, including all source code files and
+documentation files in this repository are:
+
+Copyright (c) 2014 LG Electronics
+
+Unless otherwise specified or set forth in the NOTICE file, all content,
+including all source code files and documentation files in this repository are:
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this content except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
