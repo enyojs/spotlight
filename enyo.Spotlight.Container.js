@@ -62,11 +62,8 @@ enyo.Spotlight.Container = new function() {
 
 		_focusLeave = function(oSender, s5WayEventType) {
 			// console.log('FOCUS LEAVE', oSender.name);
-			// Ensure we are actually leaving container (and not bouncing back to the originating control)
-			if (oSender._spotlight.lastFocusedChild !== enyo.Spotlight.getLastControl()) {
-				var sDirection = s5WayEventType.replace('onSpotlight','').toUpperCase();
-				enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
-			}
+			var sDirection = s5WayEventType.replace('onSpotlight','').toUpperCase();
+			enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {direction: sDirection}, oSender);
 		},
 
 		_focusEnter = function(oSender, s5WayEventType) {
