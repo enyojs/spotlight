@@ -112,6 +112,7 @@ enyo.Spotlight = new function() {
 				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
 			
+			_oThis.unspot();                                                      // Remove spotlight class and Blur 
 			_highlight(oControl);                                                 // Add spotlight class 
 			
 			var oExCurrent = _oCurrent;
@@ -730,8 +731,9 @@ enyo.Spotlight = new function() {
 		}
 		
 		if (oControl) {
-			this.unspot();
+			
 			if (this.getPointerMode() && !bWasPoint) {	                              // When the user calls spot programmatically in pointer mode, we don't actually
+				this.unspot();
 				_oLastControl = oControl;                                             // under the pointer; instead we just unspot and set up the _oLastControl 
 				_oLastMouseMoveTarget = null;                                         // used when resuming 5-way focus on an arrow key press
 				_log("Spot called in pointer mode; 5-way will resume from: " + oControl.id);
