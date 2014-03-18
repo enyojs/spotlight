@@ -10,7 +10,8 @@ enyo.Spotlight.Accelerator = new function() {
 
 	var _nSkipped = 0,
 		_nTime    = 0,
-		_nKey     = 0;
+		_nKey     = 0,
+		_bCanceled = false;
 
 	//* @public
 	/*************************************************************/
@@ -30,6 +31,9 @@ enyo.Spotlight.Accelerator = new function() {
 					_nTime = (new Date()).getTime();
 					_nKey  = oEvent.keyCode;
 					return fCallback.apply(oContext, [oEvent]);
+				} else if (_bCanceled) {
+					oEvent.preventDefault(); // Prevent skipped keydown events from bubbling
+					return true;
 				} else {
 					var nElapsedTime = (new Date()).getTime() - _nTime,
 						nSeconds     = Math.floor(nElapsedTime / 1000),
@@ -58,10 +62,15 @@ enyo.Spotlight.Accelerator = new function() {
 				return fCallback.apply(oContext, [oEvent]);
 		}
 	};
-
+	
 	this.reset = function() {
 		_nSkipped = 0;
 		_nTime    = 0;
 		_nKey     = 0;
+		_bCanceled = false;
+	};
+
+	this.cancel = function() {
+		_bCanceled = true;
 	};
 };
