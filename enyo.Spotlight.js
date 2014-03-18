@@ -546,13 +546,7 @@ enyo.Spotlight = new function() {
 	};
 
 	this.onSpotlightFocused = function(oEvent) {};
-
-	this.onSpotlightBlur = function(oEvent) {
-		if (this.hasCurrent()) {
-			_unhighlight(oEvent.originator);
-			_oLastMouseMoveTarget = null;
-		}
-	};
+	this.onSpotlightBlur    = function(oEvent) {};
 
 	//* Public
 	/******************* PUBLIC METHODS *********************/
@@ -741,6 +735,8 @@ enyo.Spotlight = new function() {
 	this.unspot = function() {
 		if (this.isFrozen()) { return false; }                                        // Current cannot change while in frozen mode
 		if (this.hasCurrent() && _bFocusOnScreen) {
+			_unhighlight(_oCurrent);
+			_oLastMouseMoveTarget = null;
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
 			return true;
 		}
