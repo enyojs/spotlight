@@ -132,7 +132,7 @@ enyo.Spotlight.Container = new function() {
 	// Set last focused child
 	this.setLastFocusedChild = function(oSender, oChild) {
 		if (!enyo.Spotlight.isSpottable(oChild)) {
-			oChild = this.getFirstChild(oChild);
+			oChild = enyo.Spotlight.getFirstChild(oChild);
 		}
 		if (oChild) {
 			oSender._spotlight = oSender._spotlight || {};
