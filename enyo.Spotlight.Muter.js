@@ -7,7 +7,7 @@ enyo.Spotlight.Muter = new function() {
 
 		if (_nMutes === 0) {
 			var oCurrent = enyo.Spotlight.getCurrent();
-			if (oCurrent) { oCurrent.removeClass('spotlight'); }
+			if (oCurrent) { enyo.Spotlight.unhighlight(oCurrent); }
 		}
 
 		_oMutes[oSender.id] = 1;
@@ -22,7 +22,7 @@ enyo.Spotlight.Muter = new function() {
 
 		if (_nMutes === 0) {
 			var oCurrent = enyo.Spotlight.getCurrent();
-			if (oCurrent) { oCurrent.addClass('spotlight'); }
+			if (oCurrent) { enyo.Spotlight.highlight(oCurrent, true); }
 		}
 	};
 

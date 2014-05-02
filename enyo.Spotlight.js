@@ -218,10 +218,10 @@ enyo.Spotlight = new function() {
 			}
 		},
 		
-		_highlight = function(oControl) {
-			if (_oThis.isMuted())             { return; }  // Not highlighting when muted
-			if (_oThis.isContainer(oControl)) { return; }  // Not highlighting containers
-			if (!_oThis.isInitialized())      { return; }  // Not highlighting first non-container control - see this.initialize()
+		_highlight = function(oControl, bIgnoreMute) {
+			if (_oThis.isMuted() && !bIgnoreMute) { return; }  // Not highlighting when muted
+			if (_oThis.isContainer(oControl))     { return; }  // Not highlighting containers
+			if (!_oThis.isInitialized())          { return; }  // Not highlighting first non-container control - see this.initialize()
 
 			// enyo.Spotlight.bench.stop();
 			oControl.addClass('spotlight');
@@ -788,6 +788,10 @@ enyo.Spotlight = new function() {
 	};
 	this.unfreeze = function() { _bFrozen = false; return 'SPOTLIGHT: Exit frozen mode';  };
 	this.isFrozen = function() { return _bFrozen;  };
+
+	// Highlighting
+	this.highlight   = function(oControl, bIgnoreMute) { _highlight(oControl, bIgnoreMute); };
+	this.unhighlight = function(oControl)              { _unhighlight(oControl);            };
 };
 
 // Event hook to all system events to catch KEYPRESS and Mouse Events
