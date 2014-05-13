@@ -47,7 +47,7 @@ enyo.Spotlight.Accelerator = new function() {
 					nToSkip = this.frequency[nSeconds] - 1;
 					if (nToSkip < 0) { nToSkip = 0; }
 
-					_isAccelerating = !(nSeconds == 0 && _nSkipped == 0);
+					_isAccelerating = !(nSeconds === 0 && _nSkipped === 0);
 
 					if (_nSkipped >= nToSkip) {
 						_nSkipped = 0;
