@@ -153,11 +153,15 @@ enyo.Spotlight = new function() {
 			if (oControl) {
 				_oThis.spot(oControl, sDirection);
 			} else {
-				var oParent = _oThis.getParent();
-				if (!oParent || oParent.spotlightModal) {  // Reached the end of spottable world
-					_oThis.spot(_oLastControl);
+				if (enyo.Spotlight.Accelerator.isAccelerating()) {
+					enyo.Spotlight.Accelerator.cancel();
 				} else {
-					_oThis.spot(oParent, sDirection);
+					var oParent = _oThis.getParent();
+					if (!oParent || oParent.spotlightModal) {  // Reached the end of spottable world
+						_oThis.spot(_oLastControl);
+					} else {
+						_oThis.spot(oParent, sDirection);
+					}
 				}
 			}
 		},

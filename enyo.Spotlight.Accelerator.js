@@ -8,7 +8,8 @@ enyo.Spotlight.Accelerator = new function() {
 	//* @protected
 	/*************************************************************/
 
-	var _nSkipped = 0,
+	var _isAccelerating = false,
+		_nSkipped = 0,
 		_nTime    = 0,
 		_nKey     = 0,
 		_bCanceled = false;
@@ -46,6 +47,8 @@ enyo.Spotlight.Accelerator = new function() {
 					nToSkip = this.frequency[nSeconds] - 1;
 					if (nToSkip < 0) { nToSkip = 0; }
 
+					_isAccelerating = !(nSeconds === 0 && _nSkipped === 0);
+
 					if (_nSkipped >= nToSkip) {
 						_nSkipped = 0;
 						return fCallback.apply(oContext, [oEvent]);
@@ -68,9 +71,14 @@ enyo.Spotlight.Accelerator = new function() {
 		_nTime    = 0;
 		_nKey     = 0;
 		_bCanceled = false;
+		_isAccelerating = false;
 	};
 
 	this.cancel = function() {
 		_bCanceled = true;
+	};
+
+	this.isAccelerating = function() {
+		return _isAccelerating;
 	};
 };
