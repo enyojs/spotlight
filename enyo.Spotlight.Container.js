@@ -39,6 +39,7 @@ enyo.Spotlight.Container = new function() {
 
 		// Handle events bubbling from within the container
 		_handleEvent = function(oSender, oEvent) {
+			oSender.cachePoint = true;
 			switch (oEvent.type) {
 				case 'onSpotlightFocus':
 					if (oEvent.originator !== oSender) {
