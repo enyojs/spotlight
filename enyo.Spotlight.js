@@ -525,7 +525,7 @@ enyo.Spotlight = new function() {
 		var ret = true;
 		switch (oEvent.keyCode) {
 			case 13:
-				enyo.mixin(oEvent, {sentHold: this._sentHold});
+				enyo.mixin(oEvent, {sentHold: _sentHold});
 				ret = _dispatchEvent('onSpotlightSelect', oEvent);
 				this.stopHold(oEvent); 
 				this.resetHold();
@@ -837,50 +837,50 @@ enyo.Spotlight = new function() {
 	};
 	// Initiate relevant variables and start sending holdPulse job 
 	this.beginHold = function(oEvent) {
-		if (this._bHold) { return; } // Prevent consecutive hold start
+		if (_bHold) { return; } // Prevent consecutive hold start
 
-		this._bHold = true;
-		this._holdStart = enyo.perfNow();
+		_bHold = true;
+		_holdStart = enyo.perfNow();
 
 		// clone the event to ensure it stays alive on IE upon returning to event loop
 		var $ce = enyo.clone(oEvent);
 		$ce.srcEvent = enyo.clone(oEvent.srcEvent);
-		this._holdJobFunction = enyo.bind(this, "sendHoldPulse", $ce);
-		this._holdJobFunction.ce = $ce;
-		this._holdJob = setInterval(this._holdJobFunction, this.getHoldPulseDelay(oEvent));
+		_holdJobFunction = enyo.bind(this, "sendHoldPulse", $ce);
+		_holdJobFunction.ce = $ce;
+		_holdJob = setInterval(_holdJobFunction, this.getHoldPulseDelay(oEvent));
 
 		return true;
 	};
 	// Clear relevant variables and cancel holdPulse job 
 	this.stopHold = function(oEvent) {
-		if (!this._bHold) { return; } // Do nothing if not in hold status
-		clearInterval(this._holdJob);
-		this._holdJob = null;
-		this._bHold = false;
-		this._holdStart = 0;
-		if (this._holdJobFunction) {
-			this._holdJobFunction.ce = null;
-			this._holdJobFunction = null;
+		if (!_bHold) { return; } // Do nothing if not in hold status
+		clearInterval(_holdJob);
+		_holdJob = null;
+		_bHold = false;
+		_holdStart = 0;
+		if (_holdJobFunction) {
+			_holdJobFunction.ce = null;
+			_holdJobFunction = null;
 		}
-		if (this._sentHold) {
-			this._sentHold = false;
+		if (_sentHold) {
+			_sentHold = false;
 		}
 		this.resetHold();
 	};
 	this.resetHold = function() {
-		this._bCancelHold = false;
+		_bCancelHold = false;
 	};
 	// Clear relevant variables and cancel holdPulse job 
 	this.cancelHold = function(oEvent) {
-		this._bCancelHold = true;
+		_bCancelHold = true;
 	};
 	// Send onHoldPulse event with holdTime parameter
 	this.sendHoldPulse = function(oEvent) {
-		if (this._bCancelHold) { return; }
-		if (!this._sentHold) {
-			this._sentHold = true;
+		if (_bCancelHold) { return; }
+		if (!_sentHold) {
+			_sentHold = true;
 		}
-		oEvent.holdTime = enyo.perfNow() - this._holdStart;
+		oEvent.holdTime = enyo.perfNow() - _holdStart;
 		_dispatchEvent('onholdpulse', oEvent);
 	};
 };
