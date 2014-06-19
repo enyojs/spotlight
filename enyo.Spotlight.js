@@ -105,6 +105,9 @@ enyo.Spotlight = new function() {
 		
 		// Set currently spotted control. 
 		_setCurrent = function(oControl) {
+			if(_oCurrent === oControl) {
+				return;
+			}
 			_initializeControl(oControl);
 
 			if (!_oThis.isSpottable(oControl)) {
@@ -376,13 +379,14 @@ enyo.Spotlight = new function() {
 						oEvent.index === _oLastMouseMoveTarget._nCurrentSpotlightItem
 					)
 				) { return; } // ignore consecutive mouse moves on same target
-				
 				this.spot(oTarget, null, true);
 				_oLastMouseMoveTarget = oTarget;
 
 			} else {
 				_oLastMouseMoveTarget = null;
-				this.unspot();
+				if(this.unspot()) {
+					_oCurrent = null;
+				}
 			}
 		}
 	};
