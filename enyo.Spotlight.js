@@ -462,11 +462,15 @@ enyo.Spotlight = new function() {
 				this.setPointerMode(true);
 				return false; 
 			case KEY_POINTER_HIDE:                               // Pointer hidden event; set pointer mode false
-				this.setPointerMode(false);
-				if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
-					enyo.asyncMethod(this, function() { _spotLastControl(); });
-				}
-				_setTimestamp();
+				setTimeout(function () {
+					if (this.getPointerMode()) {
+						this.setPointerMode(false);
+						if (!_oLastMouseMoveTarget) {                    // Spot last 5-way control, only if there's not already focus on screen
+							enyo.asyncMethod(this, function() { _spotLastControl(); });
+						}
+						_setTimestamp();
+					}
+				}.bind(this), 30);
 				return false;
 		}
 
