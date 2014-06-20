@@ -10,7 +10,7 @@ enyo.Spotlight = new function() {
 
 	var _oThis                          = this,     // Reference to this to be inherited by private closures below
 		_oRoot                          = null,     // Topmost component instance where spotlight events are caught
-		_oDefaultControl                = null,     // Is being set by spot() if it is being called before initialize() to be spotted in initialize()
+		_oDefaultControl                = null,     // Is set by spot() if it is called before initialize(), will be spotted in initialize()
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent
 		_oCurrent                       = null,     // Currently spotlighted element
@@ -65,7 +65,7 @@ enyo.Spotlight = new function() {
 		
 		_setDefaultDisappearControl = function() {
 			_oDefaultDisappear = enyo.Spotlight.Util.getDefaultDirectionControl(                   // Get control specified in defaultSpotlightDisappear
-				'disappear',                                                                       // of _oCurrent. Gotta get it before it desappears :)
+				'disappear',                                                                       // of _oCurrent. Gotta get it before it disappears :)
 				_oCurrent                                                                          //
 			);
 		},
@@ -123,7 +123,7 @@ enyo.Spotlight = new function() {
 			var oExCurrent = _oCurrent;
 			
 			_oCurrent = oControl;
-			setTimeout(function() {                                               // Set observers asynchronously to allow paint happen faster
+			setTimeout(function() {                                               // Set observers asynchronously to allow painti to happen faster
 				_observeDisappearance(false, oExCurrent);
 				_observeDisappearance(true, _oCurrent);
 			}, 1);
@@ -204,7 +204,7 @@ enyo.Spotlight = new function() {
 		},
 
 		// If originator is container, delegate processing of event to enyo.Spotlight.Container.onSpotlight*
-		// Return values: if found method to delegate, return it's return value otherwise return true
+		// Return values: if found method to delegate, return its return value otherwise return true
 		_delegateContainerEvent = function(oEvent) {
 			if (oEvent.type && oEvent.type.indexOf('onSpotlight') === 0) {
 				if (_oThis.isContainer(oEvent.originator)) {
@@ -383,13 +383,14 @@ enyo.Spotlight = new function() {
 						oEvent.index === _oLastMouseMoveTarget._nCurrentSpotlightItem
 					)
 				) { return; } // ignore consecutive mouse moves on same target
-				
 				this.spot(oTarget, null, true);
 				_oLastMouseMoveTarget = oTarget;
 
 			} else {
 				_oLastMouseMoveTarget = null;
-				this.unspot();
+				if(this.unspot()) {
+					_oCurrent = null;
+				}
 			}
 		}
 		
@@ -403,7 +404,7 @@ enyo.Spotlight = new function() {
 		// last mousemove, e.g. animating controls
 		this.onMouseMove(oEvent);
 
-		// Logic to exit frozen mode when depressing control other then current
+		// Logic to exit frozen mode when depressing control other than current
 		// And transfer spotlight directly to it
 		if (this.isFrozen()) {
 			var oTarget = _getTarget(oEvent.target.id);
@@ -715,7 +716,7 @@ enyo.Spotlight = new function() {
 		return oSpottableParent;
 	};
 
-	// Dispatches focus event to the control or it's first spottable child
+	// Dispatches focus event to the control or its first spottable child
 	this.spot = function(oControl, sDirection, bWasPoint) {
 		if (!this.isInitialized()) {                                                  // If spotlight is not yet initialized
 			_oDefaultControl = oControl;                                              // Preserve control to be spotted on initialize
@@ -737,15 +738,17 @@ enyo.Spotlight = new function() {
 		}
 		
 		var oOriginal = oControl;
-		if (!this.isSpottable(oControl)) {                                            // If control is not spottable, find it's spottable child
-			oControl = this.getFirstChild(oControl);                                  //
+		if (!this.isSpottable(oControl)) {                                            // If control is not spottable, find its spottable child
+			oControl = this.getFirstChild(oControl);
 		}
 		
 		if (oControl) {
-			
+			if (_oCurrent === oControl) {                                             // If already spotted, nothing to do
+				return true;
+			}
 			if (this.getPointerMode() && !bWasPoint) {	                              // When the user calls spot programmatically in pointer mode, we don't actually
 				this.unspot();
-				_oLastControl = oControl;                                             // under the pointer; instead we just unspot and set up the _oLastControl 
+				_oLastControl = oControl;                                             // spot; instead we just unspot and set up the _oLastControl 
 				_oLastMouseMoveTarget = null;                                         // used when resuming 5-way focus on an arrow key press
 				_log("Spot called in pointer mode; 5-way will resume from: " + oControl.id);
 			} else {
@@ -915,24 +918,3 @@ enyo.rendered(function(oRoot) {
 // 		_oBench.stop();
 // 	}
 // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
