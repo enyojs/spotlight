@@ -105,9 +105,6 @@ enyo.Spotlight = new function() {
 		
 		// Set currently spotted control. 
 		_setCurrent = function(oControl) {
-			if(_oCurrent === oControl) {
-				return;
-			}
 			_initializeControl(oControl);
 
 			if (!_oThis.isSpottable(oControl)) {
