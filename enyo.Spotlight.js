@@ -23,6 +23,7 @@ enyo.Spotlight = new function() {
 		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
 		_oDefaultDisappear              = null,     // Contains control specified in defaultSpotlightDisappear property of _oCurrent
 		_bFocusOnScreen                 = false,    // Whether focus is currently visible on screen or not (hasCurrent && !pointingAway) ??
+		_bLastKeyDownIgnored            = false,
 
 		_nMouseMoveCount                = 0,        // Number of consecutive mousemoves; require >1 to switch to pointer mode
 		_nPrevClientX                   = null,
@@ -334,7 +335,9 @@ enyo.Spotlight = new function() {
 				//enyo.log('Dummy funciton');
 			};
 		};
-		this.initiateHoldPulse(oEvent);
+		if (!_bLastKeyDownIgnored) {
+			this.initiateHoldPulse(oEvent);
+		}
 		switch (oEvent.type) {
 			case 'keydown'  : return _dispatchEvent('onSpotlightKeyDown', oEvent);
 			case 'keyup'    : return _dispatchEvent('onSpotlightKeyUp'  , oEvent);
@@ -463,7 +466,10 @@ enyo.Spotlight = new function() {
 	this.onKeyDown = function(oEvent) {
 
 		if (_isIgnoredKey(oEvent)) {
+			_bLastKeyDownIgnored = true;
 			return false;
+		} else {
+			_bLastKeyDownIgnored = false;
 		}
 
 		//Update pointer mode based on special keycode from Input Manager for magic remote show/hide
@@ -527,15 +533,17 @@ enyo.Spotlight = new function() {
 	this.onSpotlightUp     = function(oEvent) { _5WayMove(oEvent); };
 
 	this.onSpotlightKeyUp    = function(oEvent) {
-		var ret = true;
-		switch (oEvent.keyCode) {
+		if (!_bLastKeyDownIgnored) {
+			var ret = true;
+			switch (oEvent.keyCode) {
 			case 13:
 				enyo.mixin(oEvent, {sentHold: _sentHold});
 				ret = _dispatchEvent('onSpotlightSelect', oEvent);
-				this.stopHold(oEvent); 
+				this.stopHold(oEvent);
 				this.resetHold();
+			}
+			return ret; // Should never get here
 		}
-		return ret; // Should never get here
 	};
 	this.onSpotlightKeyDown  = function(oEvent) {
 
