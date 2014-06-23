@@ -23,7 +23,7 @@ enyo.Spotlight = new function() {
 		_bFrozen                        = false,    // While frozen, current cannot change and all events are directed to it.
 		_oDefaultDisappear              = null,     // Contains control specified in defaultSpotlightDisappear property of _oCurrent
 		_bFocusOnScreen                 = false,    // Whether focus is currently visible on screen or not (hasCurrent && !pointingAway) ??
-		_bLastKeyDownIgnored            = false,    // Whether last key down was ignored because the spotted control had it spotlightIgnoredKeys
+		_bLastKeyDownIgnored            = false,    // Whether last key down was ignored because the spotted control had it in spotlightIgnoredKeys
 
 		_nMouseMoveCount                = 0,        // Number of consecutive mousemoves; require >1 to switch to pointer mode
 		_nPrevClientX                   = null,
