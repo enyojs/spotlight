@@ -29,7 +29,6 @@ enyo.Spotlight.Container = new function() {
 				if (oLastFocusedChild && oLastFocusedChild.isDescendantOf(oSender)) {
 					_oThis.setLastFocusedChild(oSender, oLastFocusedChild);
 				}
-				enyo.Spotlight.Util.interceptEvents(oSender, _handleEvent);
 			}
 		},
 
@@ -77,7 +76,17 @@ enyo.Spotlight.Container = new function() {
 
 	//* Public
 	/************************************************************/
-		
+
+	// Start intercept event to remember last focus on container.
+	// Call this api after dynamically set spotlight as "container".
+	this.initContainer = function(oControl) {
+		if (!oControl._spotlight || (oControl._spotlight && !oControl._spotlight.interceptEvents)) {
+			oControl._spotlight = oControl._spotlight || {};
+			oControl._spotlight.interceptEvents = true;
+			enyo.Spotlight.Util.interceptEvents(oControl, _handleEvent);
+		}
+	};
+
 	this.onSpotlightFocus = function(oSender, oEvent) {
 		oSender._spotlight = oSender._spotlight || {};
 		oSender._spotlight.bEnorceOutsideIn = !oEvent.dir;
@@ -143,3 +152,15 @@ enyo.Spotlight.Container = new function() {
 	};
 	
 };
+
+enyo.Control.extend({
+	create: enyo.inherit(function (sup) {
+		return function () {
+			sup.apply(this, arguments);
+			// If spotlight "container" is set statically then automatically starts intercept events.
+			if (this.spotlight && this.spotlight === "container") {
+				enyo.Spotlight.Container.initContainer(this);
+			}
+		};
+	})
+});
