@@ -117,10 +117,10 @@ enyo.Spotlight = new function() {
 				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
 			
+			var oExCurrent = _oCurrent;
+
 			_oThis.unspot();                                                      // Remove spotlight class and Blur 
 			_highlight(oControl);                                                 // Add spotlight class 
-			
-			var oExCurrent = _oCurrent;
 			
 			_oCurrent = oControl;
 			setTimeout(function() {                                               // Set observers asynchronously to allow painti to happen faster
@@ -388,9 +388,7 @@ enyo.Spotlight = new function() {
 
 			} else {
 				_oLastMouseMoveTarget = null;
-				if(this.unspot()) {
-					_oCurrent = null;
-				}
+				this.unspot();
 			}
 		}
 		
@@ -768,6 +766,7 @@ enyo.Spotlight = new function() {
 			_unhighlight(_oCurrent);
 			_oLastMouseMoveTarget = null;
 			_dispatchEvent('onSpotlightBlur', null, _oCurrent);
+			_oCurrent = null;
 			return true;
 		}
 		return false;
