@@ -510,7 +510,7 @@ enyo.Spotlight = new function() {
 	
 	this.onKeyUp = function(oEvent) {
 		if (_isIgnoredKey(oEvent)) {
-			return true;
+			return false;
 		}
 		enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 		return false; // Always allow key events to bubble regardless of what onSpotlight** handlers return
