@@ -259,7 +259,7 @@ enyo.Spotlight = new function() {
          * Create control-specific spotlight state storage
          *
          * @name Spotlight#_initializeControl
-         * @param {object} oControl Somebody's name.
+         * @param {object} oControl
          * @type {function}
          * @private
          */
@@ -274,7 +274,7 @@ enyo.Spotlight = new function() {
          * of _oCurrent. Gotta get it before it disappears :)
          *
          * @name Spotlight#_setDefaultDisappearControl
-         * @param {object} oControl Somebody's name.
+         * @param {object} oControl
          * @type {function}
          * @private
          */
@@ -289,7 +289,7 @@ enyo.Spotlight = new function() {
          * Observer
          *
          * @name Spotlight#_onDisappear
-         * @param {object} oControl Somebody's name.
+         * @param {object} oControl
          * @type {function}
          * @private
          */
@@ -333,7 +333,7 @@ enyo.Spotlight = new function() {
          * Add observers on control's parent chain
          *
          * @name Spotlight#_observeDisappearance
-         * @param {object} oControl Somebody's name.
+         * @param {object} oControl
          * @type {function}
          * @private
          */
@@ -381,7 +381,7 @@ enyo.Spotlight = new function() {
          * Set currently spotted control.
          *
          * @name Spotlight#_setCurrent
-         * @param {object} oControl Somebody's name.
+         * @param {object} oControl
          * @type {function}
          * @private
          */
@@ -428,7 +428,7 @@ enyo.Spotlight = new function() {
          * Artificially trigger events on current control, like click
          *
          * @name Spotlight#_setCurrent
-         * @param {object} oControl Somebody's name.
+         * @param {object} oControl
          * @type {function}
          * @private
          */
@@ -1454,7 +1454,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#spot
      * @type {function}
-     * @param {object} oControl Somebody's name.
+     * @param {object} oControl
      * @returns {object}
      * @private
      */
@@ -1479,7 +1479,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#spot
      * @type {function}
-     * @param {object} oControl Somebody's name.
+     * @param {object} oControl
      * @return {boolean}
      * @private
      */
@@ -1551,7 +1551,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#unspot
      * @type {function}
-     * @param {object} oControl Somebody's name.
+     * @param {object} oControl
      * @returns {boolean}
      * @private
      */
@@ -1577,7 +1577,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#getFirstChild
      * @type {function}
-     * @param {object} oControl Somebody's name.
+     * @param {object} oControl
      * @returns {object}
      * @private
      */
@@ -1594,7 +1594,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#clientXYChanged
      * @type {function}
-     * @param {object} oEvent Somebody's name.
+     * @param {object} oEvent
      * @returns {boolean}
      * @private
      */
@@ -1656,7 +1656,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#verbose
      * @type {function}
-     * @param {boolean} bVerbose Somebody's name.
+     * @param {boolean} bVerbose
      * @return {string}
      * @private
      */
@@ -1735,7 +1735,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#initiateHoldPulse
      * @type {function}
-     * @param {object} oEvent Somebody's name.
+     * @param {object} oEvent
      * @private
      */
     this.initiateHoldPulse = function(oEvent) {
@@ -1753,7 +1753,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#getHoldPulseDelay
      * @type {function}
-     * @param {object} oEvent Somebody's name.
+     * @param {object} oEvent
      * @returns {object}
      * @private
      */
@@ -1767,7 +1767,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#beginHold
      * @type {function}
-     * @param {object} oEvent Somebody's name.
+     * @param {object} oEvent
      * @returns {boolean}
      * @private
      */
@@ -1796,7 +1796,7 @@ enyo.Spotlight = new function() {
      *
      * @name Spotlight#stopHold
      * @type {function}
-     * @param {object} oEvent Somebody's name.
+     * @param {object} oEvent .
      * @private
      */
     this.stopHold = function(oEvent) {
