@@ -1,12 +1,12 @@
 /**
- * Spotlight utilities
- *
- * @typedef {Object} enyo.Spotlight.TestMode definition
- *
- * @ui
- * @class enyo.Spotlight.TestMode
- * @public
- */
+* Spotlight utilities
+*
+* @typedef {Object} enyo.Spotlight.TestMode definition
+*
+* @ui
+* @class enyo.Spotlight.TestMode
+* @public
+*/
 enyo.Spotlight.TestMode = new function() {
 
     /********************* PRIVATE ********************/
@@ -16,12 +16,12 @@ enyo.Spotlight.TestMode = new function() {
 
     var
 
-    /**
-     * Destroy all highlight elements
-     *
-     * @type {function}
-     * @private
-     */
+        /**
+        * Destroy all highlight elements
+        *
+        * @type {Function}
+        * @private
+        */
         _destroyExistingHighlightNodes = function() {
             var n;
             for (n = 0; n < _aNodes.length; n++) {
@@ -33,11 +33,11 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-         * Highlight the current spotlighted control and add it to __aNodes_
-         *
-         * @type {function}
-         * @private
-         */
+        * Highlight the current spotlighted control and add it to __aNodes_
+        *
+        * @type {Function}
+        * @private
+        */
         _highlightCurrentControl = function() {
             _aNodes.push(_addConrolHighlightNode({
                 control: enyo.Spotlight.getCurrent(),
@@ -46,11 +46,11 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-         * Highlight controls adjacent to the current spotlighted controls and add them to __aNodes_
-         *
-         * @type {function}
-         * @private
-         */
+        * Highlight controls adjacent to the current spotlighted controls and add them to __aNodes_
+        *
+        * @type {Function}
+        * @private
+        */
         _highlightAdjacentControls = function() {
             if (!enyo.Spotlight.getCurrent()) {
                 return;
@@ -78,12 +78,12 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-         * Combine duplicated highlight nodes (created for the same control). This happens when a given
-         * control can be reached via more than one five-way direction (e.g. up and left).
-         *
-         * @type {function}
-         * @private
-         */
+        * Combine duplicated highlight nodes (created for the same control). This happens when a given
+        * control can be reached via more than one five-way direction (e.g. up and left).
+        *
+        * @type {Function}
+        * @private
+        */
         _removeDuplicateHighlightNodes = function(inControls) {
             var returnControls = [],
                 dupeOf = -1;
@@ -110,11 +110,11 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-         * Create a new control with styling to highlight current or adjacent spotlight nodes.
-         *
-         * @type {function}
-         * @private
-         */
+        * Create a new control with styling to highlight current or adjacent spotlight nodes.
+        *
+        * @type {Function}
+        * @private
+        */
         _addConrolHighlightNode = function(inObj) {
             if (!inObj || !inObj.control || !inObj.control.hasNode()) {
                 return null;
@@ -134,33 +134,33 @@ enyo.Spotlight.TestMode = new function() {
         };
 
     /**
-     *  Enable/disable test mode
-     *
-     * @type {function}
-     * @public
-     */
+    * Enable/disable test mode
+    *
+    * @type {Function}
+    * @public
+    */
     this.enable = function() {
         _bEnabled = true;
         this.highlight();
     };
 
     /**
-     * Disables test mode
-     *
-     * @type {function}
-     * @public
-     */
+    * Disables test mode
+    *
+    * @type {Function}
+    * @public
+    */
     this.disable = function() {
         _bEnabled = false;
         _destroyExistingHighlightNodes();
     };
 
     /**
-     * Destroy existing highlight nodes, and highlight current and adjacent spotlight controls
-     *
-     * @type {function}
-     * @public
-     */
+    * Destroy existing highlight nodes, and highlight current and adjacent spotlight controls
+    *
+    * @type {Function}
+    * @public
+    */
     this.highlight = function() {
         if (!_bEnabled) {
             return;
@@ -171,12 +171,12 @@ enyo.Spotlight.TestMode = new function() {
     };
 
     /**
-     * Return true if test mode is enabled
-     *
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Return true if test mode is enabled
+    *
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.isEnabled = function() {
         return _bEnabled;
     };

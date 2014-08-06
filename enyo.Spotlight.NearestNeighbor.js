@@ -1,26 +1,25 @@
 /**
- * Provides the nearest neighbor to object with current focus
- *
- * @typedef {Object} enyo.Spotlight.NearestNeighbor definition
- *
- * @ui
- * @class enyo.Spotlight.NearestNeighbor
- * @public
- */
-
+* Provides the nearest neighbor to object with current focus
+*
+* @typedef {Object} enyo.Spotlight.NearestNeighbor definition
+*
+* @ui
+* @class enyo.Spotlight.NearestNeighbor
+* @public
+*/
 enyo.Spotlight.NearestNeighbor = new function() {
 
     /**
-     * Checks to see if a control overlaps multiple planes
-     *
-     * @param  {string} sDirection - Direction of acceleration
-     * @param  {object} oBounds1 - Initial Bounds
-     * @param  {object} oBounds2 - Final Bounds
-     * @param  {boolean} bCenterCheck - Check for the center of the bounds
-     * @type {function}
-     * @returns {boolean}
-     * @private
-     */
+    * Checks to see if a control overlaps multiple planes
+    *
+    * @param  {String} sDirection - Direction of acceleration
+    * @param  {Object} oBounds1 - Initial Bounds
+    * @param  {Object} oBounds2 - Final Bounds
+    * @param  {Boolean} bCenterCheck - Check for the center of the bounds
+    * @type {Function}
+    * @returns {Boolean}
+    * @private
+    */
     var _isInHalfPlane = function(sDirection, oBounds1, oBounds2, bCenterCheck) {
             if (bCenterCheck) {
                 switch (sDirection) {
@@ -48,30 +47,30 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Checks to see which control has higher precidence for spottability
-         *
-         * @param  {string} sDirection - Direction of acceleration
-         * @param  {object} oBounds1 - Initial Bounds
-         * @param  {object} oBounds2 - Final Bounds
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Checks to see which control has higher precidence for spottability
+        *
+        * @param  {String} sDirection - Direction of acceleration
+        * @param  {Object} oBounds1 - Initial Bounds
+        * @param  {Object} oBounds2 - Final Bounds
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getAdjacentControlPrecedence = function(sDirection, oBounds1, oBounds2) {
             var oPoints = _getAdjacentControlPoints(sDirection, oBounds1, oBounds2);
             return _getPrecedenceValue(oPoints, sDirection);
         },
 
         /**
-         * Retrieves the adjacent control Axis based on direction of acceleration
-         *
-         * @param  {string} sDirection - Direction of acceleration
-         * @param  {object} oBounds1 - Initial Bounds
-         * @param  {object} oBounds2 - Final Bounds
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Retrieves the adjacent control Axis based on direction of acceleration
+        *
+        * @param  {String} sDirection - Direction of acceleration
+        * @param  {Object} oBounds1 - Initial Bounds
+        * @param  {Object} oBounds2 - Final Bounds
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getAdjacentControlPoints = function(sDirection, oBounds1, oBounds2) {
             switch (sDirection) {
                 case 'UP':
@@ -84,15 +83,15 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Retrieves the Y axis points of bounds, dependent on direction of acceleration
-         *
-         * @param  {string} sDirection - Direction of acceleration
-         * @param  {object} oBounds1 - Initial Bounds
-         * @param  {object} oBounds2 - Final Bounds
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Retrieves the Y axis points of bounds, dependent on direction of acceleration
+        *
+        * @param  {String} sDirection - Direction of acceleration
+        * @param  {Object} oBounds1 - Initial Bounds
+        * @param  {Object} oBounds2 - Final Bounds
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getYAxisPoints = function(sDirection, oBounds1, oBounds2) {
             var x1, x2, y1, y2;
 
@@ -128,15 +127,15 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Retrieves the X axis points of bounds, dependent on direction of acceleration
-         *
-         * @param  {string} sDirection - Direction of acceleration
-         * @param  {object} oBounds1 - Initial Bounds
-         * @param  {object} oBounds2 - Final Bounds
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Retrieves the X axis points of bounds, dependent on direction of acceleration
+        *
+        * @param  {String} sDirection - Direction of acceleration
+        * @param  {Object} oBounds1 - Initial Bounds
+        * @param  {Object} oBounds2 - Final Bounds
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getXAxisPoints = function(sDirection, oBounds1, oBounds2) {
             var x1, x2, y1, y2;
 
@@ -172,12 +171,12 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * @param  {object} oPoints - Axis Points
-         * @param  {object} sDirection - Direction of acceleration
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * @param  {Object} oPoints - Axis Points
+        * @param  {Object} sDirection - Direction of acceleration
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getPrecedenceValue = function(oPoints, sDirection) {
             var delta = _getDelta(oPoints[0], oPoints[1]),
                 slope = _getSlope(delta, sDirection),
@@ -188,14 +187,14 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Retrieves the difference between points.
-         *
-         * @param  {object} point1 - Initial Point
-         * @param  {object} point2 - Destination Point
-         * @type {function}
-         * @returns {object}
-         * @private
-         */
+        * Retrieves the difference between points.
+        *
+        * @param  {Object} point1 - Initial Point
+        * @param  {Object} point2 - Destination Point
+        * @type {Function}
+        * @returns {Object}
+        * @private
+        */
         _getDelta = function(point1, point2) {
             return {
                 dx: Math.abs(point2.x - point1.x),
@@ -204,14 +203,14 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Retrieves the distance from bounds to the center point.
-         *
-         * @param  {object} oBounds1 - Initial bounds
-         * @param  {object} oBounds2 - Destination bounds
-         * @type {function}
-         * @returns {object}
-         * @private
-         */
+        * Retrieves the distance from bounds to the center point.
+        *
+        * @param  {Object} oBounds1 - Initial bounds
+        * @param  {Object} oBounds2 - Destination bounds
+        * @type {Function}
+        * @returns {Object}
+        * @private
+        */
         _getCenterToCenterDistance = function(oBounds1, oBounds2) {
             var oCenter1 = {
                     x: oBounds1.left + oBounds1.width / 2,
@@ -228,14 +227,14 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Retrieves the slope of the angle
-         *
-         * @param  {object} delta - Initial bounds
-         * @param  {string} sDirection - Destination bounds
-         * @type {function}
-         * @returns {object}
-         * @private
-         */
+        * Retrieves the slope of the angle
+        *
+        * @param  {Object} delta - Initial bounds
+        * @param  {String} sDirection - Destination bounds
+        * @type {Function}
+        * @returns {Object}
+        * @private
+        */
         _getSlope = function(delta, sDirection) {
             switch (sDirection) {
                 case 'UP':
@@ -248,40 +247,40 @@ enyo.Spotlight.NearestNeighbor = new function() {
         },
 
         /**
-         * Retrieves the distance between delta points
-         *
-         * @param  {object} delta - Initial bounds
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Retrieves the distance between delta points
+        *
+        * @param  {Object} delta - Initial bounds
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getDistance = function(delta) {
             return Math.pow(delta.dx * delta.dx + delta.dy * delta.dy, 0.5) || 0.1;
         },
 
         /**
-         * Retrieves the distance between angle based on slope
-         *
-         * @param  {number} nSlope - Slope used to determine angle
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Retrieves the distance between angle based on slope
+        *
+        * @param  {Number} nSlope - Slope used to determine angle
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _getAngle = function(nSlope) {
             return Math.atan(nSlope) * 180 / Math.PI || 0.1;
         },
 
         /**
-         * Calculates nearest neighbor based using bounds and acceleration direction
-         *
-         * @param  {object} o - Object used to determine if it is a neighbor
-         * @param  {number} sDirection - Direction of acceleration
-         * @param  {number} oBounds1 - Originating bounds
-         * @param  {number} oControl - Current control
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Calculates nearest neighbor based using bounds and acceleration direction
+        *
+        * @param  {Object} o - Object used to determine if it is a neighbor
+        * @param  {Number} sDirection - Direction of acceleration
+        * @param  {Number} oBounds1 - Originating bounds
+        * @param  {Number} oControl - Current control
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _calculateNearestNeighbor = function(o, sDirection, oBounds1, oControl) {
             var n,
                 oBounds2,
@@ -323,16 +322,16 @@ enyo.Spotlight.NearestNeighbor = new function() {
         };
 
     /**
-     * Gets the nearest neighbor of the pointer
-     *
-     * @param  {object} oRoot - Root component
-     * @param  {string} sDirection - Direction to spot next control
-     * @param  {number} nPositionX - X coordinate of the pointer
-     * @param  {number} nPositionY - Y coordinate of the pointer
-     * @type {function}
-     * @returns {object}
-     * @public
-     */
+    * Gets the nearest neighbor of the pointer
+    *
+    * @param  {Object} oRoot - Root component
+    * @param  {String} sDirection - Direction to spot next control
+    * @param  {Number} nPositionX - X coordinate of the pointer
+    * @param  {Number} nPositionY - Y coordinate of the pointer
+    * @type {Function}
+    * @returns {Object}
+    * @public
+    */
     this.getNearestPointerNeighbor = function(oRoot, sDirection, nPositionX, nPositionY) {
         var oBounds = {
                 left: nPositionX,
@@ -345,16 +344,15 @@ enyo.Spotlight.NearestNeighbor = new function() {
         return _calculateNearestNeighbor(o, sDirection, oBounds);
     };
 
-
     /**
-     * Get the nearest neighbor of a control
-     *
-     * @param  {string} sDirection - Direction to spot next control
-     * @param  {object} oControl - Control from which to determine the next spottable control
-     * @type {function}
-     * @returns {object}
-     * @public
-     */
+    * Get the nearest neighbor of a control
+    *
+    * @param  {String} sDirection - Direction to spot next control
+    * @param  {Object} oControl - Control from which to determine the next spottable control
+    * @type {Function}
+    * @returns {Object}
+    * @public
+    */
     this.getNearestNeighbor = function(sDirection, oControl) {
         sDirection = sDirection.toUpperCase();
         oControl = oControl || enyo.Spotlight.getCurrent();

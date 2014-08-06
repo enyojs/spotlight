@@ -1,23 +1,22 @@
 /**
- * @typedef {Object} enyo.Spotlight.Container definition
- *
- * @ui
- * @class enyo.Spotlight.Muter
- * @public
- */
-
+* @typedef {Object} enyo.Spotlight.Container definition
+*
+* @ui
+* @class enyo.Spotlight.Muter
+* @public
+*/
 enyo.Spotlight.Muter = new function() {
     var _oMutes = {},
         _nMutes = 0;
 
     /**
-     * Add a muted control
-     *
-     * @param  {object} oSender - Control to be muted
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Add a muted control
+    *
+    * @param  {Object} oSender - Control to be muted
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.addMuteReason = function(oSender) {
         if (typeof _oMutes[oSender.id] != 'undefined') {
             return;
@@ -35,13 +34,13 @@ enyo.Spotlight.Muter = new function() {
     };
 
     /**
-     * Remove a muted control
-     *
-     * @param  {object} oSender - Control to be un-muted
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Remove a muted control
+    *
+    * @param  {Object} oSender - Control to be un-muted
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.removeMuteReason = function(oSender) {
         if (typeof _oMutes[oSender.id] == 'undefined') {
             return;
@@ -59,12 +58,12 @@ enyo.Spotlight.Muter = new function() {
     };
 
     /**
-     * Checks if spotlight muter is muting
-     *
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Checks if spotlight muter is muting
+    *
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.isMuted = function() {
         return _nMutes > 0;
     };

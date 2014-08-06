@@ -1,74 +1,72 @@
 /**
- * Use enyo.Spotlight.States when need to save spotlight state (what is currently spotted) to spot again later
- * A use case would be a model window that takes over spotlight interaction for the duration of being open.
- * To restore component that has been spotted before it opened, call enyo.Spotlight.push("mystackname")
- * then, on window closed, call enyo.Spotlight.pop("mystackname") and previous state is restored.
- *
- * You can create as many stacks as needed and push as many states as necessary on each stack by specifying it's name or
- * component that keeps track of changes: enyo.Spotlight.push(this.id) => enyo.Spotlight.pop(this.id)
- *
- * In addition, you can specify the component that you want to be spotted on pop(), which if left blank, defaults to enyo.Spotlight.getCurrent()
- *
- * To log changes in States, turn on verbose mode (see verbose() method)
- *
- * @typedef {Object} enyo.Spotlight.Scrolling definition
- *
- * @ui
- * @class enyo.Spotlight.Scrolling
- * @public
- */
-
-
+* Use enyo.Spotlight.States when need to save spotlight state (what is currently spotted) to spot again later
+* A use case would be a model window that takes over spotlight interaction for the duration of being open.
+* To restore component that has been spotted before it opened, call enyo.Spotlight.push("mystackname")
+* then, on window closed, call enyo.Spotlight.pop("mystackname") and previous state is restored.
+*
+* You can create as many stacks as needed and push as many states as necessary on each stack by specifying it's name or
+* component that keeps track of changes: enyo.Spotlight.push(this.id) => enyo.Spotlight.pop(this.id)
+*
+* In addition, you can specify the component that you want to be spotted on pop(), which if left blank, defaults to enyo.Spotlight.getCurrent()
+*
+* To log changes in States, turn on verbose mode (see verbose() method)
+*
+* @typedef {Object} enyo.Spotlight.Scrolling definition
+*
+* @ui
+* @class enyo.Spotlight.Scrolling
+* @public
+*/
 enyo.Spotlight.States = new function() {
     var _oStacks = {},
         _bVerbose = false;
 
     var
     /**
-     * Figure out string component id to push
-     *
-     * @param  {object} oComponentToSpotOnPop - Spotlight a component when it is popped
-     * @type {function}
-     * @returns {number}
-     * @private
-     */
-        _resolveComponentId = function(oComponentToSpotOnPop) {
-            return (oComponentToSpotOnPop && oComponentToSpotOnPop.id) ? oComponentToSpotOnPop.id : enyo.Spotlight.getCurrent().id;
-        },
-
-        /**
-         * Has stack with this name been created?
-         *
-         * @param  {string} sStackName - Name of the stack to verify
-         * @type {function}
-         * @returns {boolean}
-         * @private
-         */
-        _stackExists = function(sStackName) {
-            return typeof _oStacks[sStackName] != 'undefined';
-        },
-
-        /**
-         * Logs string in verbose mode
-         *
-         * @type {function}
-         * @private
-         */
-        _log = function() {
-            if (!_bVerbose) {
-                return;
-            }
-            enyo.log('SPOTLIGHT STATES: ' + Array.prototype.slice.call(arguments, 0).join(' '));
-        };
+    * Figure out string component id to push
+    *
+    * @param  {Object} oComponentToSpotOnPop - Spotlight a component when it is popped
+    * @type {Function}
+    * @returns {Number}
+    * @private
+    */
+    _resolveComponentId = function(oComponentToSpotOnPop) {
+        return (oComponentToSpotOnPop && oComponentToSpotOnPop.id) ? oComponentToSpotOnPop.id : enyo.Spotlight.getCurrent().id;
+    },
 
     /**
-     * Add a component to the stack
-     *
-     * @param  {string} sStackName - Name of the stack to push to
-     * @param  {object} oComponentToSpotOnPop - Spotlight a component when it is popped
-     * @type {function}
-     * @public
-     */
+    * Has stack with this name been created?
+    *
+    * @param  {String} sStackName - Name of the stack to verify
+    * @type {Function}
+    * @returns {Boolean}
+    * @private
+    */
+    _stackExists = function(sStackName) {
+        return typeof _oStacks[sStackName] != 'undefined';
+    },
+
+    /**
+    * Logs string in verbose mode
+    *
+    * @type {Function}
+    * @private
+    */
+    _log = function() {
+        if (!_bVerbose) {
+            return;
+        }
+        enyo.log('SPOTLIGHT STATES: ' + Array.prototype.slice.call(arguments, 0).join(' '));
+    };
+
+    /**
+    * Add a component to the stack
+    *
+    * @param  {String} sStackName - Name of the stack to push to
+    * @param  {Object} oComponentToSpotOnPop - Spotlight a component when it is popped
+    * @type {Function}
+    * @public
+    */
     this.push = function(sStackName, /*optional*/ oComponentToSpotOnPop) {
 
         var sComponentId = _resolveComponentId(oComponentToSpotOnPop);
@@ -84,12 +82,12 @@ enyo.Spotlight.States = new function() {
     };
 
     /**
-     * Pops a component from the stack
-     *
-     * @param  {string} sStackName - Name of the stack to push to
-     * @type {function}
-     * @public
-     */
+    * Pops a component from the stack
+    *
+    * @param  {String} sStackName - Name of the stack to push to
+    * @type {Function}
+    * @public
+    */
     this.pop = function(sStackName) {
         var sComponentId;
 
@@ -109,12 +107,12 @@ enyo.Spotlight.States = new function() {
     };
 
     /**
-     * Enable or Disable verbosity
-     *
-     * @param  {boolean} bVerbose - flag to enable or disable verbosity
-     * @type {function}
-     * @public
-     */
+    * Enable or Disable verbosity
+    *
+    * @param  {Boolean} bVerbose - flag to enable or disable verbosity
+    * @type {Function}
+    * @public
+    */
     this.verbose = function(bVerbose) {
         _bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
         return 'SPOTLIGHT.STATES: verbose mode is ' + (_bVerbose ? 'ON' : 'OFF');

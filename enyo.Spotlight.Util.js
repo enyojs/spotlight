@@ -1,24 +1,24 @@
 /**
- * Spotlight utilities
- *
- * @typedef {Object} enyo.Spotlight.Scrolling definition
- *
- * @ui
- * @class enyo.Spotlight.Util
- * @public
- */
+* Spotlight utilities
+*
+* @typedef {Object} enyo.Spotlight.Scrolling definition
+*
+* @ui
+* @class enyo.Spotlight.Util
+* @public
+*/
 enyo.Spotlight.Util = new function() {
 
     /**
-     * Attempts to dispatch all spotlight events through the low-level dispatcher
-     * or directly through the origination control.
-     *
-     * @param  {string} sEvent - Current event to validate
-     * @param  {object} oInData - Callback that is executed
-     * @param  {object} oControl - Dispatch originator
-     * @type {function}
-     * @public
-     */
+    * Attempts to dispatch all spotlight events through the low-level dispatcher
+    * or directly through the origination control.
+    *
+    * @param  {String} sEvent - Current event to validate
+    * @param  {Object} oInData - Callback that is executed
+    * @param  {Object} oControl - Dispatch originator
+    * @type {Function}
+    * @public
+    */
     this.dispatchEvent = function(sEvent, oInData, oControl) {
         var oData;
 
@@ -58,13 +58,13 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * Attach event hook to capture events coming from within the container
-     *
-     * @param  {object} oControl - Dispatch originator
-     * @param  {function} fHandler - Event handler function
-     * @type {function}
-     * @public
-     */
+    * Attach event hook to capture events coming from within the container
+    *
+    * @param  {Object} oControl - Dispatch originator
+    * @param  {Function} fHandler - Event handler function
+    * @type {Function}
+    * @public
+    */
     this.interceptEvents = function(oControl, fHandler) {
         var f = oControl.dispatchEvent;
 
@@ -81,13 +81,13 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * Returns a boolean, detecting if a control is a child of another control
-     *
-     * @param  {object} oParent - Dispatch originator
-     * @param  {function} oChild - Event handler function
-     * @type {function}
-     * @public
-     */
+    * Returns a boolean, detecting if a control is a child of another control
+    *
+    * @param  {Object} oParent - Dispatch originator
+    * @param  {Function} oChild - Event handler function
+    * @type {Function}
+    * @public
+    */
     this.isChild = function(oParent, oChild) {
         if (!oParent) {
             return false;
@@ -106,26 +106,26 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * Left for backward compatibility; users should call the getAbsoluteBounds instance
-     * function of enyo.Control (or enyo.dom.getAbsoluteBounds for nodes) instead.
-     *
-     * @param  {object} oControl - Control in which to query for bounds
-     * @type {function}
-     * @public
-     */
+    * Left for backward compatibility; users should call the getAbsoluteBounds instance
+    * function of enyo.Control (or enyo.dom.getAbsoluteBounds for nodes) instead.
+    *
+    * @param  {Object} oControl - Control in which to query for bounds
+    * @type {Function}
+    * @public
+    */
     this.getAbsoluteBounds = function(oControl) {
         var node = oControl instanceof enyo.Control ? oControl.hasNode() : oControl;
         return enyo.dom.getAbsoluteBounds(node);
     };
 
     /**
-     * Check if a control has a class applied.
-     *
-     * @param  {object} o - Control in which to apply the query
-     * @param  {string} s - Class name to query
-     * @type {function}
-     * @public
-     */
+    * Check if a control has a class applied.
+    *
+    * @param  {Object} o - Control in which to apply the query
+    * @param  {String} s - Class name to query
+    * @type {Function}
+    * @public
+    */
     this.hasClass = function(o, s) {
         if (!o || !o.className) {
             return;
@@ -134,13 +134,13 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * Add a class to a control
-     *
-     * @param  {object} o - Control in which to apply the query
-     * @param  {string} s - Class name to query
-     * @type {function}
-     * @public
-     */
+    * Add a class to a control
+    *
+    * @param  {Object} o - Control in which to apply the query
+    * @param  {String} s - Class name to query
+    * @type {Function}
+    * @public
+    */
     this.addClass = function(o, s) {
         if (o && !this.hasClass(o, s)) {
             var ss = o.className;
@@ -149,13 +149,13 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * Remove a class from a control
-     *
-     * @param  {object} o - Control in which to apply the query
-     * @param  {string} s - Class name to query
-     * @type {function}
-     * @public
-     */
+    * Remove a class from a control
+    *
+    * @param  {Object} o - Control in which to apply the query
+    * @param  {String} s - Class name to query
+    * @type {Function}
+    * @public
+    */
     this.removeClass = function(o, s) {
         if (o && this.hasClass(o, s)) {
             var ss = o.className;
@@ -164,36 +164,36 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * Querys a string for a suffix
-     *
-     * @param  {string} s - String to query
-     * @param  {string} sSuffix - Suffix to apply to query
-     * @type {function}
-     * @public
-     */
+    * Querys a string for a suffix
+    *
+    * @param  {String} s - String to query
+    * @param  {String} sSuffix - Suffix to apply to query
+    * @type {Function}
+    * @public
+    */
     this.stringEndsWith = function(s, sSuffix) {
         return s.indexOf(sSuffix, s.length - sSuffix.length) !== -1;
     };
 
     /**
-     * Translates a direction, to an appropriate Spotlight event
-     *
-     * @param  {string} sDirection - Direction of acceleration
-     * @type {function}
-     * @public
-     */
+    * Translates a direction, to an appropriate Spotlight event
+    *
+    * @param  {String} sDirection - Direction of acceleration
+    * @type {Function}
+    * @public
+    */
     this.directionToEvent = function(sDirection) {
         return 'onSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase();
     };
 
     /**
-     * Gets the default direction that a control will accelerate
-     *
-     * @param  {string} sDirection - String to query
-     * @param  {object} oControl - String to query
-     * @type {function}
-     * @public
-     */
+    * Gets the default direction that a control will accelerate
+    *
+    * @param  {String} sDirection - String to query
+    * @param  {Object} oControl - String to query
+    * @type {Function}
+    * @public
+    */
     this.getDefaultDirectionControl = function(sDirection, oControl) {
         var sProperty = 'defaultSpotlight' + sDirection.charAt(0).toUpperCase() + sDirection.substr(1).toLowerCase(),
             oNeighbor;
@@ -207,13 +207,13 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-     * We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
-     *
-     * @param  {string} sDirection - String to query
-     * @param  {object} oControl - String to query
-     * @type {function}
-     * @public
-     */
+    * We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
+    *
+    * @param  {String} sDirection - String to query
+    * @param  {Object} oControl - String to query
+    * @type {Function}
+    * @public
+    */
     this.isSimulatedClick = function(oEvent) {
         return (
             oEvent.clientX === 0 && oEvent.clientY === 0 &&

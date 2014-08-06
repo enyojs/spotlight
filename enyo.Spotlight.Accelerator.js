@@ -1,12 +1,12 @@
 /**
- * provides acceleration and throttle of cursor movement.
- *
- * @typedef {Object} enyo.Spotlight.Accelerator
- *
- * @ui
- * @class enyo.Spotlight.Accelerator
- * @public
- */
+* Provides acceleration and throttle of cursor movement.
+*
+* @typedef {Object} enyo.Spotlight.Accelerator
+*
+* @ui
+* @class enyo.Spotlight.Accelerator
+* @public
+*/
 enyo.Spotlight.Accelerator = new function() {
 
     //* @protected
@@ -19,26 +19,26 @@ enyo.Spotlight.Accelerator = new function() {
         _bCanceled = false;
 
     /**
-     * Controls the frequency in which the cursor will 'freeze'
-     * While frozen, current cannot change and all events are directed to it.
-     *
-     * @type {array}
-     * @default [3, 3, 3, 2, 2, 2, 1]
-     * @public
-     */
+    * Controls the frequency in which the cursor will 'freeze'
+    * While frozen, current cannot change and all events are directed to it.
+    *
+    * @type {Array}
+    * @default [3, 3, 3, 2, 2, 2, 1]
+    * @public
+    */
     this.frequency = [3, 3, 3, 2, 2, 2, 1];
 
     /**
-     * Called from enyo.Spotlight, with current keydown event and Spotlight's callback
-     * Which will be called when an event is allowed through
-     *
-     * @param  {object} oEvent - Current event to validate
-     * @param  {function} fCallback - Callback that is executed
-     * @param  {object} oContext - Callback's execution context
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Called from enyo.Spotlight, with current keydown event and Spotlight's callback
+    * Which will be called when an event is allowed through
+    *
+    * @param  {Object} oEvent - Current event to validate
+    * @param  {Function} fCallback - Callback that is executed
+    * @param  {Object} oContext - Callback's execution context
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.processKey = function(oEvent, fCallback, oContext) {
         switch (oEvent.type) {
             case 'keydown':
@@ -87,11 +87,11 @@ enyo.Spotlight.Accelerator = new function() {
 
 
     /**
-     * Reset values for spotlight
-     *
-     * @type {function}
-     * @public
-     */
+    * Reset values for spotlight
+    *
+    * @type {Function}
+    * @public
+    */
     this.reset = function() {
         _nSkipped = 0;
         _nTime = 0;
@@ -101,22 +101,22 @@ enyo.Spotlight.Accelerator = new function() {
     };
 
     /**
-     * Cancel the accelerator
-     *
-     * @type {function}
-     * @public
-     */
+    * Cancel the accelerator
+    *
+    * @type {Function}
+    * @public
+    */
     this.cancel = function() {
         _bCanceled = true;
     };
 
     /**
-     * Verify the accelerator is in motion
-     *
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Verify the accelerator is in motion
+    *
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.isAccelerating = function() {
         return _isAccelerating;
     };

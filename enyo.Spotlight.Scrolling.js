@@ -15,22 +15,22 @@ enyo.Spotlight.Scrolling = new function() {
     var _nDelta = 0;
 
     /**
-     * Fire scroll event every this.frequency mousewheel points
-     *
-     * @type {number}
-     * @public
-     */
+    * Fire scroll event every this.frequency mousewheel points
+    *
+    * @type {Number}
+    * @public
+    */
     this.frequency = 40;
 
     /**
-     * Figure out string component id to push
-     *
-     * @param  {object} oEvent - Current event
-     * @param  {function} fCallback - Callback function
-     * @param  {object} oContext - Execution context for callback
-     * @type {function}
-     * @public
-     */
+    * Figure out string component id to push
+    *
+    * @param  {Object} oEvent - Current event
+    * @param  {Function} fCallback - Callback function
+    * @param  {Object} oContext - Execution context for callback
+    * @type {Function}
+    * @public
+    */
     this.processMouseWheel = function(oEvent, fCallback, oContext) {
         _nDelta += oEvent.wheelDeltaY;
 

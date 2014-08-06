@@ -1,248 +1,248 @@
 /**
- * Spotlight is an extensible utility that enables users to navigate
- * Enyo applications using a keyboard or television remote control.
- *
- * @namespace Spotlight
- */
+* Spotlight is an extensible utility that enables users to navigate
+* Enyo applications using a keyboard or television remote control.
+*
+* @namespace Spotlight
+*/
 enyo.Spotlight = new function() {
 
     /**
-     * Reference to this to be inherited by private closures below
-     * @type {Object}
-     * @private
-     */
+    * Reference to this to be inherited by private closures below
+    * @type {Object}
+    * @private
+    */
     var _oThis = this,
 
         /**
-         * Topmost component instance where spotlight events are caught
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Topmost component instance where spotlight events are caught
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oRoot = null,
 
         /**
-         * Is set by spot() if it is called before initialize(), will be spotted in initialize()
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Is set by spot() if it is called before initialize(), will be spotted in initialize()
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oDefaultControl = null,
 
         /**
-         * Is spotlight in pointer mode or 5way mode?
-         * @type {boolean}
-         * @default true
-         * @private
-         */
+        * Is spotlight in pointer mode or 5way mode?
+        * @type {Boolean}
+        * @default true
+        * @private
+        */
         _bPointerMode = true,
 
         /**
-         * Does spotlight have _oCurrent
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * Does spotlight have _oCurrent
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _bInitialized = false,
 
         /**
-         * Currently spotlighted element
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Currently spotlighted element
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oCurrent = null,
 
         /**
-         * Last event received by Spotlight
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Last event received by Spotlight
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oLastEvent = null,
 
         /**
-         * Last 5way event received by Spotlight
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Last 5way event received by Spotlight
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oLast5WayEvent = null,
 
         /**
-         * Last non-container (spotlight:true) control that was _oCurrent
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Last non-container (spotlight:true) control that was _oCurrent
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oLastControl = null,
 
         /**
-         * For things like input boxes we need a way to disable pointer mode while cursor is in
-         * @type {boolean}
-         * @default true
-         * @private
-         */
+        * For things like input boxes we need a way to disable pointer mode while cursor is in
+        * @type {Boolean}
+        * @default true
+        * @private
+        */
         _bEnablePointerMode = true,
 
         /**
-         * Keeping state consistency between onMouseDown() and onMouseUp(),
-         * if focus has been moved in between
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Keeping state consistency between onMouseDown() and onMouseUp(),
+        * if focus has been moved in between
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oDepressedControl = null,
 
         /**
-         * In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * In verbose mode spotlight prints 1) Current 2) Pointer mode change to enyo.log
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _bVerbose = false,
 
         /**
-         * While frozen, current cannot change and all events are directed to it.
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * While frozen, current cannot change and all events are directed to it.
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _bFrozen = false,
 
         /**
-         * Contains control specified in defaultSpotlightDisappear property of _oCurrent
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * Contains control specified in defaultSpotlightDisappear property of _oCurrent
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oDefaultDisappear = null,
 
         /**
-         * Whether focus is currently visible on screen or not (hasCurrent && !pointingAway) ??
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * Whether focus is currently visible on screen or not (hasCurrent && !pointingAway) ??
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _bFocusOnScreen = false,
 
         /**
-         * number of consecutive mousemoves; require >1 to switch to pointer mode
-         * @type {number}
-         * @default 0
-         * @private
-         */
+        * number of consecutive mousemoves; require >1 to switch to pointer mode
+        * @type {Number}
+        * @default 0
+        * @private
+        */
         _nMouseMoveCount = 0,
 
         /**
-         * @type {number}
-         * @default null
-         * @private
-         */
+        * @type {Number}
+        * @default null
+        * @private
+        */
         _nPrevClientX = null,
 
         /**
-         * @type {number}
-         * @default null
-         * @private
-         */
+        * @type {Number}
+        * @default null
+        * @private
+        */
         _nPrevClientY = null,
 
         /**
-         * @type {Object}
-         * @default null
-         * @private
-         */
+        * @type {Object}
+        * @default null
+        * @private
+        */
         _oLastMouseMoveTarget = null,
 
         /**
-         * Timestamp at the last point the pointer was hidden
-         * @type {number}
-         * @default 0
-         * @private
-         */
+        * Timestamp at the last point the pointer was hidden
+        * @type {Number}
+        * @default 0
+        * @private
+        */
         _nPointerHiddenTime = 0,
 
         /**
-         * Amount of time in ms to require after hiding pointer before 5-way keys are processed
-         * @type {number}
-         * @default 300
-         * @private
-         */
+        * Amount of time in ms to require after hiding pointer before 5-way keys are processed
+        * @type {Number}
+        * @default 300
+        * @private
+        */
         _nPointerHiddenToKeyTimeout = 300,
 
         /**
-         * Is key in pressed status?
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * Is key in pressed status?
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _bHold = false,
 
         /**
-         * Amount of time in ms of key hold
-         * @type {number}
-         * @default 0
-         * @private
-         */
+        * Amount of time in ms of key hold
+        * @type {Number}
+        * @default 0
+        * @private
+        */
         _holdStart = 0,
 
         /**
-         * Function which is sending onholdulse
-         * @type {Function}
-         * @default null
-         * @private
-         */
+        * Function which is sending onholdulse
+        * @type {Function}
+        * @default null
+        * @private
+        */
         _holdJobFunction = null,
 
         /**
-         * Job which is sending onholdulse
-         * @type {Function}
-         * @default null
-         * @private
-         */
+        * Job which is sending onholdulse
+        * @type {Function}
+        * @default null
+        * @private
+        */
         _holdJob = null,
 
         /**
-         * Is onholdulse fired?
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * Is onholdulse fired?
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _sentHold = false,
 
         /**
-         * Is holdPulse canceled?
-         * @type {boolean}
-         * @default false
-         * @private
-         */
+        * Is holdPulse canceled?
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
         _bCancelHold = false;
 
 
-    /**
-    @constant
-    @type {number}
-    @default 1536
-    */
+        /**
+        * @constant
+        * @type {Number}
+        * @default 1536
+        */
     var KEY_POINTER_SHOW = 1536,
 
         /**
-    @constant
-    @type {number}
-    @default 1537
-    */
+        * @constant
+        * @type {Number}
+        * @default 1537
+        */
         KEY_POINTER_HIDE = 1537;
 
 
     var
-    /**
-     * Event hook to the owner to catch Spotlight Events
-     *
-     * @name Spotlight#_interceptEvents
-     * @type {function}
-     * @private
-     */
+        /**
+        * Event hook to the owner to catch Spotlight Events
+        *
+        * @name Spotlight#_interceptEvents
+        * @type {Function}
+        * @private
+        */
         _interceptEvents = function() {
             _oThis.rootDispatchFunction = enyo.master.dispatchEvent;
             enyo.master.dispatchEvent = function(sEventName, oEvent, oSender) {
@@ -256,13 +256,13 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Create control-specific spotlight state storage
-         *
-         * @name Spotlight#_initializeControl
-         * @param {object} oControl
-         * @type {function}
-         * @private
-         */
+        * Create control-specific spotlight state storage
+        *
+        * @name Spotlight#_initializeControl
+        * @param {Object} oControl
+        * @type {Function}
+        * @private
+        */
         _initializeControl = function(oControl) {
             if (typeof oControl._spotlight == 'undefined') {
                 oControl._spotlight = {};
@@ -270,14 +270,14 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Get control specified in defaultSpotlightDisappear
-         * of _oCurrent. Gotta get it before it disappears :)
-         *
-         * @name Spotlight#_setDefaultDisappearControl
-         * @param {object} oControl
-         * @type {function}
-         * @private
-         */
+        * Get control specified in defaultSpotlightDisappear
+        * of _oCurrent. Gotta get it before it disappears :)
+        *
+        * @name Spotlight#_setDefaultDisappearControl
+        * @param {Object} oControl
+        * @type {Function}
+        * @private
+        */
         _setDefaultDisappearControl = function() {
             _oDefaultDisappear = enyo.Spotlight.Util.getDefaultDirectionControl(
                 'disappear',
@@ -286,13 +286,13 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Observer
-         *
-         * @name Spotlight#_onDisappear
-         * @param {object} oControl
-         * @type {function}
-         * @private
-         */
+        * Observer
+        *
+        * @name Spotlight#_onDisappear
+        * @param {Object} oControl
+        * @type {Function}
+        * @private
+        */
         _onDisappear = function() {
 
             // Only handle disappearance once
@@ -330,13 +330,13 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Add observers on control's parent chain
-         *
-         * @name Spotlight#_observeDisappearance
-         * @param {object} oControl
-         * @type {function}
-         * @private
-         */
+        * Add observers on control's parent chain
+        *
+        * @name Spotlight#_observeDisappearance
+        * @param {Object} oControl
+        * @type {Function}
+        * @private
+        */
         _observeDisappearance = function(bObserve, oControl, bInAncestor) {
 
             // Terminal case
@@ -378,13 +378,13 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Set currently spotted control.
-         *
-         * @name Spotlight#_setCurrent
-         * @param {object} oControl
-         * @type {function}
-         * @private
-         */
+        * Set currently spotted control.
+        *
+        * @name Spotlight#_setCurrent
+        * @param {Object} oControl
+        * @type {Function}
+        * @private
+        */
         _setCurrent = function(oControl) {
             _initializeControl(oControl);
 
@@ -425,26 +425,26 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Artificially trigger events on current control, like click
-         *
-         * @name Spotlight#_setCurrent
-         * @param {object} oControl
-         * @type {function}
-         * @private
-         */
+        * Artificially trigger events on current control, like click
+        *
+        * @name Spotlight#_setCurrent
+        * @param {Object} oControl
+        * @type {Function}
+        * @private
+        */
         _dispatchEvent = function(sEvent, oData, oControl) {
             oControl = oControl || _oThis.getCurrent();
             return enyo.Spotlight.Util.dispatchEvent(sEvent, oData, oControl);
         },
 
         /**
-         * Moves to a nearest neightbor based on 5Way Spotlight event
-         *
-         * @name Spotlight#_5WayMove
-         * @param {object} oEvent Current 5way event
-         * @type {function}
-         * @private
-         */
+        * Moves to a nearest neightbor based on 5Way Spotlight event
+        *
+        * @name Spotlight#_5WayMove
+        * @param {Object} oEvent Current 5way event
+        * @type {Function}
+        * @private
+        */
         _5WayMove = function(oEvent) {
             var sDirection = oEvent.type.replace('onSpotlight', '').toUpperCase(),
                 oControl = enyo.Spotlight.NearestNeighbor.getNearestNeighbor(sDirection);
@@ -474,14 +474,14 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Is oEvent.keyCode an arrow or enter
-         *
-         * @name Spotlight#_is5WayKey
-         * @param {object} oEvent Current 5way event
-         * @type {function}
-         * @returns {number}
-         * @private
-         */
+        * Is oEvent.keyCode an arrow or enter
+        *
+        * @name Spotlight#_is5WayKey
+        * @param {Object} oEvent Current 5way event
+        * @type {Function}
+        * @returns {Number}
+        * @private
+        */
         _is5WayKey = function(oEvent) {
 
             // 13==Enter, 16777221==KeypadEnter
@@ -489,18 +489,18 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Is the key that was pressed, one that is supposed
-         * to be ignored by the event's originator?
-         * This checks for whether the originator of the event,
-         * had any keyCodes specified, that it was supposed to ignore;
-         * returning true if it was supposed to ignore the oEvent.keyCode, or false if not.
-         *
-         * @name Spotlight#_isIgnoredKey
-         * @param {object} oEvent Current 5way event
-         * @type {function}
-         * @returns {boolean}
-         * @private
-         */
+        * Is the key that was pressed, one that is supposed
+        * to be ignored by the event's originator?
+        * This checks for whether the originator of the event,
+        * had any keyCodes specified, that it was supposed to ignore;
+        * returning true if it was supposed to ignore the oEvent.keyCode, or false if not.
+        *
+        * @name Spotlight#_isIgnoredKey
+        * @param {Object} oEvent Current 5way event
+        * @type {Function}
+        * @returns {Boolean}
+        * @private
+        */
         _isIgnoredKey = function(oEvent) {
             var oOriginator = enyo.$[oEvent.target.id];
             if (oOriginator && oOriginator.spotlightIgnoredKeys) {
@@ -516,15 +516,15 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Prevent default on dom event associated with spotlight event
-         * This is only for 5Way keydown events
-         *
-         * @name Spotlight#_isIgnoredKey
-         * @param {object} oEvent Current 5way event
-         * @type {function}
-         * @returns {boolean}
-         * @private
-         */
+        * Prevent default on dom event associated with spotlight event
+        * This is only for 5Way keydown events
+        *
+        * @name Spotlight#_isIgnoredKey
+        * @param {Object} oEvent Current 5way event
+        * @type {Function}
+        * @returns {Boolean}
+        * @private
+        */
         _preventDomDefault = function(oSpotlightEvent) {
 
             // Prevent default to keep the browser from scrolling the page, etc.,
@@ -536,16 +536,16 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * If originator is container, delegate processing of event
-         * to enyo.Spotlight.Container.onSpotlight* Return values: if found
-         * method to delegate, return its return value otherwise return true
-         *
-         * @name Spotlight#_delegateContainerEvent
-         * @param {object} oEvent Current 5way event
-         * @type {function}
-         * @returns {boolean}
-         * @private
-         */
+        * If originator is container, delegate processing of event
+        * to enyo.Spotlight.Container.onSpotlight* Return values: if found
+        * method to delegate, return its return value otherwise return true
+        *
+        * @name Spotlight#_delegateContainerEvent
+        * @param {Object} oEvent Current 5way event
+        * @type {Function}
+        * @returns {Boolean}
+        * @private
+        */
         _delegateContainerEvent = function(oEvent) {
             if (oEvent.type && oEvent.type.indexOf('onSpotlight') === 0) {
                 if (_oThis.isContainer(oEvent.originator)) {
@@ -558,14 +558,14 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Get spottable target by id for pointer events
-         *
-         * @name Spotlight#_getTarget
-         * @param {string} sId String ID of target
-         * @type {function}
-         * @returns {object}
-         * @private
-         */
+        * Get spottable target by id for pointer events
+        *
+        * @name Spotlight#_getTarget
+        * @param {String} sId String ID of target
+        * @type {Function}
+        * @returns {Object}
+        * @private
+        */
         _getTarget = function(sId) {
             var oTarget = enyo.$[sId];
             if (typeof oTarget != 'undefined') {
@@ -578,14 +578,14 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Get spottable target by id for pointer events
-         *
-         * @name Spotlight#_highlight
-         * @param {object} oControl Control to Mute
-         * @param {boolean} bIgnoreMute Should be muted?
-         * @type {function}
-         * @private
-         */
+        * Get spottable target by id for pointer events
+        *
+        * @name Spotlight#_highlight
+        * @param {Object} oControl Control to Mute
+        * @param {Boolean} bIgnoreMute Should be muted?
+        * @type {Function}
+        * @private
+        */
         _highlight = function(oControl, bIgnoreMute) {
 
             // Not highlighting when muted
@@ -609,59 +609,59 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Remove spotlight class from a control
-         *
-         * @name Spotlight#_unhighlight
-         * @param {object} oControl Control to have spotlight class removed
-         * @type {function}
-         * @private
-         */
+        * Remove spotlight class from a control
+        *
+        * @name Spotlight#_unhighlight
+        * @param {Object} oControl Control to have spotlight class removed
+        * @type {Function}
+        * @private
+        */
         _unhighlight = function(oControl) {
             oControl.removeClass('spotlight');
             _bFocusOnScreen = false;
         },
 
         /**
-         * Is pointer pointing away
-         *
-         * @name Spotlight#_isPointingAway
-         * @type {function}
-         * @returns {boolean}
-         * @private
-         */
+        * Is pointer pointing away
+        *
+        * @name Spotlight#_isPointingAway
+        * @type {Function}
+        * @returns {Boolean}
+        * @private
+        */
         _isPointingAway = function() {
             return _oThis.getPointerMode() && !_oLastMouseMoveTarget;
         },
 
         /**
-         * Checks to see if the timestamp is expired
-         *
-         * @name Spotlight#_isTimestampExpired
-         * @type {function}
-         * @private
-         */
+        * Checks to see if the timestamp is expired
+        *
+        * @name Spotlight#_isTimestampExpired
+        * @type {Function}
+        * @private
+        */
         _isTimestampExpired = function() {
             return enyo.perfNow() >= (_nPointerHiddenTime + _nPointerHiddenToKeyTimeout);
         },
 
         /**
-         * Sets the timestamp
-         *
-         * @name Spotlight#_setTimestamp
-         * @type {function}
-         * @private
-         */
+        * Sets the timestamp
+        *
+        * @name Spotlight#_setTimestamp
+        * @type {Function}
+        * @private
+        */
         _setTimestamp = function() {
             _nPointerHiddenTime = enyo.perfNow();
         },
 
         /**
-         * enyo.logs messages in verbose mode
-         *
-         * @name Spotlight#_log
-         * @type {function}
-         * @private
-         */
+        * enyo.logs messages in verbose mode
+        *
+        * @name Spotlight#_log
+        * @type {Function}
+        * @private
+        */
         _log = function() {
             if (_bVerbose) {
                 enyo.log('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
@@ -669,23 +669,23 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * enyo.warns messages
-         *
-         * @name Spotlight#_warn
-         * @type {function}
-         * @private
-         */
+        * enyo.warns messages
+        *
+        * @name Spotlight#_warn
+        * @type {Function}
+        * @private
+        */
         _warn = function() {
             enyo.warn('SPOTLIGHT: ' + Array.prototype.slice.call(arguments, 0).join(' '));
         },
 
         /**
-         * Spotlights the last control
-         *
-         * @name Spotlight#_spotLastControl
-         * @type {function}
-         * @private
-         */
+        * Spotlights the last control
+        *
+        * @name Spotlight#_spotLastControl
+        * @type {Function}
+        * @private
+        */
         _spotLastControl = function() {
             if (_oThis.isSpottable(_oLastControl)) {
                 _oThis.spot(_oLastControl);
@@ -695,14 +695,14 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Attempts to spot the control nearest the current pointer position.
-         * If no nearest control is found, the previous control is spotted.
-         *
-         * @name Spotlight#_spotNearestToPointer
-         * @param {object} oControl Control to have spotlight class removed
-         * @type {function}
-         * @private
-         */
+        * Attempts to spot the control nearest the current pointer position.
+        * If no nearest control is found, the previous control is spotted.
+        *
+        * @name Spotlight#_spotNearestToPointer
+        * @param {Object} oControl Control to have spotlight class removed
+        * @type {Function}
+        * @private
+        */
         _spotNearestToPointer = function(oEvent) {
             var oNearest = enyo.Spotlight.
             NearestNeighbor.
@@ -718,13 +718,13 @@ enyo.Spotlight = new function() {
         },
 
         /**
-         * Determines the intended direction of a keypress, given a keydown event.
-         *
-         * @name Spotlight#_getSpotDirection
-         * @param {object} oEvent Event to interpret
-         * @type {function}
-         * @private
-         */
+        * Determines the intended direction of a keypress, given a keydown event.
+        *
+        * @name Spotlight#_getSpotDirection
+        * @param {Object} oEvent Event to interpret
+        * @type {Function}
+        * @private
+        */
         _getSpotDirection = function(oEvent) {
             switch (oEvent.keyCode) {
                 case 37:
@@ -782,14 +782,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Receive accelerated keyup and keydown from accelerator
-     *
-     * @name Spotlight#onAcceleratedKey
-     * @param {object} oEvent Event to interpret
-     * @type {function}
-     * @returns {boolean}
-     * @public
-     */
+    * Receive accelerated keyup and keydown from accelerator
+    *
+    * @name Spotlight#onAcceleratedKey
+    * @param {Object} oEvent Event to interpret
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
     this.onAcceleratedKey = function(oEvent) {
         oEvent.domEvent = oEvent;
         oEvent.allowDomDefault = function() {
@@ -816,94 +816,94 @@ enyo.Spotlight = new function() {
             switch (oEvent.type) {
 
                 /**
-                 * @event Spotlight#onSpotlightKeyUp
-                 * @param {object} oEvent
-                 * @type {Object}
-                 * @public
-                 */
+                * @event Spotlight#onSpotlightKeyUp
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightKeyUp':
                     return this.onSpotlightKeyUp(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightKeyDown
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightKeyDown
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightKeyDown':
                     return this.onSpotlightKeyDown(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightFocus
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightFocus
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightFocus':
                     return this.onSpotlightFocus(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightFocused
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightFocused
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightFocused':
                     return this.onSpotlightFocused(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightFocused
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightFocused
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightBlur':
                     return this.onSpotlightBlur(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightFocused
-                     * @param {object} oEvent
-                     * @memberof Spotlight
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightFocused
+                * @param {Object} oEvent
+                * @memberof Spotlight
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightLeft':
                     return this.onSpotlightLeft(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightRight
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightRight
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightRight':
                     return this.onSpotlightRight(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightUp
-                     * @param {object} oEvent
-                     * @memberof Spotlight
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightUp
+                * @param {Object} oEvent
+                * @memberof Spotlight
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightUp':
                     return this.onSpotlightUp(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightDown
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightDown
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightDown':
                     return this.onSpotlightDown(oEvent);
 
-                    /**
-                     * @event Spotlight#onSpotlightSelect
-                     * @param {object} oEvent
-                     * @type {Object}
-                     * @public
-                     */
+                /**
+                * @event Spotlight#onSpotlightSelect
+                * @param {Object} oEvent
+                * @type {Object}
+                * @public
+                */
                 case 'onSpotlightSelect':
                     return this.onSpotlightSelect(oEvent);
             }
@@ -911,13 +911,13 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Called by onEvent() (via spotlight scrolling) to process scroll events
-     * @event Spotlight#onScroll
-     * @param {object} oEvent
-     * @param {boolean} bUp Bubble up? If false, bubble down.
-     * @type {Object}
-     * @public
-     */
+    * Called by onEvent() (via spotlight scrolling) to process scroll events
+    * @event Spotlight#onScroll
+    * @param {Object} oEvent
+    * @param {Boolean} bUp Bubble up? If false, bubble down.
+    * @type {Object}
+    * @public
+    */
     this.onScroll = function(oEvent, bUp) {
         var sEventName = 'onSpotlightScroll' + (bUp ? 'Up' : 'Down');
         return _dispatchEvent(sEventName, {
@@ -1199,42 +1199,42 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Called when spotlight is focusing on a control
-     * @event Spotlight#onSpotlightFocus
-     * @param {object} oEvent
-     * @type {function}
-     * @public
-     */
+    * Called when spotlight is focusing on a control
+    * @event Spotlight#onSpotlightFocus
+    * @param {Object} oEvent
+    * @type {Function}
+    * @public
+    */
     this.onSpotlightFocus = function(oEvent) {
         _setCurrent(oEvent.originator);
     };
 
     /**
-     * Called after spotlight has focused on a control
-     * @event Spotlight#onSpotlightFocused
-     * @param {object} oEvent
-     * @type {function}
-     * @public
-     */
+    * Called after spotlight has focused on a control
+    * @event Spotlight#onSpotlightFocused
+    * @param {Object} oEvent
+    * @type {Function}
+    * @public
+    */
     this.onSpotlightFocused = function(oEvent) {};
 
     /**
-     * Called when control's focus is blured
-     * @event Spotlight#onSpotlightBlur
-     * @param {object} oEvent
-     * @type {function}
-     * @public
-     */
+    * Called when control's focus is blured
+    * @event Spotlight#onSpotlightBlur
+    * @param {Object} oEvent
+    * @type {Function}
+    * @public
+    */
     this.onSpotlightBlur = function(oEvent) {};
 
     /**
-     * Initializes spotlight's flags and root
-     *
-     * @name Spotlight#initialize
-     * @type {function}
-     * @param {object} oRoot Root container.
-     * @public
-     */
+    * Initializes spotlight's flags and root
+    *
+    * @name Spotlight#initialize
+    * @type {Function}
+    * @param {Object} oRoot Root container.
+    * @public
+    */
     this.initialize = function(oRoot) {
 
         // Prevent double init'ion, for example, it
@@ -1267,24 +1267,24 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Does spotlight have _oCurrent and last5waycontrol?
-     *
-     * @name Spotlight#isInitialized
-     * @type {function}
-     * @public
-     */
+    * Does spotlight have _oCurrent and last5waycontrol?
+    *
+    * @name Spotlight#isInitialized
+    * @type {Function}
+    * @public
+    */
     this.isInitialized = function() {
         return _bInitialized;
     };
 
     /**
-     * Does spotlight have _oCurrent and last5waycontrol?
-     *
-     * @name Spotlight#isInitialized
-     * @type {function}
-     * @param {boolean} bPointerMode Is navigation using pointer mode?
-     * @public
-     */
+    * Does spotlight have _oCurrent and last5waycontrol?
+    *
+    * @name Spotlight#isInitialized
+    * @type {Function}
+    * @param {Boolean} bPointerMode Is navigation using pointer mode?
+    * @public
+    */
     this.setPointerMode = function(bPointerMode) {
         if ((_bPointerMode != bPointerMode) && (!enyo.platform.touch)) {
             _bPointerMode = bPointerMode;
@@ -1391,13 +1391,13 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Returns spottable chldren along with position of self
-     *
-     * @name Spotlight#getSiblings
-     * @param {object} oControl Control used to retrieve siblings
-     * @type {function}
-     * @private
-     */
+    * Returns spottable chldren along with position of self
+    *
+    * @name Spotlight#getSiblings
+    * @param {Object} oControl Control used to retrieve siblings
+    * @type {Function}
+    * @private
+    */
     this.getSiblings = function(oControl) {
         oControl = oControl || this.getCurrent();
         if (!oControl) {
@@ -1419,14 +1419,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Dispatches focus event to the control or its first spottable child
-     *
-     * @name Spotlight#getChildren
-     * @param {object} oControl Control used to retrieve children
-     * @param {boolean} bSpotlightTrueOnly retrieve only spotable children
-     * @type {function}
-     * @private
-     */
+    * Dispatches focus event to the control or its first spottable child
+    *
+    * @name Spotlight#getChildren
+    * @param {Object} oControl Control used to retrieve children
+    * @param {Boolean} bSpotlightTrueOnly retrieve only spotable children
+    * @type {Function}
+    * @private
+    */
     this.getChildren = function(oControl, bSpotlightTrueOnly) {
         oControl = oControl || this.getCurrent();
         if (!oControl) {
@@ -1450,14 +1450,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Returns closest spottable parent, or null if there is none
-     *
-     * @name Spotlight#spot
-     * @type {function}
-     * @param {object} oControl
-     * @returns {object}
-     * @private
-     */
+    * Returns closest spottable parent, or null if there is none
+    *
+    * @name Spotlight#spot
+    * @type {Function}
+    * @param {Object} oControl
+    * @returns {Object}
+    * @private
+    */
     this.getParent = function(oControl) {
         oControl = oControl || this.getCurrent();
         if (!oControl) {
@@ -1475,14 +1475,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Dispatches focus event to the control or its first spottable child
-     *
-     * @name Spotlight#spot
-     * @type {function}
-     * @param {object} oControl
-     * @return {boolean}
-     * @private
-     */
+    * Dispatches focus event to the control or its first spottable child
+    *
+    * @name Spotlight#spot
+    * @type {Function}
+    * @param {Object} oControl
+    * @return {Boolean}
+    * @private
+    */
     this.spot = function(oControl, sDirection, bWasPoint) {
 
         // If spotlight is not yet initialized
@@ -1547,14 +1547,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Dispatches spotlight blur event to current control
-     *
-     * @name Spotlight#unspot
-     * @type {function}
-     * @param {object} oControl
-     * @returns {boolean}
-     * @private
-     */
+    * Dispatches spotlight blur event to current control
+    *
+    * @name Spotlight#unspot
+    * @type {Function}
+    * @param {Object} oControl
+    * @returns {Boolean}
+    * @private
+    */
     this.unspot = function() {
 
         // Current cannot change while in frozen mode
@@ -1573,14 +1573,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Get first spottable child of a control
-     *
-     * @name Spotlight#getFirstChild
-     * @type {function}
-     * @param {object} oControl
-     * @returns {object}
-     * @private
-     */
+    * Get first spottable child of a control
+    *
+    * @name Spotlight#getFirstChild
+    * @type {Function}
+    * @param {Object} oControl
+    * @returns {Object}
+    * @private
+    */
     this.getFirstChild = function(oControl) {
         oControl = oControl || this.getCurrent();
         if (!oControl) {
@@ -1590,14 +1590,14 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Has XY value changed since last mousemove event?
-     *
-     * @name Spotlight#clientXYChanged
-     * @type {function}
-     * @param {object} oEvent
-     * @returns {boolean}
-     * @private
-     */
+    * Has XY value changed since last mousemove event?
+    *
+    * @name Spotlight#clientXYChanged
+    * @type {Function}
+    * @param {Object} oEvent
+    * @returns {Boolean}
+    * @private
+    */
     this.clientXYChanged = function(oEvent) {
         var bChanged = (
             _nPrevClientX !== oEvent.clientX ||
@@ -1613,34 +1613,34 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Enable pointer mode
-     *
-     * @name Spotlight#disablePointerMode
-     * @type {function}
-     * @private
-     */
+    * Enable pointer mode
+    *
+    * @name Spotlight#disablePointerMode
+    * @type {Function}
+    * @private
+    */
     this.disablePointerMode = function() {
         _bEnablePointerMode = false;
     };
 
     /**
-     * Disable pointer mode
-     *
-     * @name Spotlight#disablePointerMode
-     * @type {function}
-     * @private
-     */
+    * Disable pointer mode
+    *
+    * @name Spotlight#disablePointerMode
+    * @type {Function}
+    * @private
+    */
     this.enablePointerMode = function() {
         _bEnablePointerMode = true;
     };
 
     /**
-     * Switching to muted mode (no "spotlight" css class is being set in dom)
-     *
-     * @name Spotlight#disablePointerMode
-     * @type {function}
-     * @private
-     */
+    * Switching to muted mode (no "spotlight" css class is being set in dom)
+    *
+    * @name Spotlight#disablePointerMode
+    * @type {Function}
+    * @private
+    */
     this.mute = function(oSender) {
         enyo.Spotlight.Muter.addMuteReason(oSender);
     };
@@ -1652,27 +1652,27 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Switching to verbose mode
-     *
-     * @name Spotlight#verbose
-     * @type {function}
-     * @param {boolean} bVerbose
-     * @return {string}
-     * @private
-     */
+    * Switching to verbose mode
+    *
+    * @name Spotlight#verbose
+    * @type {Function}
+    * @param {Boolean} bVerbose
+    * @return {String}
+    * @private
+    */
     this.verbose = function(bVerbose) {
         _bVerbose = (typeof bVerbose == 'undefined') ? !_bVerbose : bVerbose;
         return 'SPOTLIGHT: Verbose mode set to ' + _bVerbose;
     };
 
     /**
-     * Switching to frozen mode (current cannot change while frozen)
-     *
-     * @name Spotlight#freeze
-     * @type {function}
-     * @return {string}
-     * @private
-     */
+    * Switching to frozen mode (current cannot change while frozen)
+    *
+    * @name Spotlight#freeze
+    * @type {Function}
+    * @return {String}
+    * @private
+    */
     this.freeze = function() {
         if (!this.hasCurrent()) {
             throw 'Can not enter frozen mode until something is spotted';
@@ -1682,46 +1682,46 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Switching to frozen mode (current cannot change while frozen)
-     *
-     * @name Spotlight#unfreeze
-     * @type {function}
-     * @return {string}
-     * @private
-     */
+    * Switching to frozen mode (current cannot change while frozen)
+    *
+    * @name Spotlight#unfreeze
+    * @type {Function}
+    * @return {String}
+    * @private
+    */
     this.unfreeze = function() {
         _bFrozen = false;
         return 'SPOTLIGHT: Exit frozen mode';
     };
 
     /**
-     * Switching to frozen mode (current cannot change while frozen)
-     *
-     * @name Spotlight#isFrozen
-     * @type {function}
-     * @return {string}
-     * @private
-     */
+    * Switching to frozen mode (current cannot change while frozen)
+    *
+    * @name Spotlight#isFrozen
+    * @type {Function}
+    * @return {String}
+    * @private
+    */
     this.isFrozen = function() {
         return _bFrozen;
     };
 
     /**
-     *
-     * @name Spotlight#highlight
-     * @type {function}
-     * @private
-     */
+    *
+    * @name Spotlight#highlight
+    * @type {Function}
+    * @private
+    */
     this.highlight = function(oControl, bIgnoreMute) {
         _highlight(oControl, bIgnoreMute);
     };
 
     /**
-     *
-     * @name Spotlight#unhighlight
-     * @type {function}
-     * @private
-     */
+    *
+    * @name Spotlight#unhighlight
+    * @type {Function}
+    * @private
+    */
     this.unhighlight = function(oControl) {
         _unhighlight(oControl);
     };
@@ -1731,13 +1731,13 @@ enyo.Spotlight = new function() {
     /************************************************************/
 
     /**
-     * Decorate event to let user can call configureHoldPulse function
-     *
-     * @name Spotlight#initiateHoldPulse
-     * @type {function}
-     * @param {object} oEvent
-     * @private
-     */
+    * Decorate event to let user can call configureHoldPulse function
+    *
+    * @name Spotlight#initiateHoldPulse
+    * @type {Function}
+    * @param {Object} oEvent
+    * @private
+    */
     this.initiateHoldPulse = function(oEvent) {
 
         // Set holdpulse defaults and expose method for configuring holdpulse options
@@ -1749,28 +1749,28 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Get default holdPulseConfig if it if not initialized by down event
-     *
-     * @name Spotlight#getHoldPulseDelay
-     * @type {function}
-     * @param {object} oEvent
-     * @returns {object}
-     * @private
-     */
+    * Get default holdPulseConfig if it if not initialized by down event
+    *
+    * @name Spotlight#getHoldPulseDelay
+    * @type {Function}
+    * @param {Object} oEvent
+    * @returns {Object}
+    * @private
+    */
     this.getHoldPulseDelay = function(oEvent) {
         var drag = enyo.gesture.drag;
         return Object.keys(drag.holdPulseConfig).length > 0 ? drag.holdPulseConfig.delay : drag.holdPulseDefaultConfig.delay;
     };
 
     /**
-     * Initiate relevant variables and start sending holdPulse job
-     *
-     * @name Spotlight#beginHold
-     * @type {function}
-     * @param {object} oEvent
-     * @returns {boolean}
-     * @private
-     */
+    * Initiate relevant variables and start sending holdPulse job
+    *
+    * @name Spotlight#beginHold
+    * @type {Function}
+    * @param {Object} oEvent
+    * @returns {Boolean}
+    * @private
+    */
     this.beginHold = function(oEvent) {
 
         // Prevent consecutive hold start
@@ -1792,13 +1792,13 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Clear relevant variables and cancel holdPulse job
-     *
-     * @name Spotlight#stopHold
-     * @type {function}
-     * @param {object} oEvent .
-     * @private
-     */
+    * Clear relevant variables and cancel holdPulse job
+    *
+    * @name Spotlight#stopHold
+    * @type {Function}
+    * @param {Object} oEvent .
+    * @private
+    */
     this.stopHold = function(oEvent) {
 
         // Do nothing if not in hold status
@@ -1821,34 +1821,34 @@ enyo.Spotlight = new function() {
     };
 
     /**
-     * Clear relevant variables and cancel holdPulse job
-     *
-     * @name Spotlight#resetHold
-     * @type {function}
-     * @private
-     */
+    * Clear relevant variables and cancel holdPulse job
+    *
+    * @name Spotlight#resetHold
+    * @type {Function}
+    * @private
+    */
     this.resetHold = function() {
         _bCancelHold = false;
     };
 
     /**
-     * Clear relevant variables and cancel holdPulse job
-     *
-     * @name Spotlight#resetHold
-     * @type {function}
-     * @private
-     */
+    * Clear relevant variables and cancel holdPulse job
+    *
+    * @name Spotlight#resetHold
+    * @type {Function}
+    * @private
+    */
     this.cancelHold = function(oEvent) {
         _bCancelHold = true;
     };
 
     /**
-     * Send onHoldPulse event with holdTime parameter
-     *
-     * @name Spotlight#resetHold
-     * @type {function}
-     * @private
-     */
+    * Send onHoldPulse event with holdTime parameter
+    *
+    * @name Spotlight#resetHold
+    * @type {Function}
+    * @private
+    */
     this.sendHoldPulse = function(oEvent) {
         if (_bCancelHold) {
             return;
