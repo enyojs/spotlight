@@ -213,6 +213,10 @@ enyo.Spotlight.NearestNeighbor = new function() {
 		var oBounds = oControl.getAbsoluteBounds(),
 			o       = enyo.Spotlight.getSiblings(oControl);
 
+		if (oControl.spotlight && oControl.spotlight == "container" && enyo.Spotlight.getExCurrent()) {
+			oBounds = enyo.Spotlight.getExCurrent().getAbsoluteBounds();
+		}
+
 		return _calculateNearestNeighbor(o.siblings, sDirection, oBounds, oControl);
 	};
 };

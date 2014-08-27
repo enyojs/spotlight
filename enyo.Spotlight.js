@@ -14,6 +14,7 @@ enyo.Spotlight = new function() {
 		_bPointerMode                   = true,     // Is spotlight in pointer mode or 5way mode?
 		_bInitialized                   = false,    // Does spotlight have _oCurrent
 		_oCurrent                       = null,     // Currently spotlighted element
+		_oExCurrent                     = null,     // Previously spotlighted element
 		_oLastEvent                     = null,     // Last event received by Spotlight
 		_oLast5WayEvent                 = null,     // Last 5way event received by Spotlight
 		_oLastControl                   = null,     // Last non-container (spotlight:true) control that was _oCurrent
@@ -117,14 +118,14 @@ enyo.Spotlight = new function() {
 				throw 'Attempting to spot not-spottable control: ' + oControl.toString();
 			}
 			
-			var oExCurrent = _oCurrent;
+			_oExCurrent = _oCurrent;
 
 			_oThis.unspot();                                                      // Remove spotlight class and Blur 
 			_highlight(oControl);                                                 // Add spotlight class 
 			
 			_oCurrent = oControl;
 			setTimeout(function() {                                               // Set observers asynchronously to allow painti to happen faster
-				_observeDisappearance(false, oExCurrent);
+				_observeDisappearance(false, _oExCurrent);
 				_observeDisappearance(true, _oCurrent);
 			}, 1);
 				
@@ -609,6 +610,7 @@ enyo.Spotlight = new function() {
 	this.getCurrent           = function()                { return _oCurrent;               };
 	this.setCurrent           = function(oControl)        { return _setCurrent(oControl);   };
 	this.hasCurrent           = function()                { return _oCurrent !== null;      };
+	this.getExCurrent         = function()                { return _oExCurrent;             };
 	this.getLastEvent         = function()                { return _oLastEvent;             };
 	this.getLastControl       = function()                { return _oLastControl;           };
 	this.getLast5WayEvent     = function()                { return _oLast5WayEvent;         };
