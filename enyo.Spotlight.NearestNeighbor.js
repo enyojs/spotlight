@@ -210,11 +210,14 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
 		// If default control in the directin of navigation is not specified, calculate it
 
-		var oBounds = oControl.getAbsoluteBounds(),
-			o       = enyo.Spotlight.getSiblings(oControl);
+		var oBounds   = null,
+			o         = enyo.Spotlight.getSiblings(oControl),
+			oPrevious = enyo.Spotlight.getPrevious();
 
-		if (oControl.spotlight && oControl.spotlight == "container" && enyo.Spotlight.getExCurrent()) {
-			oBounds = enyo.Spotlight.getExCurrent().getAbsoluteBounds();
+		if (oControl.spotlight && oControl.spotlight == "container" && oPrevious) {
+			oBounds = oPrevious.getAbsoluteBounds();
+		} else {
+			oBounds = oControl.getAbsoluteBounds();
 		}
 
 		return _calculateNearestNeighbor(o.siblings, sDirection, oBounds, oControl);
