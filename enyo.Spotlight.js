@@ -1674,11 +1674,11 @@ enyo.Spotlight = new function() {
     * @private
     */
     this.freeze = function() {
-        if (!this.hasCurrent()) {
-            throw 'Can not enter frozen mode until something is spotted';
-        }
-        _bFrozen = true;
-        return 'SPOTLIGHT: Frozen on ' + _oCurrent.toString();
+		if (this.hasCurrent()) {
+			_bFrozen = true;
+		} else {
+			_warn('Can not enter frozen mode until something is spotted');
+		}
     };
 
     /**
@@ -1689,10 +1689,9 @@ enyo.Spotlight = new function() {
     * @return {String}
     * @private
     */
-    this.unfreeze = function() {
-        _bFrozen = false;
-        return 'SPOTLIGHT: Exit frozen mode';
-    };
+    this.unfreeze = function() { 
+		_bFrozen = false;
+	};
 
     /**
     * Switching to frozen mode (current cannot change while frozen)
