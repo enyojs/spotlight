@@ -1,32 +1,70 @@
+/**
+* @typedef {Object} enyo.Spotlight.Container definition
+*
+* @ui
+* @class enyo.Spotlight.Muter
+* @public
+*/
 enyo.Spotlight.Muter = new function() {
-	var _oMutes = {},
-		_nMutes = 0;
+    var _oMutes = {},
+        _nMutes = 0;
 
-	this.addMuteReason = function(oSender) {
-		if (typeof _oMutes[oSender.id] != 'undefined') { return; }
+    /**
+    * Add a muted control
+    *
+    * @param  {Object} oSender - Control to be muted
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
+    this.addMuteReason = function(oSender) {
+        if (typeof _oMutes[oSender.id] != 'undefined') {
+            return;
+        }
 
-		if (_nMutes === 0) {
-			var oCurrent = enyo.Spotlight.getCurrent();
-			if (oCurrent) { enyo.Spotlight.unhighlight(oCurrent); }
-		}
+        if (_nMutes === 0) {
+            var oCurrent = enyo.Spotlight.getCurrent();
+            if (oCurrent) {
+                enyo.Spotlight.unhighlight(oCurrent);
+            }
+        }
 
-		_oMutes[oSender.id] = 1;
-		_nMutes ++;
-	};
+        _oMutes[oSender.id] = 1;
+        _nMutes++;
+    };
 
-	this.removeMuteReason = function(oSender) {
-		if (typeof _oMutes[oSender.id] == 'undefined') { return; }
+    /**
+    * Remove a muted control
+    *
+    * @param  {Object} oSender - Control to be un-muted
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
+    this.removeMuteReason = function(oSender) {
+        if (typeof _oMutes[oSender.id] == 'undefined') {
+            return;
+        }
 
-		delete _oMutes[oSender.id];
-		_nMutes --;
+        delete _oMutes[oSender.id];
+        _nMutes--;
 
-		if (_nMutes === 0) {
-			var oCurrent = enyo.Spotlight.getCurrent();
-			if (oCurrent) { enyo.Spotlight.highlight(oCurrent, true); }
-		}
-	};
+        if (_nMutes === 0) {
+            var oCurrent = enyo.Spotlight.getCurrent();
+            if (oCurrent) {
+                enyo.Spotlight.highlight(oCurrent, true);
+            }
+        }
+    };
 
-	this.isMuted = function() {
-		return _nMutes > 0;
-	};
+    /**
+    * Checks if spotlight muter is muting
+    *
+    * @type {Function}
+    * @returns {Boolean}
+    * @public
+    */
+    this.isMuted = function() {
+        return _nMutes > 0;
+    };
 };
