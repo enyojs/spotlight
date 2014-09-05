@@ -183,7 +183,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
                 angle = _getAngle(slope),
                 distance = _getDistance(delta);
 
-            return angle > 89 ? 0 : 1 / (angle * Math.pow(distance, 4));
+            return angle > 90 ? 0 : 1 / (angle * Math.pow(distance, 4));
         },
 
         /**
