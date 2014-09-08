@@ -217,7 +217,17 @@ enyo.Spotlight = new function() {
         * @default false
         * @private
         */
-        _bCancelHold = false;
+        _bCancelHold = false,
+        
+        /**
+        * If a key down was ignored, be sure to ignore the following key up. Specifically, this
+        * works around the different target keyup for Enter for inputs (input on down, body on up).
+        *
+        * @type {Number}
+        * @default 0
+        * @private
+        */
+        _nIgnoredKeyDown = 0;
 
 
         /**
@@ -1043,7 +1053,10 @@ enyo.Spotlight = new function() {
     this.onKeyDown = function(oEvent) {
 
         if (_isIgnoredKey(oEvent)) {
+            _nIgnoredKeyDown = oEvent.which;
             return false;
+        } else {
+            _nIgnoredKeyDown = 0;
         }
 
         // Update pointer mode based on special keycode from
@@ -1111,7 +1124,7 @@ enyo.Spotlight = new function() {
     };
 
     this.onKeyUp = function(oEvent) {
-        if (_isIgnoredKey(oEvent)) {
+        if (_nIgnoredKeyDown === oEvent.which || _isIgnoredKey(oEvent)) {
             return false;
         }
         enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
