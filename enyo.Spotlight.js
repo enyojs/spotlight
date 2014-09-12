@@ -315,7 +315,8 @@ enyo.Spotlight = new function() {
                 if (!oControl) {
                     _unhighlight(_oLastControl);
                     _oLastControl = null;
-
+                    
+                    _observeDisappearance(false, _oCurrent);
                     // NULL CASE :(, just like when no spottable children found on init
                     _oCurrent = null;
                     return;
@@ -1566,6 +1567,7 @@ enyo.Spotlight = new function() {
             _unhighlight(_oCurrent);
             _oLastMouseMoveTarget = null;
             _dispatchEvent('onSpotlightBlur', null, _oCurrent);
+            _observeDisappearance(false, _oCurrent);
             _oCurrent = null;
             return true;
         }
