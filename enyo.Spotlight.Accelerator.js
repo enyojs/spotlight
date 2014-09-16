@@ -1,5 +1,6 @@
 /**
-* Provides acceleration and throttle of cursor movement.
+* {@link enyo.Spotlight.Accelerator} provides logic for accelerating and
+* throttling cursor movement.
 *
 * @typedef {Object} enyo.Spotlight.Accelerator
 *
@@ -19,8 +20,8 @@ enyo.Spotlight.Accelerator = new function() {
         _bCanceled = false;
 
     /**
-    * Controls the frequency in which the cursor will 'freeze'
-    * While frozen, current cannot change and all events are directed to it.
+    * Controls the frequency with which the cursor will "freeze". While frozen,
+    * the current spotted item cannot change, and all events are directed to it.
     *
     * @type {Array}
     * @default [3, 3, 3, 2, 2, 2, 1]
@@ -29,13 +30,13 @@ enyo.Spotlight.Accelerator = new function() {
     this.frequency = [3, 3, 3, 2, 2, 2, 1];
 
     /**
-    * Called from enyo.Spotlight, with current keydown event and Spotlight's callback
-    * Which will be called when an event is allowed through
+    * Called from {@link enyo.Spotlight}, with the current keydown event and
+    * Spotlight's callback, which will be called when the event is allowed
+    * through.
     *
-    * @param  {Object} oEvent - Current event to validate
-    * @param  {Function} fCallback - Callback that is executed
-    * @param  {Object} oContext - Callback's execution context
-    * @type {Function}
+    * @param  {Object} oEvent - The current event to validate.
+    * @param  {Function} fCallback - The callback to execute.
+    * @param  {Object} oContext - The callback's execution context.
     * @returns {Boolean}
     * @public
     */
@@ -87,9 +88,8 @@ enyo.Spotlight.Accelerator = new function() {
 
 
     /**
-    * Reset values for spotlight
+    * Resets values for Spotlight.
     *
-    * @type {Function}
     * @public
     */
     this.reset = function() {
@@ -101,9 +101,8 @@ enyo.Spotlight.Accelerator = new function() {
     };
 
     /**
-    * Cancel the accelerator
+    * Cancels the accelerator.
     *
-    * @type {Function}
     * @public
     */
     this.cancel = function() {
@@ -111,10 +110,9 @@ enyo.Spotlight.Accelerator = new function() {
     };
 
     /**
-    * Verify the accelerator is in motion
+    * Verifies that the accelerator is active.
     *
-    * @type {Function}
-    * @returns {Boolean}
+    * @returns {Boolean} `true` if the accelerator is active; otherwise, `false`.
     * @public
     */
     this.isAccelerating = function() {

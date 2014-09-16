@@ -1,5 +1,5 @@
 /**
-* provides acceleration and throttle of cursor movement.
+* {@link enyo.Spotlight.Container}
 *
 * @typedef {Object} enyo.Spotlight.Container definition
 *
@@ -15,10 +15,9 @@ enyo.Spotlight.Container = new function() {
     var _oThis = this;
 
     /**
-    * Creates oSender._spotlight object
+    * Creates `oSender._spotlight` object.
     *
-    * @param  {Object} oSender - Object that will be initalized for spotlight
-    * @type {Function}
+    * @param  {Object} oSender - The object that will be initalized for Spotlight.
     * @private
     */
     var _initComponent = function(oSender) {
@@ -43,10 +42,11 @@ enyo.Spotlight.Container = new function() {
         },
 
         /**
-        * Verifies if spotlight has been initialized
+        * Determines whether Spotlight has been initialized.
         *
-        * @param  {Object} oSender - Object that will be initalized for spotlight
-        * @type {Function}
+        * @param  {Object} oSender - The object that will be checked for
+        * Spotlight initalization.
+        * @return {Boolean} `true` if Spotlight has been initialized; otherwise, `false`.
         * @private
         */
         _isInitialized = function(oSender) {
@@ -54,11 +54,10 @@ enyo.Spotlight.Container = new function() {
         },
 
         /**
-        * Handle events bubbling from within the container
+        * Handles events bubbling from within the container.
         *
-        * @param  {Object} oSender - Object that is sending the event
-        * @param  {Object} oEvent - Event to bubble
-        * @type {Function}
+        * @param  {Object} oSender - The object that is sending the event.
+        * @param  {Object} oEvent - The event to bubble.
         * @private
         */
         _handleEvent = function(oSender, oEvent) {
@@ -77,10 +76,9 @@ enyo.Spotlight.Container = new function() {
         },
 
         /**
-        * Was last spotted control the container's child?
+        * Determines whether last spotted control was the container's child.
         *
-        * @param  {Object} oSender - Object that will be initalized for spotlight
-        * @type {Function}
+        * @param  {Object} oSender
         * @returns {Object}
         * @private
         */
@@ -96,11 +94,10 @@ enyo.Spotlight.Container = new function() {
         },
 
         /**
-        * Handle a control losing focus from spotlight
+        * Handles a control's losing focus from Spotlight.
         *
-        * @param  {Object} oSender - Object that is sending the event
-        * @param  {String} s5WayEventType - Event to move focus.
-        * @type {Function}
+        * @param  {Object} oSender - The object that is sending the event.
+        * @param  {String} s5WayEventType - The event causing focus to move.
         * @private
         */
         _focusLeave = function(oSender, s5WayEventType) {
@@ -115,11 +112,10 @@ enyo.Spotlight.Container = new function() {
         },
 
         /**
-        * Handle a control gaining focus from spotlight
+        * Handles a control's gaining focus from Spotlight.
         *
-        * @param  {Object} oSender - Object that is sending the event
-        * @param  {String} s5WayEventType - Event to move focus.
-        * @type {Function}
+        * @param  {Object} oSender - The object that is sending the event.
+        * @param  {String} s5WayEventType - The event causing focus to move.
         * @private
         */
         _focusEnter = function(oSender, s5WayEventType) {
@@ -131,8 +127,8 @@ enyo.Spotlight.Container = new function() {
         };
 
     /**
-    * Start intercept event to remember last focus on container.
-    * Call this api after dynamically set spotlight as "container".
+    * Starts intercepting events to keep track of last focus for container.
+    * Call this API after dynamically setting Spotlight as "container".
     *
     * @param  {Object} control
     * @public
@@ -146,10 +142,10 @@ enyo.Spotlight.Container = new function() {
     };
 
     /**
-    * Spotlight focus event
+    * Handles Spotlight focus event.
     *
-    * @param  {Object} oChild
-    * @param  {Object} oEvent
+    * @param  {Object} oSender - The sender of the event.
+    * @param  {Object} oEvent - The focus event.
     * @public
     */
     this.onSpotlightFocus = function(oSender, oEvent) {
@@ -158,10 +154,10 @@ enyo.Spotlight.Container = new function() {
     };
 
     /**
-    * Spotlight focused event
+    * Handles Spotlight focused event.
     *
-    * @param  {Object} oChild
-    * @param  {Object} oEvent
+    * @param  {Object} oSender - The sender of the event.
+    * @param  {Object} oEvent - The focused event.
     * @returns {Boolean}
     * @public
     */
@@ -187,7 +183,7 @@ enyo.Spotlight.Container = new function() {
             }
             _focusLeave(oSender, s5WayEventType);
 
-            // Focus came from outside or this was a programmic spot
+            // Focus came from outside or this was a programmatic spot
         } else {
             var oLastFocusedChild = this.getLastFocusedChild(oSender);
             if (oLastFocusedChild) {
@@ -212,10 +208,10 @@ enyo.Spotlight.Container = new function() {
     };
 
     /**
-    * What child of container was last focused?
+    * Returns last focused child of the container.
     *
     * @param  {Object} oSender
-    * @returns {Object}
+    * @returns {Object} - The last focused child of the container.
     * @public
     */
     this.getLastFocusedChild = function(oSender) {
@@ -227,10 +223,10 @@ enyo.Spotlight.Container = new function() {
     };
 
     /**
-    * Set last focused child
+    * Sets last focused child for the container.
     *
     * @param  {Object} oSender
-    * @param  {Object} oChild
+    * @param  {Object} oChild - The child to set as the last focused child.
     * @public
     */
     this.setLastFocusedChild = function(oSender, oChild) {
@@ -241,7 +237,7 @@ enyo.Spotlight.Container = new function() {
             oSender._spotlight = oSender._spotlight || {};
             oSender._spotlight.lastFocusedChild = oChild;
         } else {
-            enyo.warn('Spotlight Container attempts to set not spottable lastFocusedChild');
+            enyo.warn('Spotlight Container attempting to set non-spottable lastFocusedChild');
         }
     };
 
@@ -251,7 +247,7 @@ enyo.Control.extend({
     create: enyo.inherit(function(sup) {
         return function() {
             sup.apply(this, arguments);
-            // If spotlight "container" is set statically then automatically starts intercept events.
+            // If spotlight "container" is set statically then automatically starts to intercept events.
             if (this.spotlight && this.spotlight === 'container') {
                 enyo.Spotlight.Container.initContainer(this);
             }

@@ -1,5 +1,10 @@
 /**
-* @typedef {Object} enyo.Spotlight.Container definition
+* {@link enyo.Spotlight.Muter} provides methods for working with muted controls.
+* By default, when a control is muted, it does not have the `'spotlight'` CSS class
+* applied to its DOM node, and does not appear as highlighted when it has Spotlight
+* focus.
+*
+* @typedef {Object} enyo.Spotlight.Muter definition
 *
 * @ui
 * @class enyo.Spotlight.Muter
@@ -10,11 +15,9 @@ enyo.Spotlight.Muter = new function() {
         _nMutes = 0;
 
     /**
-    * Add a muted control
+    * Mutes a control.
     *
-    * @param  {Object} oSender - Control to be muted
-    * @type {Function}
-    * @returns {Boolean}
+    * @param  {Object} oSender - The control to be muted.
     * @public
     */
     this.addMuteReason = function(oSender) {
@@ -34,11 +37,9 @@ enyo.Spotlight.Muter = new function() {
     };
 
     /**
-    * Remove a muted control
+    * Un-mutes a muted control.
     *
-    * @param  {Object} oSender - Control to be un-muted
-    * @type {Function}
-    * @returns {Boolean}
+    * @param  {Object} oSender - The control to be un-muted.
     * @public
     */
     this.removeMuteReason = function(oSender) {
@@ -58,10 +59,11 @@ enyo.Spotlight.Muter = new function() {
     };
 
     /**
-    * Checks if spotlight muter is muting
+    * Determines whether Spotlight muter is currently in use.
     *
     * @type {Function}
-    * @returns {Boolean}
+    * @returns {Boolean} `true` if there is at least one currently muted control;
+    * otherwise, `false`.
     * @public
     */
     this.isMuted = function() {
