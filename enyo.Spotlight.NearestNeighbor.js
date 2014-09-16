@@ -370,11 +370,16 @@ enyo.Spotlight.NearestNeighbor = new function() {
 			}
 		}
 
-        // If default control in the directin of navigation is not specified, calculate it
+		// If default control in the direction of navigation is not specified, calculate it
+		var oBounds, oLast, o = enyo.Spotlight.getSiblings(oControl);
 
-        var oBounds = oControl.getAbsoluteBounds(),
-            o = enyo.Spotlight.getSiblings(oControl);
+		// if the focused control is a container, base the nearest neighbor calc off it's last
+		// focused child (which is what the user last saw focused) rather than the container
+		if(enyo.Spotlight.isContainer(oControl)) {
+			oLast = enyo.Spotlight.Container.getLastFocusedChild(oControl);
+		}
 
-        return _calculateNearestNeighbor(o.siblings, sDirection, oBounds, oControl);
-    };
+		oBounds = (oLast || oControl).getAbsoluteBounds();
+		return _calculateNearestNeighbor(o.siblings, sDirection, oBounds, oControl);
+	};
 };
