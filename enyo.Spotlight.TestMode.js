@@ -1,5 +1,6 @@
 /**
-* Spotlight utilities
+* {@link enyo.Spotlight.TestMode} is a collection of Spotlight utilities for use
+* in testing.
 *
 * @typedef {Object} enyo.Spotlight.TestMode definition
 *
@@ -17,7 +18,7 @@ enyo.Spotlight.TestMode = new function() {
     var
 
         /**
-        * Destroy all highlight elements
+        * Destroys all highlight elements.
         *
         * @type {Function}
         * @private
@@ -33,9 +34,8 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-        * Highlight the current spotlighted control and add it to __aNodes_
+        * Highlights the current spotted control and adds it to `_aNodes`.
         *
-        * @type {Function}
         * @private
         */
         _highlightCurrentControl = function() {
@@ -46,9 +46,9 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-        * Highlight controls adjacent to the current spotlighted controls and add them to __aNodes_
+        * Highlights controls adjacent to the current spotted control and adds
+        * them to `_aNodes`.
         *
-        * @type {Function}
         * @private
         */
         _highlightAdjacentControls = function() {
@@ -78,10 +78,10 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-        * Combine duplicated highlight nodes (created for the same control). This happens when a given
-        * control can be reached via more than one five-way direction (e.g. up and left).
+        * Combines duplicate highlight nodes (created for the same control).
+        * This happens when a given control can be reached via multiple 5-way
+        * directions (e.g., up and left).
         *
-        * @type {Function}
         * @private
         */
         _removeDuplicateHighlightNodes = function(inControls) {
@@ -110,9 +110,9 @@ enyo.Spotlight.TestMode = new function() {
         },
 
         /**
-        * Create a new control with styling to highlight current or adjacent spotlight nodes.
+        * Creates a new control with styling to highlight current or adjacent
+        * Spotlight nodes.
         *
-        * @type {Function}
         * @private
         */
         _addConrolHighlightNode = function(inObj) {
@@ -134,9 +134,8 @@ enyo.Spotlight.TestMode = new function() {
         };
 
     /**
-    * Enable/disable test mode
+    * Enables test mode.
     *
-    * @type {Function}
     * @public
     */
     this.enable = function() {
@@ -145,9 +144,8 @@ enyo.Spotlight.TestMode = new function() {
     };
 
     /**
-    * Disables test mode
+    * Disables test mode.
     *
-    * @type {Function}
     * @public
     */
     this.disable = function() {
@@ -156,9 +154,9 @@ enyo.Spotlight.TestMode = new function() {
     };
 
     /**
-    * Destroy existing highlight nodes, and highlight current and adjacent spotlight controls
+    * Destroys existing highlight nodes and highlights the currently spotted
+    * control and adjacent controls.
     *
-    * @type {Function}
     * @public
     */
     this.highlight = function() {
@@ -171,10 +169,9 @@ enyo.Spotlight.TestMode = new function() {
     };
 
     /**
-    * Return true if test mode is enabled
+    * Determines whether test mode is enabled.
     *
-    * @type {Function}
-    * @returns {Boolean}
+    * @returns {Boolean} `true` if test mode is enabled; otherwise, `false`.
     * @public
     */
     this.isEnabled = function() {

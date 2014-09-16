@@ -1,5 +1,5 @@
 /**
- * Provides the nearest neighbor to object with current focus
+ * {@link enyo.Spotlight.Scrolling} contains logic relating to mousewheel events.
  *
  * @typedef {Object} enyo.Spotlight.Scrolling definition
  *
@@ -15,7 +15,7 @@ enyo.Spotlight.Scrolling = new function() {
     var _nDelta = 0;
 
     /**
-    * Fire scroll event every this.frequency mousewheel points
+    * Scroll event is fired every `this.frequency` mousewheel points.
     *
     * @type {Number}
     * @public
@@ -23,12 +23,11 @@ enyo.Spotlight.Scrolling = new function() {
     this.frequency = 40;
 
     /**
-    * Figure out string component id to push
+    * Determines string component id to push.
     *
-    * @param  {Object} oEvent - Current event
-    * @param  {Function} fCallback - Callback function
-    * @param  {Object} oContext - Execution context for callback
-    * @type {Function}
+    * @param  {Object} oEvent - The current event.
+    * @param  {Function} fCallback - The callback function.
+    * @param  {Object} oContext - The execution context for the callback.
     * @public
     */
     this.processMouseWheel = function(oEvent, fCallback, oContext) {

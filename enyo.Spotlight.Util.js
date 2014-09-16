@@ -1,7 +1,8 @@
 /**
-* Spotlight utilities
+* {@link enyo.Spotlight.Util} provides a collection of utility methods for use
+* with Spotlight.
 *
-* @typedef {Object} enyo.Spotlight.Scrolling definition
+* @typedef {Object} enyo.Spotlight.Util definition
 *
 * @ui
 * @class enyo.Spotlight.Util
@@ -10,13 +11,12 @@
 enyo.Spotlight.Util = new function() {
 
     /**
-    * Attempts to dispatch all spotlight events through the low-level dispatcher
-    * or directly through the origination control.
+    * Attempts to dispatch all Spotlight events through the low-level dispatcher
+    * or directly through the originating control.
     *
-    * @param  {String} sEvent - Current event to validate
-    * @param  {Object} oInData - Callback that is executed
-    * @param  {Object} oControl - Dispatch originator
-    * @type {Function}
+    * @param  {String} sEvent - The current event to validate.
+    * @param  {Object} oInData - The callback to be executed.
+    * @param  {Object} oControl - The dispatch originator.
     * @public
     */
     this.dispatchEvent = function(sEvent, oInData, oControl) {
@@ -58,11 +58,10 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Attach event hook to capture events coming from within the container
+    * Attaches event hook to capture events coming from within the container.
     *
-    * @param  {Object} oControl - Dispatch originator
-    * @param  {Function} fHandler - Event handler function
-    * @type {Function}
+    * @param  {Object} oControl - The dispatch originator.
+    * @param  {Function} fHandler - The event handler function.
     * @public
     */
     this.interceptEvents = function(oControl, fHandler) {
@@ -81,11 +80,12 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Returns a boolean, detecting if a control is a child of another control
+    * Determines whether one control is a child of another control.
     *
-    * @param  {Object} oParent - Dispatch originator
-    * @param  {Function} oChild - Event handler function
-    * @type {Function}
+    * @param  {Object} oParent - The parent control.
+    * @param  {Object} oChild - The potential child control.
+    * @return {Boolean} `true` if `oChild` is a child of `oParent`; otherwise,
+    * `false`.
     * @public
     */
     this.isChild = function(oParent, oChild) {
@@ -106,11 +106,13 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Left for backward compatibility; users should call the getAbsoluteBounds instance
-    * function of enyo.Control (or enyo.dom.getAbsoluteBounds for nodes) instead.
+    * Preserved for backward compatibility; users should instead call
+    * [getAbsoluteBounds()]{@link enyo.Control#getAbsoluteBounds} on the
+    * {@link enyo.Control} instance (or
+    * [enyo.dom.getAbsoluteBounds()]{@link enyo.dom#getAbsoluteBounds} for the
+    * node).
     *
-    * @param  {Object} oControl - Control in which to query for bounds
-    * @type {Function}
+    * @param  {Object} oControl - The control to query for bounds.
     * @public
     */
     this.getAbsoluteBounds = function(oControl) {
@@ -119,11 +121,11 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Check if a control has a class applied.
+    * Determines whether a control has a given CSS class applied.
     *
-    * @param  {Object} o - Control in which to apply the query
-    * @param  {String} s - Class name to query
-    * @type {Function}
+    * @param  {enyo.Control} o - The control to query.
+    * @param  {String} s - The name of the CSS class.
+    * @return {Boolean} `true` if the class is applied to the control; otherwise, `false`.
     * @public
     */
     this.hasClass = function(o, s) {
@@ -134,11 +136,10 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Add a class to a control
+    * Applies a CSS class to a control.
     *
-    * @param  {Object} o - Control in which to apply the query
-    * @param  {String} s - Class name to query
-    * @type {Function}
+    * @param  {enyo.Control} o - The control to be styled.
+    * @param  {String} s - The name of the CSS class to apply.
     * @public
     */
     this.addClass = function(o, s) {
@@ -149,11 +150,10 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Remove a class from a control
+    * Removes a CSS class from a control.
     *
-    * @param  {Object} o - Control in which to apply the query
-    * @param  {String} s - Class name to query
-    * @type {Function}
+    * @param  {Object} o - The control from which to remove the class.
+    * @param  {String} s - The name of the CSS class name to remove.
     * @public
     */
     this.removeClass = function(o, s) {
@@ -164,11 +164,12 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Querys a string for a suffix
+    * Queries a string for the presence of a given suffix.
     *
-    * @param  {String} s - String to query
-    * @param  {String} sSuffix - Suffix to apply to query
-    * @type {Function}
+    * @param  {String} s - The string to query.
+    * @param  {String} sSuffix - The suffix to look for.
+    * @return {Boolean} `true` if the string ends in the specified suffix;
+    * otherwise, `false`.
     * @public
     */
     this.stringEndsWith = function(s, sSuffix) {
@@ -176,10 +177,10 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Translates a direction, to an appropriate Spotlight event
+    * Translates a direction to an appropriate Spotlight event.
     *
-    * @param  {String} sDirection - Direction of acceleration
-    * @type {Function}
+    * @param  {String} sDirection - The direction of acceleration.
+    * @return {String} The name of the corresponding Spotlight event.
     * @public
     */
     this.directionToEvent = function(sDirection) {
@@ -187,11 +188,10 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * Gets the default direction that a control will accelerate
+    * Gets the default control to move to in a particular direction.
     *
-    * @param  {String} sDirection - String to query
-    * @param  {Object} oControl - String to query
-    * @type {Function}
+    * @param  {String} sDirection - The direction of movement.
+    * @param  {Object} oControl - The control from which movement will occur.
     * @public
     */
     this.getDefaultDirectionControl = function(sDirection, oControl) {
@@ -207,11 +207,11 @@ enyo.Spotlight.Util = new function() {
     };
 
     /**
-    * We use the same check as in dispatcher to know when it's simulated: by looking for x/y == 0
+    * Determines whether the given event is a simulated click.
+    * We use the same check as in dispatcher to know when it's simulated: looking for x/y == 0.
     *
-    * @param  {String} sDirection - String to query
-    * @param  {Object} oControl - String to query
-    * @type {Function}
+    * @param  {Object} oEvent - The current event.
+    * @return {Boolean} `true` if event is a simulated click; otherwise, `false`.
     * @public
     */
     this.isSimulatedClick = function(oEvent) {
