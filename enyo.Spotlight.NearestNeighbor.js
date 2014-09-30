@@ -365,8 +365,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
         // If default control in the directin of navigation is not specified, calculate it
 
-        var oBounds = oControl.getAbsoluteBounds(),
-            o = enyo.Spotlight.getSiblings(oControl),
+        var o = enyo.Spotlight.getSiblings(oControl);
         // If the control is container, the nearest neighbor is calculated based on the bounds
         // of last focused child of container.
         if(enyo.Spotlight.isContainer(oControl)) {
