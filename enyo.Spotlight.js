@@ -2,7 +2,7 @@
 * Spotlight is an extensible utility that enables users to navigate
 * Enyo applications using a keyboard or television remote control.
 *
-* @namespace Spotlight
+* @namespace enyo.Spotlight
 */
 enyo.Spotlight = new function() {
 
