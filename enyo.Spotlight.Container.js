@@ -242,14 +242,26 @@ enyo.Spotlight.Container = new function() {
 
 };
 
-enyo.Control.extend({
-    create: enyo.inherit(function(sup) {
-        return function() {
-            sup.apply(this, arguments);
-            // If spotlight "container" is set statically then automatically starts to intercept events.
-            if (this.spotlight && this.spotlight === 'container') {
-                enyo.Spotlight.Container.initContainer(this);
-            }
-        };
-    })
-});
+/*
+Using the hack below to ensure that statically declared Spotlight containers are
+initialized upon creation. Our previous pass at this used enyo.Control.extend(),
+which meant it failed to work for Control subkinds whose constructors were created
+immediately (vs. being deferred). Unfortunately, this caused big problems in webOS,
+where the "container" app systematically disables the deferral of constructor
+creation.
+
+There is some discussion ongoing as to whether we need a nicer mechanism for
+extending functionality in cases like this (see comments in BHV-15323), but in
+the meantime we need to proceed with a quick fix for this issue.
+*/
+
+var originalEnyoComponentCreate = enyo.Component.create;
+
+enyo.Component.create = function () {
+    var component = originalEnyoComponentCreate.apply(enyo.Component, arguments);
+    if (component.spotlight == 'container') {
+        enyo.Spotlight.Container.initContainer(component);
+    }
+    return component;
+};
+

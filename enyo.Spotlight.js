@@ -446,7 +446,8 @@ enyo.Spotlight = new function() {
         */
         _5WayMove = function(oEvent) {
             var sDirection = oEvent.type.replace('onSpotlight', '').toUpperCase(),
-                oControl = enyo.Spotlight.NearestNeighbor.getNearestNeighbor(sDirection);
+                leave = oEvent.requestLeaveContainer,
+                oControl = !leave && enyo.Spotlight.NearestNeighbor.getNearestNeighbor(sDirection);
 
 
             // If oEvent.allowDomDefault() was not called
