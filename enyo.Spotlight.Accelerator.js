@@ -4,7 +4,6 @@
 *
 * @typedef {Object} enyo.Spotlight.Accelerator
 *
-* @ui
 * @class enyo.Spotlight.Accelerator
 * @public
 */

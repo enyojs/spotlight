@@ -4,7 +4,6 @@
 *
 * @typedef {Object} enyo.Spotlight.TestMode definition
 *
-* @ui
 * @class enyo.Spotlight.TestMode
 * @public
 */

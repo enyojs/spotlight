@@ -3,7 +3,6 @@
 *
 * @typedef {Object} enyo.Spotlight.Container definition
 *
-* @ui
 * @class enyo.Spotlight.Container
 * @public
 */

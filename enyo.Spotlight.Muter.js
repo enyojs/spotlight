@@ -6,7 +6,6 @@
 *
 * @typedef {Object} enyo.Spotlight.Muter definition
 *
-* @ui
 * @class enyo.Spotlight.Muter
 * @public
 */

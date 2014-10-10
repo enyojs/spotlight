@@ -4,7 +4,6 @@
 *
 * @typedef {Object} enyo.Spotlight.Util definition
 *
-* @ui
 * @class enyo.Spotlight.Util
 * @public
 */

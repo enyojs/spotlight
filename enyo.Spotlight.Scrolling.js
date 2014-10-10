@@ -3,7 +3,6 @@
  *
  * @typedef {Object} enyo.Spotlight.Scrolling definition
  *
- * @ui
  * @class enyo.Spotlight.Scrolling
  * @public
  */

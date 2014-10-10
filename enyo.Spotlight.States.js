@@ -21,7 +21,6 @@
 *
 * @typedef {Object} enyo.Spotlight.States definition
 *
-* @ui
 * @class enyo.Spotlight.States
 * @public
 */

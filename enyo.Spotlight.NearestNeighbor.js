@@ -4,7 +4,6 @@
 *
 * @typedef {Object} enyo.Spotlight.NearestNeighbor definition
 *
-* @ui
 * @class enyo.Spotlight.NearestNeighbor
 * @public
 */
