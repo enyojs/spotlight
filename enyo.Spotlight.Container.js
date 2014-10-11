@@ -71,6 +71,11 @@ enyo.Spotlight.Container = new function() {
                     // Inform other controls that spotlight 5-way event was generated within a container
                     oEvent.spotSentFromContainer = true;
                     break;
+                case 'onSpotlightContainerLeave':
+                    if(oEvent.commonAncestor && oEvent.commonAncestor.isDescendantOf(oSender)) {
+                        return true;
+                    }
+                    break;
             }
         },
 
@@ -102,12 +107,12 @@ enyo.Spotlight.Container = new function() {
         _focusLeave = function(oSender, s5WayEventType) {
             // console.log('FOCUS LEAVE', oSender.name);
             // Ensure we are actually leaving container (and not bouncing back to the originating control)
-            if (oSender._spotlight.lastFocusedChild !== enyo.Spotlight.getLastControl()) {
-                var sDirection = s5WayEventType.replace('onSpotlight', '').toUpperCase();
-                enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
-                    direction: sDirection
-                }, oSender);
-            }
+            // if (oSender._spotlight.lastFocusedChild !== enyo.Spotlight.getLastControl()) {
+            //     var sDirection = s5WayEventType.replace('onSpotlight', '').toUpperCase();
+            //     enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
+            //         direction: sDirection
+            //     }, oSender);
+            // }
         },
 
         /**
@@ -119,10 +124,10 @@ enyo.Spotlight.Container = new function() {
         */
         _focusEnter = function(oSender, s5WayEventType) {
             // console.log('FOCUS ENTER', oSender.name);
-            var sDirection = s5WayEventType.replace('onSpotlight', '').toUpperCase();
-            enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {
-                direction: sDirection
-            }, oSender);
+            // var sDirection = s5WayEventType.replace('onSpotlight', '').toUpperCase();
+            // enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {
+            //     direction: sDirection
+            // }, oSender);
         };
 
     /**
@@ -240,6 +245,31 @@ enyo.Spotlight.Container = new function() {
         }
     };
 
+    this.fireContainerEvents = function (blurredControl, focusedControl) {
+        if(blurredControl) {
+            var to = focusedControl.hasNode(),
+                from = blurredControl,
+                position = 0,
+                n;
+
+            // find common ancestor
+            do {
+                position = enyo.dom.compareDocumentPosition(to, from.hasNode());
+                if(position & 8) {  // 8 == 'contains'
+                    enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
+                        commonAncestor: from
+                    }, blurredControl);
+                    break;
+                } else {
+                    from = from.parent;
+                }
+            } while (from);
+        }
+
+        if(focusedControl) {
+            enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, focusedControl);
+        }
+    };
 };
 
 /*

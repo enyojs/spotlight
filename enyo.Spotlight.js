@@ -412,6 +412,8 @@ enyo.Spotlight = new function() {
                 _observeDisappearance(true, _oCurrent);
             }, 1);
 
+            enyo.Spotlight.Container.fireContainerEvents(oExCurrent || _oLastControl, _oCurrent);
+
             _log('CURRENT =', _oCurrent.toString());
             enyo.Signals.send('onSpotlightCurrentChanged', {
                 current: oControl
