@@ -222,7 +222,7 @@ enyo.Spotlight = new function() {
         * @private
         */
         _bCancelHold = false,
-        
+
         /**
         * If a key down was ignored, be sure to ignore the following key up. Specifically, this
         * works around the different target keyup for Enter for inputs (input on down, body on up).
@@ -320,7 +320,7 @@ enyo.Spotlight = new function() {
                 if (!oControl) {
                     _unhighlight(_oLastControl);
                     _oLastControl = null;
-                    
+
                     _observeDisappearance(false, _oCurrent);
                     // NULL CASE :(, just like when no spottable children found on init
                     _oCurrent = null;
@@ -1036,19 +1036,16 @@ enyo.Spotlight = new function() {
 
                 // Spot first available control on bootstrap
                 _spotNearestToPointer(oEvent);
-                return false;
             }
 
             // Does this immediately follow KEY_POINTER_HIDE
             if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {
                 _spotNearestToPointer(oEvent);
-                return false;
             }
 
             // Spot last 5-way control, only if there's not already focus on screen
             if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {
                 _spotNearestToPointer(oEvent);
-                return false;
             }
         }
 
@@ -1622,7 +1619,7 @@ enyo.Spotlight = new function() {
     *
     * @private
     */
-    this.unfreeze = function() { 
+    this.unfreeze = function() {
 		_bFrozen = false;
 	};
 
