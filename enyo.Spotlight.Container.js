@@ -95,39 +95,6 @@ enyo.Spotlight.Container = new function() {
                 return false;
             } // Because oLastControl might have been DHD'd
             return enyo.Spotlight.Util.isChild(oSender, oLastControl);
-        },
-
-        /**
-        * Handles a control's losing focus from Spotlight.
-        *
-        * @param  {Object} oSender - The object that is sending the event.
-        * @param  {String} s5WayEventType - The event causing focus to move.
-        * @private
-        */
-        _focusLeave = function(oSender, s5WayEventType) {
-            // console.log('FOCUS LEAVE', oSender.name);
-            // Ensure we are actually leaving container (and not bouncing back to the originating control)
-            // if (oSender._spotlight.lastFocusedChild !== enyo.Spotlight.getLastControl()) {
-            //     var sDirection = s5WayEventType.replace('onSpotlight', '').toUpperCase();
-            //     enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
-            //         direction: sDirection
-            //     }, oSender);
-            // }
-        },
-
-        /**
-        * Handles a control's gaining focus from Spotlight.
-        *
-        * @param  {Object} oSender - The object that is sending the event.
-        * @param  {String} s5WayEventType - The event causing focus to move.
-        * @private
-        */
-        _focusEnter = function(oSender, s5WayEventType) {
-            // console.log('FOCUS ENTER', oSender.name);
-            // var sDirection = s5WayEventType.replace('onSpotlight', '').toUpperCase();
-            // enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {
-            //     direction: sDirection
-            // }, oSender);
         };
 
     /**
@@ -185,7 +152,6 @@ enyo.Spotlight.Container = new function() {
                     oSender
                 );
             }
-            _focusLeave(oSender, s5WayEventType);
 
             // Focus came from outside or this was a programmatic spot
         } else {
@@ -205,7 +171,6 @@ enyo.Spotlight.Container = new function() {
                     return true;
                 }
             }
-            _focusEnter(oSender, s5WayEventType);
         }
 
         return true;
