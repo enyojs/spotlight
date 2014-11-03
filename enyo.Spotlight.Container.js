@@ -214,8 +214,7 @@ enyo.Spotlight.Container = new function() {
         if(blurredControl) {
             var to = focusedControl.hasNode(),
                 from = blurredControl,
-                position = 0,
-                n;
+                position = 0;
 
             // find common ancestor
             do {
