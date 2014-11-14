@@ -71,6 +71,11 @@ enyo.Spotlight.Container = new function() {
                     // Inform other controls that spotlight 5-way event was generated within a container
                     oEvent.spotSentFromContainer = true;
                     break;
+                case 'onSpotlightContainerEnter':
+                    if(oEvent.last.isDescendantOf(oSender)) {
+                        return true;
+                    }
+                    break;
                 case 'onSpotlightContainerLeave':
                     if(oEvent.commonAncestor && oEvent.commonAncestor.isDescendantOf(oSender)) {
                         return true;
@@ -231,7 +236,10 @@ enyo.Spotlight.Container = new function() {
         }
 
         if(focusedControl) {
-            enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {}, focusedControl);
+            enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {
+                last: blurredControl,
+                current: focusedControl
+            }, focusedControl);
         }
     };
 };
