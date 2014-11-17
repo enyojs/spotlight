@@ -1686,7 +1686,7 @@ enyo.Spotlight = new function() {
     */
     this.getHoldPulseDelay = function(oEvent) {
         var drag = enyo.gesture.drag;
-        return Object.keys(drag.holdPulseConfig).length > 0 ? drag.holdPulseConfig.delay : drag.holdPulseDefaultConfig.delay;
+        return Object.keys(drag.holdPulseConfig).length > 0 ? drag.holdPulseConfig.frequency : drag.holdPulseDefaultConfig.frequency;
     };
 
     /**
