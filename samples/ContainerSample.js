@@ -4,36 +4,36 @@ enyo.kind({
 	fit     : true,
 	
 	handlers: {
-		onSpotlightFocus: 'onSpotlightFocus'
+		onSpotlightFocused: 'buttonFocused'
 	},
 	
 	components: [
-		{name: 'c1', spotlight: 'container', classes: 'container', components: [
-			{name: 'c11', spotlight: 'container', classes: 'container', components: [
-				{name: 'c111', spotlight: 'container', classes: 'container', components: [
-					{name: 'button1', spotlight: true, kind: 'Button', content: 'Button1'},
-					{name: 'button2', spotlight: true, kind: 'Button', content: 'Button2'}
-				]}
-			]},
-			{name: 'c12' ,spotlight: 'container', classes: 'container', components: [
-				{name: 'button3', spotlight: true, kind: 'Button', content: 'Button3'},
-				{name: 'button4', spotlight: true, kind: 'Button', content: 'Button4'}
-			]},
-			{name: 'c13', spotlight: 'container', classes: 'container', components: [
-				{name: 'c131', spotlight: 'container', classes: 'container', components: [
-				]}
-			]},
-			{name: 'button5', spotlight: true, kind: 'Button', content: 'Button5'}
+		{name: 'c1', spotlight: 'container', onSpotlightContainerEnter: 'enterContainer', onSpotlightContainerLeave: 'leaveContainer', components: [
+			{name: 'c1b1', kind: 'enyo.Button', spotlight: true, content: 'c1b1'},
+			{name: 'c1b2', kind: 'enyo.Button', spotlight: true, content: 'c1b2'}
 		]},
-		{name: 'button6', spotlight: true, kind: 'Button', content: 'Button6'}
+		{name: 'c2', spotlight: 'container', onSpotlightContainerEnter: 'enterContainer', onSpotlightContainerLeave: 'leaveContainer', components: [
+			{name: 'c2b1', kind: 'enyo.Button', spotlight: true, content: 'c2b1'},
+			{name: 'c2b2', kind: 'enyo.Button', spotlight: true, content: 'c2b2'},
+			{name: 'c2c1', spotlight: 'container', onSpotlightContainerEnter: 'enterContainer', onSpotlightContainerLeave: 'leaveContainer', components: [
+				{name: 'c2c1b1', kind: 'enyo.Button', spotlight: true, content: 'c2c1b1'},
+				{name: 'c2c1b2', kind: 'enyo.Button', spotlight: true, content: 'c2c1b1'}
+			]}
+		]}
 	],
-	
-	onSpotlightFocus: function(oSender, oEvent) {
-		enyo.log('Focus ' + oEvent.originator.toString());
+
+	buttonFocused: function (sender, event) {
+		this.log('Button Focused', event.originator.id);
 	},
-	
-	rendered: function() {
-		this.inherited(arguments);
+
+	enterContainer: function (sender, event) {
+		this.log('Container Entered:', event.originator.id);
+		sender.applyStyle('border', '2px solid red');
+	},
+
+	leaveContainer: function (sender, event) {
+		this.log('Container Left:', event.originator.id);
+		sender.applyStyle('border', null);
 	}
 });
 
