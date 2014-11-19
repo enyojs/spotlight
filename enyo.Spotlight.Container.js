@@ -72,7 +72,7 @@ enyo.Spotlight.Container = new function() {
                     oEvent.spotSentFromContainer = true;
                     break;
                 case 'onSpotlightContainerEnter':
-                    if(oEvent.last.isDescendantOf(oSender)) {
+                    if(oEvent.last && oEvent.last.isDescendantOf(oSender)) {
                         return true;
                     }
                     break;
