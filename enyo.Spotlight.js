@@ -176,54 +176,6 @@ enyo.Spotlight = new function() {
         _nPointerHiddenToKeyTimeout = 300,
 
         /**
-        * Whether key is in pressed state.
-        * @type {Boolean}
-        * @default false
-        * @private
-        */
-        _bHold = false,
-
-        /**
-        * Length of time in milliseconds of key hold.
-        * @type {Number}
-        * @default 0
-        * @private
-        */
-        _holdStart = 0,
-
-        /**
-        * The function that is sending `onholdulse`.
-        * @type {Function}
-        * @default null
-        * @private
-        */
-        _holdJobFunction = null,
-
-        /**
-        * The job that is sending `onholdpulse`.
-        * @type {Function}
-        * @default null
-        * @private
-        */
-        _holdJob = null,
-
-        /**
-        * Whether `onholdpulse` has been fired.
-        * @type {Boolean}
-        * @default false
-        * @private
-        */
-        _sentHold = false,
-
-        /**
-        * Whether holdPulse has been canceled.
-        * @type {Boolean}
-        * @default false
-        * @private
-        */
-        _bCancelHold = false,
-        
-        /**
         * If a key down was ignored, be sure to ignore the following key up. Specifically, this
         * works around the different target keyup for Enter for inputs (input on down, body on up).
         *
@@ -770,7 +722,7 @@ enyo.Spotlight = new function() {
                 //enyo.log('Dummy function');
             };
         };
-        this.initiateHoldPulse(oEvent);
+        enyo.gesture.drag.prepareHold(oEvent);
         switch (oEvent.type) {
             case 'keydown':
                 return _dispatchEvent('onSpotlightKeyDown', oEvent);
@@ -905,9 +857,6 @@ enyo.Spotlight = new function() {
                 this.unspot();
             }
         }
-
-        // There is a edge case that onSpotlightKeyUp is not comming
-        this.stopHold();
     };
 
     // Called by `onEvent()` to process mousedown events.
@@ -1095,12 +1044,8 @@ enyo.Spotlight = new function() {
         var ret = true;
         switch (oEvent.keyCode) {
             case 13:
-                enyo.mixin(oEvent, {
-                    sentHold: _sentHold
-                });
                 ret = _dispatchEvent('onSpotlightSelect', oEvent);
-                this.stopHold(oEvent);
-                this.resetHold();
+                enyo.gesture.drag.endHold();
         }
 
         // Should never get here
@@ -1110,7 +1055,10 @@ enyo.Spotlight = new function() {
 
         switch (oEvent.keyCode) {
             case 13:
-                return this.beginHold(oEvent);
+                if (!enyo.Spotlight.Accelerator.isAccelerating()) {
+                    enyo.gesture.drag.beginHold(oEvent);
+                }
+                return true;
             case 37:
                 return _dispatchEvent('onSpotlightLeft', oEvent);
             case 38:
@@ -1657,126 +1605,6 @@ enyo.Spotlight = new function() {
     */
     this.unhighlight = function(oControl) {
         _unhighlight(oControl);
-    };
-
-    //* Emulate holdPulse for onSpotlightkeyDown event
-    //* To-do: These are not public functions. Move to private.
-    /************************************************************/
-
-    /**
-    * Decorates event to let user call `configureHoldPulse()` function.
-    *
-    * @param {Object} oEvent - The event to decorate.
-    * @private
-    */
-    this.initiateHoldPulse = function(oEvent) {
-
-        // Set holdpulse defaults and expose method for configuring holdpulse options
-        if (oEvent.keyCode === 13) {
-            enyo.gesture.drag.holdPulseConfig = enyo.clone(enyo.gesture.drag.holdPulseDefaultConfig);
-            oEvent.configureHoldPulse = enyo.gesture.configureHoldPulse;
-            oEvent.cancelHoldPulse = enyo.bind(this, "cancelHold");
-        }
-    };
-
-    /**
-    * Gets default `holdPulse` delay if not initialized by down event.
-    *
-    * @param {Object} oEvent - The current event.
-    * @return {Number} The `holdPulse` delay.
-    * @private
-    */
-    this.getHoldPulseDelay = function(oEvent) {
-        var drag = enyo.gesture.drag;
-        return Object.keys(drag.holdPulseConfig).length > 0 ? drag.holdPulseConfig.delay : drag.holdPulseDefaultConfig.delay;
-    };
-
-    /**
-    * Initializes relevant variables and starts holdPulse job.
-    *
-    * @param {Object} oEvent - The current event.
-    * @return {Boolean} - `true` if successful; otherwise, `false`.
-    * @private
-    */
-    this.beginHold = function(oEvent) {
-
-        // Prevent consecutive hold start
-        if (_bHold) {
-            return;
-        }
-
-        _bHold = true;
-        _holdStart = enyo.perfNow();
-
-        // clone the event to ensure it stays alive on IE upon returning to event loop
-        var $ce = enyo.clone(oEvent);
-        $ce.srcEvent = enyo.clone(oEvent.srcEvent);
-        _holdJobFunction = enyo.bind(this, "sendHoldPulse", $ce);
-        _holdJobFunction.ce = $ce;
-        _holdJob = setInterval(_holdJobFunction, this.getHoldPulseDelay(oEvent));
-
-        return true;
-    };
-
-    /**
-    * Clears relevant variables and cancels holdPulse job.
-    *
-    * @param {Object} oEvent - The current event.
-    * @private
-    */
-    this.stopHold = function(oEvent) {
-
-        // Do nothing if not in hold status
-        if (!_bHold) {
-            return;
-        }
-
-        clearInterval(_holdJob);
-        _holdJob = null;
-        _bHold = false;
-        _holdStart = 0;
-        if (_holdJobFunction) {
-            _holdJobFunction.ce = null;
-            _holdJobFunction = null;
-        }
-        if (_sentHold) {
-            _sentHold = false;
-        }
-        this.resetHold();
-    };
-
-    /**
-    * Resets holdPulse job.
-    *
-    * @private
-    */
-    this.resetHold = function() {
-        _bCancelHold = false;
-    };
-
-    /**
-    * Cancels holdPulse job.
-    *
-    * @private
-    */
-    this.cancelHold = function(oEvent) {
-        _bCancelHold = true;
-    };
-
-    /**
-    * Sends `onHoldPulse` event with `holdTime` parameter.
-    *
-    * @private
-    */
-    this.sendHoldPulse = function(oEvent) {
-        if (_bCancelHold) {
-            return;
-        }
-        if (!_sentHold) {
-            _sentHold = true;
-        }
-        oEvent.holdTime = enyo.perfNow() - _holdStart;
-        _dispatchEvent('onholdpulse', oEvent);
     };
 };
 
