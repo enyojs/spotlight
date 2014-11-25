@@ -628,20 +628,28 @@ enyo.Spotlight = new function() {
         * Attempts to spot the control nearest the current pointer position.
         * If no nearest control is found, the previous control is spotted.
         *
-        * @param {Object} oEvent - The current event.
+        * @param {Object} oEvent - The event corresponding to the 5-way directional key pressed.
+        *   This event should have a value for its keycode property that corresponds to a valid
+        *   direction.
         * @private
         */
         _spotNearestToPointer = function(oEvent) {
-            var oNearest = enyo.Spotlight.
-            NearestNeighbor.
-            getNearestPointerNeighbor(_oRoot,
-                _getSpotDirection(oEvent),
-                _nPrevClientX,
-                _nPrevClientY);
-            if (oNearest) {
-                _oThis.spot(oNearest);
-            } else {
-                _spotLastControl();
+            var sDir = _getSpotDirection(oEvent),
+                oNearest;
+
+            // Ensure we have a valid direction when spotting nearest control
+            if (sDir) {
+                oNearest = enyo.Spotlight.
+                NearestNeighbor.
+                getNearestPointerNeighbor(_oRoot,
+                    sDir,
+                    _nPrevClientX,
+                    _nPrevClientY);
+                if (oNearest) {
+                    _oThis.spot(oNearest);
+                } else {
+                    _spotLastControl();
+                }
             }
         },
 
