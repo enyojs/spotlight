@@ -47,6 +47,14 @@ enyo.Spotlight = new function() {
         _bInitialized = false,
 
         /**
+        * Indicates if a control was spotted as a result of a key down event
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
+        _bSpotOnKeyDown = false,
+
+        /**
         * The currently spotted element.
         * @type {Object}
         * @default null
@@ -983,22 +991,15 @@ enyo.Spotlight = new function() {
             var bWasPointerMode = this.getPointerMode();
             this.setPointerMode(false);
 
-            if (!this.isSpottable(this.getCurrent())) {
+            // Spot first available control on bootstrap
+            if (!this.isSpottable(this.getCurrent()) ||
+                // Or does this immediately follow KEY_POINTER_HIDE
+                (!_isTimestampExpired() && !_oLastMouseMoveTarget) || 
+                // Or spot last 5-way control, only if there's not already focus on screen
+                (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen())) {
 
-                // Spot first available control on bootstrap
                 _spotNearestToPointer(oEvent);
-                return false;
-            }
-
-            // Does this immediately follow KEY_POINTER_HIDE
-            if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {
-                _spotNearestToPointer(oEvent);
-                return false;
-            }
-
-            // Spot last 5-way control, only if there's not already focus on screen
-            if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {
-                _spotNearestToPointer(oEvent);
+                _bSpotOnKeyDown = true;
                 return false;
             }
         }
@@ -1018,6 +1019,12 @@ enyo.Spotlight = new function() {
         if (_nIgnoredKeyDown === oEvent.which || _isIgnoredKey(oEvent)) {
             return false;
         }
+
+        if (_bSpotOnKeyDown) {
+            _bSpotOnKeyDown = false;
+            return true;
+        }
+
         enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 
         // Always allow key events to bubble regardless of what onSpotlight** handlers return
