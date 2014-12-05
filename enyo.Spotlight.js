@@ -47,6 +47,18 @@ enyo.Spotlight = new function() {
         _bInitialized = false,
 
         /**
+        * State variable allowing us to suppress Spotlight select on
+        * keyup in the specific case where a press of the [Enter] key
+        * has just triggered a switch from pointer mode to 5-way mode
+        * (since we only want to switch modes in this case, not perform
+        * a selection)
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
+        _bSuppressSelectOnNextKeyUp = false,
+
+        /**
         * The currently spotted element.
         * @type {Object}
         * @default null
@@ -943,6 +955,8 @@ enyo.Spotlight = new function() {
     // Called by `onEvent()` to process keydown.
     this.onKeyDown = function(oEvent) {
 
+        _bSuppressSelectOnNextKeyUp = false;
+
         if (_isIgnoredKey(oEvent)) {
             _nIgnoredKeyDown = oEvent.which;
             return false;
@@ -983,22 +997,15 @@ enyo.Spotlight = new function() {
             var bWasPointerMode = this.getPointerMode();
             this.setPointerMode(false);
 
-            if (!this.isSpottable(this.getCurrent())) {
+            // Spot first available control on bootstrap
+            if (!this.isSpottable(this.getCurrent()) ||
+                // Or does this immediately follow KEY_POINTER_HIDE
+                (!_isTimestampExpired() && !_oLastMouseMoveTarget) || 
+                // Or spot last 5-way control, only if there's not already focus on screen
+                (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen())) {
 
-                // Spot first available control on bootstrap
                 _spotNearestToPointer(oEvent);
-                return false;
-            }
-
-            // Does this immediately follow KEY_POINTER_HIDE
-            if (!_isTimestampExpired() && !_oLastMouseMoveTarget) {
-                _spotNearestToPointer(oEvent);
-                return false;
-            }
-
-            // Spot last 5-way control, only if there's not already focus on screen
-            if (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen()) {
-                _spotNearestToPointer(oEvent);
+                _bSuppressSelectOnNextKeyUp = oEvent.keyCode == 13;
                 return false;
             }
         }
@@ -1018,6 +1025,12 @@ enyo.Spotlight = new function() {
         if (_nIgnoredKeyDown === oEvent.which || _isIgnoredKey(oEvent)) {
             return false;
         }
+
+        if (_bSuppressSelectOnNextKeyUp) {
+            _bSuppressSelectOnNextKeyUp = false;
+            return true;
+        }
+
         enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 
         // Always allow key events to bubble regardless of what onSpotlight** handlers return
