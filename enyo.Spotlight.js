@@ -52,7 +52,7 @@ enyo.Spotlight = new function() {
         * @default false
         * @private
         */
-        _bSpotOnKeyDown = false,
+        _bSuppressSelectOnNextKeyUp = false,
 
         /**
         * The currently spotted element.
@@ -951,6 +951,8 @@ enyo.Spotlight = new function() {
     // Called by `onEvent()` to process keydown.
     this.onKeyDown = function(oEvent) {
 
+        _bSuppressSelectOnNextKeyUp = false;
+
         if (_isIgnoredKey(oEvent)) {
             _nIgnoredKeyDown = oEvent.which;
             return false;
@@ -999,7 +1001,7 @@ enyo.Spotlight = new function() {
                 (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen())) {
 
                 _spotNearestToPointer(oEvent);
-                _bSpotOnKeyDown = true;
+                _bSuppressSelectOnNextKeyUp = oEvent.keyCode == 13;
                 return false;
             }
         }
@@ -1020,8 +1022,8 @@ enyo.Spotlight = new function() {
             return false;
         }
 
-        if (_bSpotOnKeyDown) {
-            _bSpotOnKeyDown = false;
+        if (_bSuppressSelectOnNextKeyUp) {
+            _bSuppressSelectOnNextKeyUp = false;
             return true;
         }
 
