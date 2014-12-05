@@ -47,7 +47,11 @@ enyo.Spotlight = new function() {
         _bInitialized = false,
 
         /**
-        * Indicates if a control was spotted as a result of a key down event
+        * State variable allowing us to suppress Spotlight select on
+        * keyup in the specific case where a press of the [Enter] key
+        * has just triggered a switch from pointer mode to 5-way mode
+        * (since we only want to switch modes in this case, not perform
+        * a selection)
         * @type {Boolean}
         * @default false
         * @private
