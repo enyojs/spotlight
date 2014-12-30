@@ -1057,9 +1057,7 @@ enyo.Spotlight = new function() {
         var ret = true;
         switch (oEvent.keyCode) {
             case 13:
-                if (!enyo.gesture.drag.isPulsing()) {
-                    ret = _dispatchEvent('onSpotlightSelect', oEvent);
-                }
+                ret = _dispatchEvent('onSpotlightSelect', oEvent);
                 enyo.gesture.drag.endHold();
         }
 
