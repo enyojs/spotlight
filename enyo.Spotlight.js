@@ -685,6 +685,13 @@ enyo.Spotlight = new function() {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'focus':
+                    // Call webOS TV platform API (new) here to update current pointer mode
+                    if (PalmSystem && PalmSystem.cursor)
+                        this.setPointerMode( PalmSystem.cursor.visibility );
+                    // When app is go to background then unspot focus
+                    this.spot(this.getLastControl());
+                    break;
                 case 'blur':
                     // When app is go to background then unspot focus
                     this.unspot();
