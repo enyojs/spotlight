@@ -685,6 +685,10 @@ enyo.Spotlight = new function() {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'blur':
+                    // When app is go to background then unspot focus
+                    this.unspot();
+                    break;
                 case 'move':
 
                     // Only register mousemove if the x/y actually changed,
