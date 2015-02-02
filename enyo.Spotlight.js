@@ -686,16 +686,19 @@ enyo.Spotlight = new function() {
         if (this.isInitialized()) {
             switch (oEvent.type) {
                 case 'focus':
-                    // Call webOS TV platform API (new) here to update current pointer mode
-                    if (window.PalmSystem && window.PalmSystem.cursor) {
-                        this.setPointerMode( window.PalmSystem.cursor.visibility );
+                    if (oEvent.target === window) {
+                        // Call webOS TV platform API (new) here to update current pointer mode
+                        if (window.PalmSystem && window.PalmSystem.cursor) {
+                            this.setPointerMode( window.PalmSystem.cursor.visibility );
+                        }
+                        // When app is go to background then unspot focus
+                        this.spot(this.getLastControl());
                     }
-                    // When app is go to background then unspot focus
-                    this.spot(this.getLastControl());
                     break;
                 case 'blur':
                     // When app is go to background then unspot focus
-                    this.unspot();
+                    if (oEvent.target === window) 
+                        this.unspot();
                     break;
                 case 'move':
 
