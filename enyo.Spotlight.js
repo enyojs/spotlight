@@ -363,7 +363,7 @@ enyo.Spotlight = new function() {
             var oExCurrent = _oCurrent;
 
             // Remove spotlight class and Blur
-            _oThis.unspot();
+            _oThis.unspot(oControl);
 
             // Add spotlight class
             _highlight(oControl);
@@ -1466,8 +1466,7 @@ enyo.Spotlight = new function() {
     * @return {Boolean} - `true` if control was successfully blurred; otherwise, `false`.
     * @private
     */
-    this.unspot = function() {
-
+    this.unspot = function(oNext) {
         // Current cannot change while in frozen mode
         if (this.isFrozen()) {
             return false;
@@ -1476,7 +1475,7 @@ enyo.Spotlight = new function() {
         if (this.hasCurrent() && _bFocusOnScreen) {
             _unhighlight(_oCurrent);
             _oLastMouseMoveTarget = null;
-            _dispatchEvent('onSpotlightBlur', null, _oCurrent);
+            _dispatchEvent('onSpotlightBlur', {next: oNext}, _oCurrent);
             _observeDisappearance(false, _oCurrent);
             _oCurrent = null;
             return true;
