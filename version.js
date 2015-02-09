@@ -1,3 +1,3 @@
 if (enyo && enyo.version) {
-	enyo.version.spotlight = "2.5.3-pre.9.t";
+	enyo.version.spotlight = "2.5.3-pre.11.t";
 }
