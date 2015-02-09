@@ -1405,6 +1405,12 @@ enyo.Spotlight = new function() {
             return true;
         }
 
+        var oBounds = oControl.getAbsoluteBounds();
+        // if oControl is out of veiwport
+        if (oBounds.bottom < 0 || oBounds.right < 0) {
+            return false;
+        }
+
         // Cannot spot falsy values
         if (!oControl) {
             return false;
