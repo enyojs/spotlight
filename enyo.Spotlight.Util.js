@@ -215,7 +215,7 @@ enyo.Spotlight.Util = new function() {
     */
     this.isSimulatedClick = function(oEvent) {
         return (
-            oEvent.clientX === 0 && oEvent.clientY === 0 &&
+            oEvent.clientX === 0 && oEvent.clientY === 0 && !oEvent.detail &&
             (oEvent.type == 'click' || oEvent.type == 'tap')
         );
     };
