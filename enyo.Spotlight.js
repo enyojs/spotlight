@@ -685,6 +685,22 @@ enyo.Spotlight = new function() {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'focus':
+                    if (oEvent.target === window) {
+                        // Update pointer mode from cursor visibility platform API
+                        if (window.PalmSystem && window.PalmSystem.cursor) {
+                            this.setPointerMode( window.PalmSystem.cursor.visibility );
+                        }
+                        // Whenever app goes to foreground, refocus on last focused control
+                        this.spot(this.getLastControl());
+                    }
+                    break;
+                case 'blur':
+                    if (oEvent.target === window) {
+                        // Whenever app goes to background, unspot focus
+                        this.unspot();
+                    }
+                    break;
                 case 'move':
 
                     // Only register mousemove if the x/y actually changed,
