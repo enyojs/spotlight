@@ -109,6 +109,17 @@ enyo.Spotlight = new function() {
         _oDepressedControl = null,
 
         /**
+        * When the user presses Enter to perform a Spotlight select, we keep track
+        * of the target on keydown. If the target disappears before keyup, we end
+        * the hold gesture immediately and suppress the selection when the keyup
+        * occurs.
+        * @type {Object}
+        * @default null
+        * @private
+        */
+       _o5WaySelectTarget = null,
+
+        /**
         * In verbose mode, Spotlight prints 1) Current 2) Pointer mode change to `enyo.log`.
         * @type {Boolean}
         * @default false
@@ -274,6 +285,12 @@ enyo.Spotlight = new function() {
                 return;
             }
             _onDisappear.isOff = true;
+
+            if (_oCurrent === _o5WaySelectTarget) {
+                enyo.gesture.drag.endHold();
+                _o5WaySelectTarget = null;
+            }
+
             var oControl = _oDefaultDisappear;
 
             // Nothing is set in defaultSpotlightDisappear
@@ -363,7 +380,7 @@ enyo.Spotlight = new function() {
             var oExCurrent = _oCurrent;
 
             // Remove spotlight class and Blur
-            _oThis.unspot();
+            _oThis.unspot(oControl);
 
             // Add spotlight class
             _highlight(oControl);
@@ -1031,6 +1048,7 @@ enyo.Spotlight = new function() {
         if (_isPointingAway()) {
             return false;
         }
+
         enyo.Spotlight.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
 
         // Always allow key events to bubble regardless of what onSpotlight** handlers return
@@ -1071,10 +1089,14 @@ enyo.Spotlight = new function() {
 
     this.onSpotlightKeyUp = function(oEvent) {
         var ret = true;
+
         switch (oEvent.keyCode) {
             case 13:
-                ret = _dispatchEvent('onSpotlightSelect', oEvent);
-                enyo.gesture.drag.endHold();
+                if (oEvent.originator === _o5WaySelectTarget) {
+                    ret = _dispatchEvent('onSpotlightSelect', oEvent);
+                    enyo.gesture.drag.endHold();
+                }
+                _o5WaySelectTarget = null;
         }
 
         // Should never get here
@@ -1085,6 +1107,7 @@ enyo.Spotlight = new function() {
         switch (oEvent.keyCode) {
             case 13:
                 if (!enyo.Spotlight.Accelerator.isAccelerating()) {
+                    _o5WaySelectTarget = oEvent.originator;
                     enyo.gesture.drag.beginHold(oEvent);
                 }
                 return true;
@@ -1482,8 +1505,7 @@ enyo.Spotlight = new function() {
     * @return {Boolean} - `true` if control was successfully blurred; otherwise, `false`.
     * @private
     */
-    this.unspot = function() {
-
+    this.unspot = function(oNext) {
         // Current cannot change while in frozen mode
         if (this.isFrozen()) {
             return false;
@@ -1492,7 +1514,7 @@ enyo.Spotlight = new function() {
         if (this.hasCurrent() && _bFocusOnScreen) {
             _unhighlight(_oCurrent);
             _oLastMouseMoveTarget = null;
-            _dispatchEvent('onSpotlightBlur', null, _oCurrent);
+            _dispatchEvent('onSpotlightBlur', {next: oNext}, _oCurrent);
             _observeDisappearance(false, _oCurrent);
             _oCurrent = null;
             return true;
