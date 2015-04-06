@@ -1,9 +1,7 @@
 {
     "globals": {
-        "enyo": true,
-        "$L": true,
-        "onyx": true,
-        "moon": true
+        "require": true,
+        "module": true
     },
     "es3": true,
     "evil": false,
