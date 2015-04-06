@@ -4,7 +4,6 @@ var
 	Anchor = require('enyo/Anchor'),
 	Collection = require('enyo/Collection'),
 	Control = require('enyo/Control'),
-	drag = require('enyo/drag'),
 	DataRepeater = require('enyo/DataRepeater');
 
 var
@@ -37,7 +36,7 @@ var List = kind({
 
 ready(function () {
 	var name = window.document.location.search.substring(1),
-		sample = samples[name] || List;
+		Sample = samples[name] || List;
 
-	new sample({samples: samples}).renderInto(document.body);
+	new Sample({samples: samples}).renderInto(document.body);
 });

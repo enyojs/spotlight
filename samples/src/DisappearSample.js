@@ -2,8 +2,7 @@ var
 	kind = require('enyo/kind'),
 	Button = require('enyo/Button');
 
-var
-	Spotlight = require('spotlight');
+require('spotlight');
 
 module.exports = kind({
 	name    : 'enyo.Spotlight.DisappearSample',
@@ -43,5 +42,3 @@ module.exports = kind({
 	destroyAnsestor : function() { this.$.c11.destroy(); },
 	hideAnsestor    : function() { this.$.c11.hide(); }
 });
-
-// Spotlight.verbose();
