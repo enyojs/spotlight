@@ -1,6 +1,13 @@
-enyo.kind({
+var
+	kind = require('enyo/kind'),
+	Button = require('enyo/Button');
+
+var
+	Spotlight = require('spotlight');
+
+module.exports = kind({
 	name    : 'enyo.Spotlight.ContainerSample',
-	classes : 'sample',
+	classes : 'spotlight-sample',
 	fit     : true,
 	
 	handlers: {
@@ -9,15 +16,15 @@ enyo.kind({
 	
 	components: [
 		{name: 'c1', spotlight: 'container', onSpotlightContainerEnter: 'enterContainer', onSpotlightContainerLeave: 'leaveContainer', components: [
-			{name: 'c1b1', kind: 'enyo.Button', spotlight: true, content: 'c1b1'},
-			{name: 'c1b2', kind: 'enyo.Button', spotlight: true, content: 'c1b2'}
+			{name: 'c1b1', kind: Button, spotlight: true, content: 'c1b1'},
+			{name: 'c1b2', kind: Button, spotlight: true, content: 'c1b2'}
 		]},
 		{name: 'c2', spotlight: 'container', onSpotlightContainerEnter: 'enterContainer', onSpotlightContainerLeave: 'leaveContainer', components: [
-			{name: 'c2b1', kind: 'enyo.Button', spotlight: true, content: 'c2b1'},
-			{name: 'c2b2', kind: 'enyo.Button', spotlight: true, content: 'c2b2'},
+			{name: 'c2b1', kind: Button, spotlight: true, content: 'c2b1'},
+			{name: 'c2b2', kind: Button, spotlight: true, content: 'c2b2'},
 			{name: 'c2c1', spotlight: 'container', onSpotlightContainerEnter: 'enterContainer', onSpotlightContainerLeave: 'leaveContainer', components: [
-				{name: 'c2c1b1', kind: 'enyo.Button', spotlight: true, content: 'c2c1b1'},
-				{name: 'c2c1b2', kind: 'enyo.Button', spotlight: true, content: 'c2c1b1'}
+				{name: 'c2c1b1', kind: Button, spotlight: true, content: 'c2c1b1'},
+				{name: 'c2c1b2', kind: Button, spotlight: true, content: 'c2c1b1'}
 			]}
 		]}
 	],
@@ -37,4 +44,4 @@ enyo.kind({
 	}
 });
 
-enyo.Spotlight.verbose();
+Spotlight.verbose();
