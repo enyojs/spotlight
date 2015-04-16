@@ -699,6 +699,7 @@ enyo.Spotlight = new function() {
                     if (oEvent.target === window) {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
+                        this.setPointerMode(false);
                     }
                     break;
                 case 'move':
