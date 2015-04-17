@@ -345,12 +345,17 @@ enyo.Spotlight.NearestNeighbor = new function() {
     * @returns {Object} The nearest neighbor of the control.
     * @public
     */
-    this.getNearestNeighbor = function(sDirection, oControl) {
+    this.getNearestNeighbor = function(sDirection, oControl, oOpts) {
+        var oRoot = oOpts && oOpts.root,
+            oNeighbor,
+            oCandidates,
+            oBounds;
+
         sDirection = sDirection.toUpperCase();
         oControl = oControl || enyo.Spotlight.getCurrent();
 
         // Check to see if default direction is specified
-        var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
+        oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
 		if (oNeighbor) {
 			if (enyo.Spotlight.isSpottable(oNeighbor)) {
 				return oNeighbor;
@@ -364,8 +369,11 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
         // If default control in the direction of navigation is not specified, calculate it
 
-        var o = enyo.Spotlight.getSiblings(oControl),
-            oBounds;
+        // If we've been passed a root, find the best match among its children;
+        // otherwise, find the best match among siblings of the reference control
+        oCandidates = oRoot ?
+            enyo.Spotlight.getChildren(oRoot) :
+            enyo.Spotlight.getSiblings(oControl).siblings;
 
         // If the control is container, the nearest neighbor is calculated based on the bounds
         // of last focused child of container.
@@ -375,6 +383,6 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
         oBounds = oControl.getAbsoluteBounds();
 
-        return _calculateNearestNeighbor(o.siblings, sDirection, oBounds, oControl);
+        return _calculateNearestNeighbor(oCandidates, sDirection, oBounds, oControl);
     };
 };
