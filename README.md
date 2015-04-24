@@ -16,7 +16,8 @@
 	1. [Spotlight Decorators](#7.1)
 	2. [Extending Controls](#7.2)
 8. [Control Parameters](#8)
-9. [Copyright and License Information](#9)
+9. [Samples](#9)
+10. [Copyright and License Information](#10)
 
 <a name="1"></a>
 ## 1. WHAT IS SPOTLIGHT? ##
@@ -321,9 +322,14 @@ for examples.
 
 **spotlightIgnoredKeys: [number | array]** - Is used to specifiy a set of keys to be ignored by spotlight when originate at component.
 
-
 <a name="9"></a>
-## 9. COPYRIGHT AND LICENSE INFORMATION
+## 9. SAMPLES
+
+All samples reside in a consolidated sample app for Enyo and its libraries:
+[enyo-strawman](https://github.com/enyojs/enyo-strawman)
+
+<a name="10"></a>
+## 10. COPYRIGHT AND LICENSE INFORMATION
 
 Unless otherwise specified, all content, including all source code files and
 documentation files in this repository are:
