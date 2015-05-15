@@ -206,7 +206,14 @@ enyo.Spotlight = new function() {
         * @default 0
         * @private
         */
-        _nIgnoredKeyDown = 0;
+        _nIgnoredKeyDown = 0,
+
+        /**
+        * @type {Number}
+        * @default null
+        * @private
+        */
+        _lastSpotlightKeyDown = null;
 
         /**
         * @constant
@@ -1103,6 +1110,11 @@ enyo.Spotlight = new function() {
         return ret;
     };
     this.onSpotlightKeyDown = function(oEvent) {
+       
+        if(_lastSpotlightKeyDown != oEvent.keyCode){
+            enyo.gesture.drag.endHold();  
+        }
+        _lastSpotlightKeyDown = oEvent.keyCode;
 
         switch (oEvent.keyCode) {
             case 13:
