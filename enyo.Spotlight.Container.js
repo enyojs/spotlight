@@ -216,7 +216,7 @@ enyo.Spotlight.Container = new function() {
     };
 
     this.fireContainerEvents = function (blurredControl, focusedControl) {
-        if(blurredControl) {
+        if(blurredControl && blurredControl.hasNode()) {
             var to = focusedControl.hasNode(),
                 from = blurredControl,
                 position = 0;
@@ -232,7 +232,7 @@ enyo.Spotlight.Container = new function() {
                 } else {
                     from = from.parent;
                 }
-            } while (from);
+            } while (from && from.hasNode());
         }
 
         if(focusedControl) {
