@@ -232,7 +232,7 @@ enyo.Spotlight.Container = new function() {
                 } else {
                     from = from.parent;
                 }
-            } while (from && from.hasNode());
+            } while (from);
         }
 
         if(focusedControl) {
