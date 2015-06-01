@@ -216,13 +216,18 @@ enyo.Spotlight.Container = new function() {
     };
 
     this.fireContainerEvents = function (blurredControl, focusedControl) {
-        if(blurredControl) {
+        if(blurredControl && blurredControl.hasNode()) {
             var to = focusedControl.hasNode(),
                 from = blurredControl,
                 position = 0;
 
             // find common ancestor
             do {
+                // skip over tagless Controls (e.g. enyo/ScrollStrategy)
+                if (!from.hasNode()) {
+                    from = from.parent;
+                    continue;
+                }
                 position = enyo.dom.compareDocumentPosition(to, from.hasNode());
                 if(position & 8) {  // 8 == 'contains'
                     enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
