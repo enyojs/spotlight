@@ -928,18 +928,8 @@ var Spotlight = module.exports = new function () {
         this.setPointerMode(true);
         if (this.getPointerMode()) {
 
-            var target = oEvent.target,
-                oTarget;
-
-            if (typeof dispatcher.$[target.id] == 'undefined') {
-                while (target.parentNode) {
-                    target = target.parentNode;
-                    if (typeof dispatcher.$[target.id] != 'undefined') {
-                        break;
-                    }
-                }
-            }
-            oTarget = _getTarget(target.id);
+            var id = (typeof dispatcher.$[oEvent.target.id] == 'undefined') ? oEvent.target.offsetParent.id : oEvent.target.id;
+            var oTarget = _getTarget(id);
 
             if (oTarget && !this.isContainer(oTarget)) {
 
