@@ -1233,7 +1233,11 @@ var Spotlight = module.exports = new function () {
                 oEvent.originator.setAttribute("tabindex", null);
             } else {
                 oEvent.originator.setAttribute("tabindex", 0);
-                oEvent.originator.focus();
+                // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is
+                // to transfer focus to its internal input.
+                if (oEvent.originator.tag != 'label') {
+                    oEvent.originator.focus();
+                }
             }
         }
     };
