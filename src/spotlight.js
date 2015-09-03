@@ -1249,7 +1249,12 @@ var Spotlight = module.exports = new function () {
     * @param {Object} oEvent - The current event.
     * @public
     */
-    this.onSpotlightBlur = function(oEvent) {};
+    this.onSpotlightBlur = function(oEvent) {
+        // Accessibility - blur focus considering spot back from input or dom having aria-hidden
+        if (options.accessibility && oEvent.originator && oEvent.originator.hasFocus()) {
+                oEvent.originator.blur();
+        }
+    };
 
     /**
     * Initializes Spotlight's flags and root.
