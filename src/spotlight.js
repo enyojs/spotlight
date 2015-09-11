@@ -7,6 +7,7 @@ var
     platform = require('enyo/platform'),
     roots = require('enyo/roots'),
     utils = require('enyo/utils'),
+    Component = require('enyo/Component'),
     Control = require('enyo/Control'),
     Signals = require('enyo/Signals');
 
@@ -1227,18 +1228,13 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocused = function(oEvent) {
-        // Accessibility - Set webkit focus to read aria label.
-        if (options.accessibility && oEvent.originator) {
-            if (oEvent.originator.accessibilityDisabled || this.getPointerMode()) {
-                oEvent.originator.setAttribute("tabindex", null);
-            } else {
-                oEvent.originator.setAttribute("tabindex", 0);
-                // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is
-                // to transfer focus to its internal input.
-                if (oEvent.originator.tag != 'label') {
-                    oEvent.originator.focus();
-                }
-            }
+        var c = oEvent.originator;
+
+        // Accessibility - Set focus to read aria label.
+        // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is to
+        // transfer focus to its internal input.
+        if (options.accessibility && !this.getPointerMode() && c && !c.accessibilityDisabled && c.tag != 'label') {
+            c.focus();
         }
     };
 
@@ -1789,6 +1785,33 @@ roots.rendered(function(oRoot) {
     Spotlight.initialize(oRoot);
 });
 
+/*
+Using the hack below to ensure that statically declared Spotlight containers are
+initialized upon creation. Our previous pass at this used enyo.Control.extend(),
+which meant it failed to work for Control subkinds whose constructors were created
+immediately (vs. being deferred). Unfortunately, this caused big problems in webOS,
+where the "container" app systematically disables the deferral of constructor
+creation.
+
+There is some discussion ongoing as to whether we need a nicer mechanism for
+extending functionality in cases like this (see comments in BHV-15323), but in
+the meantime we need to proceed with a quick fix for this issue.
+*/
+
+var originalEnyoComponentCreate = Component.create;
+
+Component.create = function () {
+    var component = originalEnyoComponentCreate.apply(Component, arguments);
+    if (component.spotlight == 'container') {
+        Spotlight.Container.initContainer(component);
+    }
+    // When accessibility is enabled, set the tabindex for any control that is
+    // spottable and doesn't have a valid tabindex.
+    if (component.spotlight === true && options.accessibility && !component.tabIndex && component.tabIndex !== 0) {
+        component.set('tabIndex', '-1');
+    }
+    return component;
+};
 
 // Spotlight.bench = new function() {
 // 	var _oBench = null;
