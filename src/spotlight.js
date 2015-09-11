@@ -1233,8 +1233,13 @@ var Spotlight = module.exports = new function () {
         // Accessibility - Set focus to read aria label.
         // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is to
         // transfer focus to its internal input.
-        if (options.accessibility && !this.getPointerMode() && c && !c.accessibilityDisabled && c.tag != 'label') {
-            c.focus();
+        if (options.accessibility && !this.getPointerMode()) {
+            if (c && !c.accessibilityDisabled && c.tag != 'label') {
+                c.focus();
+            }
+            else if (document.activeElement) {
+                document.activeElement.blur();
+            }
         }
     };
 
