@@ -378,7 +378,7 @@ module.exports = function (Spotlight) {
 
         // Check to see if default direction is specified
         oNeighbor = Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
-		if (oNeighbor) {
+		if (oNeighbor && (!oRoot || oNeighbor.isDescendantOf(oRoot))) {
 			if (Spotlight.isSpottable(oNeighbor)) {
 				return oNeighbor;
 			} else {
