@@ -746,6 +746,14 @@ var Spotlight = module.exports = new function () {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'webOSMouse':
+                    if (oEvent && oEvent.detail && oEvent.detail.type == 'Leave') {
+                        // webOSMouse event comes only when pointer mode
+                        this.setPointerMode(false);
+                        this.unspot();
+                        this.setPointerMode(true);
+                    }
+                    break;
                 case 'focus':
                     if (oEvent.target === window) {
                         // Update pointer mode from cursor visibility platform API
