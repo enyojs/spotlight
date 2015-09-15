@@ -54,9 +54,9 @@ module.exports = function (Spotlight) {
         * @returns {Number}
         * @private
         */
-        _getAdjacentControlPrecedence = function(sDirection, oBounds1, oBounds2) {
+        _getAdjacentControlPrecedence = function(sDirection, oBounds1, oBounds2, oEvent) {
             var oPoints = _getAdjacentControlPoints(sDirection, oBounds1, oBounds2);
-            return _getPrecedenceValue(oPoints, sDirection);
+            return _getPrecedenceValue(oPoints, sDirection, oEvent);
         },
 
         /**
@@ -176,13 +176,14 @@ module.exports = function (Spotlight) {
         * @returns {Number} The precedence value.
         * @private
         */
-        _getPrecedenceValue = function(oPoints, sDirection) {
-            var delta = _getDelta(oPoints[0], oPoints[1]),
+        _getPrecedenceValue = function(oPoints, sDirection, oEvent) {
+            var pow = oEvent && oEvent.spotlightPrecedence || 4,
+				delta = _getDelta(oPoints[0], oPoints[1]),
                 slope = _getSlope(delta, sDirection),
                 angle = _getAngle(slope),
                 distance = _getDistance(delta);
 
-            return angle > 90 ? 0 : 1 / (angle * Math.pow(distance, 4));
+            return angle > 90 ? 0 : 1 / (angle * Math.pow(distance, pow));
         },
 
         /**
@@ -274,7 +275,7 @@ module.exports = function (Spotlight) {
         * @returns {Number}
         * @private
         */
-        _calculateNearestNeighbor = function(o, sDirection, oBounds1, oControl) {
+        _calculateNearestNeighbor = function(o, sDirection, oBounds1, oControl, oEvent) {
             var n,
                 oBounds2,
                 nPrecedence,
@@ -297,7 +298,7 @@ module.exports = function (Spotlight) {
                     // If control is in half plane specified by direction
                     if (_isInHalfPlane(sDirection, oBounds1, oBounds2)) {
                         // Find control with highest precedence to the direction
-                        nPrecedence = _getAdjacentControlPrecedence(sDirection, oBounds1, oBounds2);
+                        nPrecedence = _getAdjacentControlPrecedence(sDirection, oBounds1, oBounds2, oEvent);
                         if (nPrecedence > nBestMatch) {
                             nBestMatch = nPrecedence;
                             oBestMatch = oSibling;
@@ -346,7 +347,7 @@ module.exports = function (Spotlight) {
     * @returns {Object} The nearest neighbor of the pointer.
     * @public
     */
-    this.getNearestPointerNeighbor = function(oRoot, sDirection, nPositionX, nPositionY) {
+    this.getNearestPointerNeighbor = function(oRoot, sDirection, nPositionX, nPositionY, oEvent) {
         var oBounds = {
                 left: nPositionX,
                 top: nPositionY,
@@ -355,7 +356,7 @@ module.exports = function (Spotlight) {
             },
             o = Spotlight.getChildren(oRoot, true);
 
-        return _calculateNearestNeighbor(o, sDirection, oBounds);
+        return _calculateNearestNeighbor(o, sDirection, oBounds, null, oEvent);
     };
 
     /**
@@ -367,7 +368,7 @@ module.exports = function (Spotlight) {
     * @returns {Object} The nearest neighbor of the control.
     * @public
     */
-    this.getNearestNeighbor = function(sDirection, oControl, oOpts) {
+    this.getNearestNeighbor = function(sDirection, oControl, oOpts, oEvent) {
         var oRoot = oOpts && oOpts.root,
             oNeighbor,
             oCandidates,
@@ -405,6 +406,6 @@ module.exports = function (Spotlight) {
 
         oBounds = oControl.getAbsoluteBounds();
 
-        return _calculateNearestNeighbor(oCandidates, sDirection, oBounds, oControl);
+        return _calculateNearestNeighbor(oCandidates, sDirection, oBounds, oControl, oEvent);
     };
 };

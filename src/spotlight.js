@@ -462,7 +462,7 @@ var Spotlight = module.exports = new function () {
         _5WayMove = function(oEvent) {
             var sDirection = oEvent.type.replace('onSpotlight', '').toUpperCase(),
                 leave = oEvent.requestLeaveContainer,
-                oControl = !leave && _oThis.NearestNeighbor.getNearestNeighbor(sDirection);
+                oControl = !leave && _oThis.NearestNeighbor.getNearestNeighbor(sDirection, null, null, oEvent);
 
 
             // If oEvent.allowDomDefault() was not called
@@ -709,7 +709,8 @@ var Spotlight = module.exports = new function () {
                     getNearestPointerNeighbor(_oRoot,
                         sDir,
                         _nPrevClientX,
-                        _nPrevClientY
+                        _nPrevClientY,
+						oEvent
                     );
             if (oNearest) {
                 _oThis.spot(oNearest, {direction: sDir});
