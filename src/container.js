@@ -201,6 +201,15 @@ module.exports = function (Spotlight) {
             }
             if (!oChildToFocus) {
                 oChildToFocus = this.getLastFocusedChild(oSender);
+				// since spotlight caches the previous 5-way event we want to ensure that any
+				// subsequent calculations relative to this event originator are using the correct
+				// originator - so here we use the prioritized _originator property that will be
+				// be used as the o5WayEventOriginator (in this function) for re-dispatches
+				// this is targeting a case where a spotted control explicitly targeted another
+				// control on a direction event that was not its default nearest neighbor in that
+				// direction which causes a chain of events of containers that can't re-calculate
+				// nearest neighbor safely from the originator outside their tree
+				if (o5WayEvent && (o5WayEvent._originator || o5WayEvent.originator) !== oSender) o5WayEvent._originator = oSender;
             }
             if (oChildToFocus) {
                 Spotlight.spot(oChildToFocus, {direction: s5WayEventDir});
