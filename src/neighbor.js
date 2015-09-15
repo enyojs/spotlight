@@ -371,6 +371,7 @@ module.exports = function (Spotlight) {
         var oRoot = oOpts && oOpts.root,
             oNeighbor,
             oCandidates,
+            oNonContainer,
             oBounds;
 
         sDirection = sDirection.toUpperCase();
@@ -399,9 +400,11 @@ module.exports = function (Spotlight) {
 
         // If the control is container, the nearest neighbor is calculated based on the bounds
         // of last focused child of container.
-        if (Spotlight.isContainer(oControl)) {
-            oControl = Spotlight.Container.getLastFocusedChild(oControl) || oControl;
+        oNonContainer = oControl;
+        while (Spotlight.isContainer(oNonContainer)) {
+            oNonContainer = Spotlight.Container.getLastFocusedChild(oNonContainer);
         }
+        oControl = oNonContainer || oControl;
 
         oBounds = oControl.getAbsoluteBounds();
 
