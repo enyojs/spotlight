@@ -1245,8 +1245,8 @@ var Spotlight = module.exports = new function () {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
                 c.focus();
             }
-            else if (document.activeElement) {
-                document.activeElement.blur();
+            else if (oEvent.previous) {
+                oEvent.previous.blur();
             }
         }
     };
