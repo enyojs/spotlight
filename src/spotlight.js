@@ -454,6 +454,33 @@ var Spotlight = module.exports = new function () {
         },
 
         /**
+        * Get the default 5-way move target (if any) when moving in a
+        * given direction from a given control
+        *
+        * @private
+        */
+        _getDefault5WayMoveTarget = function(sDirection, oControl) {
+            var oTarget;
+
+            sDirection = sDirection.toUpperCase();
+            oControl = oControl || _oThis.getCurrent();
+
+            oTarget = _oThis.Util.getDefaultDirectionControl(sDirection, oControl);
+            if (oTarget) {
+                if (_oThis.isSpottable(oTarget)) {
+                    return oTarget;
+                } else {
+                    oTarget = _oThis.getFirstChild(oTarget);
+                    if (oTarget && _oThis.isSpottable(oTarget)) { 
+                        return oTarget;
+                    }
+                }
+            }
+
+            return null;
+        },
+
+        /**
         * Moves to nearest neighbor based on 5-way Spotlight event.
         *
         * @param {Object} oEvent - The current 5-way event.
@@ -462,8 +489,18 @@ var Spotlight = module.exports = new function () {
         _5WayMove = function(oEvent) {
             var sDirection = oEvent.type.replace('onSpotlight', '').toUpperCase(),
                 leave = oEvent.requestLeaveContainer,
-                oControl = !leave && _oThis.NearestNeighbor.getNearestNeighbor(sDirection);
+                oControl =
+                    // If we've been asked to exit the current container,
+                    // no need to look for a target. Setting `oControl` to `null`
+                    // will land us in the `else` block below and force the event
+                    // to propagate up the container chain.
+                    leave ? null : (
+                        // If there's a default target specified, use that...
+                        _getDefault5WayMoveTarget(sDirection) ||
+                        // Otherwise, find one using the nearest-neighbor algorithm
+                        _oThis.NearestNeighbor.getNearestNeighbor(sDirection)
 
+                    );
 
             // If oEvent.allowDomDefault() was not called
             // this will preventDefault on dom keydown event

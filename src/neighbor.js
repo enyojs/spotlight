@@ -369,27 +369,11 @@ module.exports = function (Spotlight) {
     */
     this.getNearestNeighbor = function(sDirection, oControl, oOpts) {
         var oRoot = oOpts && oOpts.root,
-            oNeighbor,
             oCandidates,
             oBounds;
 
         sDirection = sDirection.toUpperCase();
         oControl = oControl || Spotlight.getCurrent();
-
-        // Check to see if default direction is specified
-        oNeighbor = Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
-		if (oNeighbor) {
-			if (Spotlight.isSpottable(oNeighbor)) {
-				return oNeighbor;
-			} else {
-				oNeighbor = Spotlight.getFirstChild(oNeighbor);
-				if (oNeighbor && Spotlight.isSpottable(oNeighbor)) { 
-					return oNeighbor;
-				}
-			}
-		}
-
-        // If default control in the direction of navigation is not specified, calculate it
 
         // If we've been passed a root, find the best match among its children;
         // otherwise, find the best match among siblings of the reference control
