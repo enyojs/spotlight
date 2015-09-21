@@ -784,11 +784,17 @@ var Spotlight = module.exports = new function () {
         if (this.isInitialized()) {
             switch (oEvent.type) {
                 case 'webOSMouse':
-                    if (oEvent && oEvent.detail && oEvent.detail.type == 'Leave') {
-                        // webOSMouse event comes only when pointer mode
-                        this.setPointerMode(false);
-                        this.unspot();
-                        this.setPointerMode(true);
+					// webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+						if (oEvent.detail.type == 'Leave') {
+							this.setPointerMode(false);
+							this.unspot();
+							this.mute();
+							this.setPointerMode(true);
+						}
+						if (oEvent.detail.type == 'Enter') {
+							this.unmute();
+						}
                     }
                     break;
                 case 'focus':
@@ -799,6 +805,7 @@ var Spotlight = module.exports = new function () {
                         }
                         // Whenever app goes to foreground, refocus on last focused control
                         _spotLastControl();
+						this.unmute();
                     }
                     break;
                 case 'blur':
@@ -806,6 +813,7 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+						this.mute();
                     }
                     break;
                 case 'move':
