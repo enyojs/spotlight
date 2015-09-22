@@ -790,16 +790,16 @@ var Spotlight = module.exports = new function () {
                             this.setPointerMode(false);
                             this.unspot();
                             this.setPointerMode(true);
-                            this.mute();
+                            this.mute({id: 'window.focus'});
                         }
                         if (oEvent.detail.type == 'Enter') {
-                            this.unmute();
+                            this.unmute({id: 'window.focus'});
                         }
                     }
                     break;
                 case 'focus':
                     if (oEvent.target === window) {
-                        this.unmute();
+                        this.unmute({id: 'window.focus'});
                         // Update pointer mode from cursor visibility platform API
                         if (window.PalmSystem && window.PalmSystem.cursor) {
                             this.setPointerMode( window.PalmSystem.cursor.visibility );
@@ -813,7 +813,7 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
-                        this.mute();
+                        this.mute({id: 'window.focus'});
                     }
                     break;
                 case 'move':
