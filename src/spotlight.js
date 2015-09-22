@@ -789,8 +789,8 @@ var Spotlight = module.exports = new function () {
 						if (oEvent.detail.type == 'Leave') {
 							this.setPointerMode(false);
 							this.unspot();
-							this.mute();
 							this.setPointerMode(true);
+							this.mute();
 						}
 						if (oEvent.detail.type == 'Enter') {
 							this.unmute();
@@ -799,13 +799,13 @@ var Spotlight = module.exports = new function () {
                     break;
                 case 'focus':
                     if (oEvent.target === window) {
+						this.unmute();
                         // Update pointer mode from cursor visibility platform API
                         if (window.PalmSystem && window.PalmSystem.cursor) {
                             this.setPointerMode( window.PalmSystem.cursor.visibility );
                         }
                         // Whenever app goes to foreground, refocus on last focused control
                         _spotLastControl();
-						this.unmute();
                     }
                     break;
                 case 'blur':
