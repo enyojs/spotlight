@@ -6,22 +6,22 @@ var
 * Use States when you need to save Spotlight state (i.e., what is currently
 * spotted) to spot again later. One use case is a model window that takes over
 * Spotlight interaction for as long as it is open. Before the window opens,
-* save the spotted component by calling `Spotlight.push("mystackname")`; then,
-* after the window closes, call `Spotlight.pop("mystackname")` to restore the
+* save the spotted component by calling `spotlight.push('mystackname')`; then,
+* after the window closes, call `spotlight.pop('mystackname')` to restore the
 * previous state.
 *
 * You can create as many stacks as needed and push as many states as necessary
 * on each stack by specifying its name or the component that keeps track of
 * changes:
+*
 * ```
-* Spotlight.push(this.id) => Spotlight.pop(this.id)
+* spotlight.push(this.id) => spotlight.pop(this.id)
 * ```
 *
 * In addition, when pushing to a stack, you may specify the component that you
 * want to be spotted when the stack is popped.
 *
-* To log changes in States, turn on verbose mode (see
-* [verbose()]{@link module:spotlight/States#verbose}).
+* To log changes in States, turn on [verbose mode]{@link module:spotlight/states#verbose}.
 *
 * Returns a generator function that accepts the [Spotlight]{@link module:spotlight}
 * instance as an argument.
@@ -101,7 +101,7 @@ module.exports = function (Spotlight) {
         var sComponentId;
 
         if (!_stackExists(sStackName)) {
-            throw 'Error in enyo.Spotlight.States: stack "' + sStackName + "' dose not exist, call push to create it";
+            throw 'Error in spotlight/states: stack "' + sStackName + "' dose not exist, call push to create it";
         }
 
         if (_oStacks[sStackName].length > 0) {
@@ -111,7 +111,7 @@ module.exports = function (Spotlight) {
                 _log('Popped', sComponentId, 'off stack', sStackName + '[' + _oStacks[sStackName].length + ']');
             }
         } else {
-            logger.warn('enyo.Spotlight.States.pop() has failed: Stack "' + sStackName + '" is empty');
+            logger.warn('spotlight/states.pop() has failed: Stack "' + sStackName + '" is empty');
         }
     };
 
