@@ -16,13 +16,12 @@ module.exports = function (Spotlight) {
     /**
     * Mutes a control.
     *
-    * @param  {Object} oSender - The control to be muted.
+    * @param  {Object|String} oSender - The control or id to be muted.
     * @public
     */
     this.addMuteReason = function(oSender) {
-        if (typeof _oMutes[oSender.id] != 'undefined') {
-            return;
-        }
+		var id = typeof oSender == 'string' ? oSender : oSender.id;
+		if (_oMutes[id]) return;
 
         if (_nMutes === 0) {
             var oCurrent = Spotlight.getCurrent();
@@ -31,22 +30,21 @@ module.exports = function (Spotlight) {
             }
         }
 
-        _oMutes[oSender.id] = 1;
+        _oMutes[id] = true;
         _nMutes++;
     };
 
     /**
     * Un-mutes a muted control.
     *
-    * @param  {Object} oSender - The control to be un-muted.
+    * @param  {Object|String} oSender - The control or id to be un-muted.
     * @public
     */
     this.removeMuteReason = function(oSender) {
-        if (typeof _oMutes[oSender.id] == 'undefined') {
-            return;
-        }
+		var id = typeof oSender == 'string' ? oSender : oSender.id;
+		if (!_oMutes[id]) return;
 
-        delete _oMutes[oSender.id];
+        _oMutes[id] = null;
         _nMutes--;
 
         if (_nMutes === 0) {
