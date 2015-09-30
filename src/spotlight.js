@@ -784,22 +784,15 @@ var Spotlight = module.exports = new function () {
         if (this.isInitialized()) {
             switch (oEvent.type) {
                 case 'webOSMouse':
-                    // webOSMouse event comes only when pointer mode
-                    if (oEvent && oEvent.detail) {
-                        if (oEvent.detail.type == 'Leave') {
-                            this.setPointerMode(false);
-                            this.unspot();
-                            this.setPointerMode(true);
-                            this.mute('window.focus');
-                        }
-                        if (oEvent.detail.type == 'Enter') {
-                            this.unmute('window.focus');
-                        }
+                    if (oEvent && oEvent.detail && oEvent.detail.type == 'Leave') {
+                        // webOSMouse event comes only when pointer mode
+                        this.setPointerMode(false);
+                        this.unspot();
+                        this.setPointerMode(true);
                     }
                     break;
                 case 'focus':
                     if (oEvent.target === window) {
-                        this.unmute('window.focus');
                         // Update pointer mode from cursor visibility platform API
                         if (window.PalmSystem && window.PalmSystem.cursor) {
                             this.setPointerMode( window.PalmSystem.cursor.visibility );
@@ -813,7 +806,6 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
-                        this.mute('window.focus');
                     }
                     break;
                 case 'move':
