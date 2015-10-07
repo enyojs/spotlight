@@ -785,8 +785,6 @@ var Spotlight = module.exports = new function () {
             switch (oEvent.type) {
                 case 'webOSMouse':
                     if (oEvent && oEvent.detail && oEvent.detail.type == 'Leave') {
-                        // webOSMouse event comes only when pointer mode
-                        this.setPointerMode(true);
                         this.unspot();
                     }
                     break;
