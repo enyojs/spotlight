@@ -20,8 +20,8 @@ module.exports = function (Spotlight) {
     * @public
     */
     this.addMuteReason = function(oSender) {
-		var id = typeof oSender == 'string' ? oSender : oSender.id;
-		if (_oMutes[id]) return;
+        var id = typeof oSender == 'string' ? oSender : oSender.id;
+        if (_oMutes[id]) return;
 
         if (_nMutes === 0) {
             var oCurrent = Spotlight.getCurrent();
@@ -41,8 +41,8 @@ module.exports = function (Spotlight) {
     * @public
     */
     this.removeMuteReason = function(oSender) {
-		var id = typeof oSender == 'string' ? oSender : oSender.id;
-		if (!_oMutes[id]) return;
+        var id = typeof oSender == 'string' ? oSender : oSender.id;
+        if (!_oMutes[id]) return;
 
         _oMutes[id] = null;
         _nMutes--;
