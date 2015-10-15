@@ -783,13 +783,29 @@ var Spotlight = module.exports = new function () {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'keyboardStateChange':
+                    // webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+                        if (!oEvent.detail.visibility) {
+                            this.unmute('window.focus');
+                        }
+                    }
+                    break;
                 case 'webOSMouse':
-                    if (oEvent && oEvent.detail && oEvent.detail.type == 'Leave') {
-                        this.unspot();
+                    // webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+                        if (oEvent.detail.type == 'Leave') {
+                            this.unspot();
+                            this.mute('window.focus');
+                        }
+                        if (oEvent.detail.type == 'Enter') {
+                            this.unmute('window.focus');
+                        }
                     }
                     break;
                 case 'focus':
                     if (oEvent.target === window) {
+                        this.unmute('window.focus');
                         // Update pointer mode from cursor visibility platform API
                         if (window.PalmSystem && window.PalmSystem.cursor) {
                             this.setPointerMode( window.PalmSystem.cursor.visibility );
@@ -803,6 +819,7 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+                        this.mute('window.focus');
                     }
                     break;
                 case 'move':
@@ -1585,7 +1602,7 @@ var Spotlight = module.exports = new function () {
 
         // Can only spot enyo/Controls
         if (!(oControl instanceof Control)) {
-            _warn('argument is not enyo/Control');
+            _warn('argument is not enyo.Control');
             return false;
         }
 
