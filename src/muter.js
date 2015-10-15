@@ -16,7 +16,7 @@ module.exports = function (Spotlight) {
     /**
     * Mutes a control.
     *
-    * @param  {Object|String} oSender - The control or id to be muted.
+    * @param  {Object} oSender - The control to be muted.
     * @public
     */
     this.addMuteReason = function(oSender) {
@@ -37,7 +37,7 @@ module.exports = function (Spotlight) {
     /**
     * Un-mutes a muted control.
     *
-    * @param  {Object|String} oSender - The control or id to be un-muted.
+    * @param  {Object} oSender - The control to be un-muted.
     * @public
     */
     this.removeMuteReason = function(oSender) {
