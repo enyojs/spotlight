@@ -582,7 +582,7 @@ var Spotlight = module.exports = new function () {
 
         /**
         * If originator is container, delegates processing of event
-        * to `spotlight/container.onSpotlight*`. If delegate method is
+        * to `enyo.Spotlight.Container.onSpotlight*`. If delegate method is
         * found, its return value is returned; otherwise, `true` is returned.
         *
         * @param {Object} oEvent - The current 5-way event.
@@ -783,13 +783,29 @@ var Spotlight = module.exports = new function () {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'keyboardStateChange':
+                    // webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+                        if (!oEvent.detail.visibility) {
+                            this.unmute('window.focus');
+                        }
+                    }
+                    break;
                 case 'webOSMouse':
-                    if (oEvent && oEvent.detail && oEvent.detail.type == 'Leave') {
-                        this.unspot();
+                    // webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+                        if (oEvent.detail.type == 'Leave') {
+                            this.unspot();
+                            this.mute('window.focus');
+                        }
+                        if (oEvent.detail.type == 'Enter') {
+                            this.unmute('window.focus');
+                        }
                     }
                     break;
                 case 'focus':
                     if (oEvent.target === window) {
+                        this.unmute('window.focus');
                         // Update pointer mode from cursor visibility platform API
                         if (window.PalmSystem && window.PalmSystem.cursor) {
                             this.setPointerMode( window.PalmSystem.cursor.visibility );
@@ -803,6 +819,7 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+                        this.mute('window.focus');
                     }
                     break;
                 case 'move':
@@ -1517,7 +1534,7 @@ var Spotlight = module.exports = new function () {
     * Returns closest spottable parent, or `null` if there is none.
     *
     * @param {Object} oControl - The control whose parent is to be retrieved.
-    * @return {module:enyo/Control~Control} - The control's closest spottable parent.
+    * @return {enyo.Control} - The control's closest spottable parent.
     * @private
     */
     this.getParent = function(oControl) {
@@ -1539,7 +1556,7 @@ var Spotlight = module.exports = new function () {
     /**
     * Dispatches focus event to the control or its first spottable child.
     *
-    * @param {module:enyo/Control~Control} oControl - The control to be focused.
+    * @param {enyo.Control} oControl - The control to be focused.
     * @param {Object} info - Information about the nature of the focus operation.
     *   The properties of the `info` object are utilized by the logic in the `spot()`
     *   and included in the payload of the resulting `onSpotlightFocus` event. The
@@ -1583,9 +1600,9 @@ var Spotlight = module.exports = new function () {
             return false;
         }
 
-        // Can only spot enyo/Controls
+        // Can only spot enyo.Controls
         if (!(oControl instanceof Control)) {
-            _warn('argument is not enyo/Control');
+            _warn('argument is not enyo.Control');
             return false;
         }
 
@@ -1661,7 +1678,7 @@ var Spotlight = module.exports = new function () {
     * Gets first spottable child of a control.
     *
     * @param {Object} oControl - The control whose child is to be retrieved.
-    * @return {module:enyo/Control~Control} - The first spottable child.
+    * @return {enyo.Control} - The first spottable child.
     * @private
     */
     this.getFirstChild = function(oControl) {
@@ -1773,7 +1790,7 @@ var Spotlight = module.exports = new function () {
     /**
     * Highlights the specified control.
     *
-    * @param {module:enyo/Control~Control} oControl - The control to highlight.
+    * @param {enyo.Control} oControl - The control to highlight.
     * @param {Boolean} bIgnoreMute - Whether to ignore muting.
     * @private
     */
@@ -1784,7 +1801,7 @@ var Spotlight = module.exports = new function () {
     /**
     * Unhighlights the specified control.
     *
-    * @param {module:enyo/Control~Control} oControl - The control to unhighlight.
+    * @param {enyo.Control} oControl - The control to unhighlight.
     * @private
     */
     this.unhighlight = function(oControl) {
@@ -1834,7 +1851,7 @@ roots.rendered(function(oRoot) {
 
 /*
 Using the hack below to ensure that statically declared Spotlight containers are
-initialized upon creation. Our previous pass at this used enyo/Control.extend(),
+initialized upon creation. Our previous pass at this used enyo.Control.extend(),
 which meant it failed to work for Control subkinds whose constructors were created
 immediately (vs. being deferred). Unfortunately, this caused big problems in webOS,
 where the "container" app systematically disables the deferral of constructor
