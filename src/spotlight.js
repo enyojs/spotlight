@@ -374,6 +374,13 @@ var Spotlight = module.exports = new function () {
 
                     // Capture defaultSpotlightDisappear control
                     _setDefaultDisappearControl(oControl);
+
+                    // since this is called asynchronously, the control could have been made
+                    // unspottable after but within the same frame as the spot()
+                    if (oControl.disabled || oControl.destroyed || !oControl.spotlight || !oControl.generated) {
+                        _onDisappear();
+                        return;
+                    }
                 }
 
                 // Enough to check in _oCurrent only, no ancestors
@@ -387,6 +394,12 @@ var Spotlight = module.exports = new function () {
 
                 // Enough to check in _oCurrent only, no ancestors
                 oControl[sMethod]('generated', _onDisappear);
+            }
+
+            // ensure the original control is still visible and spottable
+            if (bObserve && !oControl.showing) {
+                _onDisappear();
+                return;
             }
 
             // Have to add-remove hadler to all ancestors for showing
