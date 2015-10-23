@@ -332,7 +332,7 @@ var Spotlight = module.exports = new function () {
             if (!oControl || !_oThis.isSpottable(oControl)) {
 
                 // Find first spottable parent
-                oControl = oControl = _oThis.getParent();
+                oControl = _oThis.getParent();
                 if (!oControl) {
                     _unhighlight(_oLastControl);
                     _oLastControl = null;
