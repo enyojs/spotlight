@@ -331,8 +331,8 @@ var Spotlight = module.exports = new function () {
             // Nothing is set in defaultSpotlightDisappear
             if (!oControl || !_oThis.isSpottable(oControl)) {
 
-                // Find first spottable in the app
-                oControl = _oThis.getFirstChild(_oRoot);
+                // Find first spottable parent
+                oControl = _oThis.getParent();
                 if (!oControl) {
                     _unhighlight(_oLastControl);
                     _oLastControl = null;
@@ -471,7 +471,7 @@ var Spotlight = module.exports = new function () {
                     return oTarget;
                 } else {
                     oTarget = _oThis.getFirstChild(oTarget);
-                    if (oTarget && _oThis.isSpottable(oTarget)) { 
+                    if (oTarget && _oThis.isSpottable(oTarget)) {
                         return oTarget;
                     }
                 }
