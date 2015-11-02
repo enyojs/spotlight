@@ -239,7 +239,16 @@ var Spotlight = module.exports = new function () {
         * @default 0
         * @private
         */
-        _nIgnoredKeyDown = 0;
+        _nIgnoredKeyDown = 0,
+
+        /**
+        * Timeout ID for observeDisappearance used to ensure only 1 timeout is scheduled at a time
+        *
+        * @type {Number}
+        * @default 0
+        * @private
+        */
+        _disappearTimeout = 0;
 
         /**
         * @constant
@@ -432,11 +441,13 @@ var Spotlight = module.exports = new function () {
 
             _oCurrent = oControl;
 
-            // Set observers asynchronously to allow painti to happen faster
-            setTimeout(function() {
-                _observeDisappearance(false, oExCurrent);
-                _observeDisappearance(true, oControl);
-            }, 1);
+            // Set observers asynchronously to allow painting to happen faster. Only schedule the
+            // job if there isn't a pending timeout (when _disappearTimeout would be 0)
+            _disappearTimeout = _disappearTimeout || setTimeout(utils.bind(_oThis, function (was) {
+                _disappearTimeout = 0;
+                _observeDisappearance(false, was);
+                _observeDisappearance(true, _oCurrent);
+            }, oExCurrent), 1);
 
             _oThis.Container.fireContainerEvents(oExCurrent || _oLastControl, _oCurrent);
 
