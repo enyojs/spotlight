@@ -242,10 +242,15 @@ module.exports = function (Spotlight) {
     * Sets last focused child for the container.
     *
     * @param  {Object} oSender
-    * @param  {Object} oChild - The child to set as the last focused child.
+    * @param  {Object} oChild - The child to set as the last focused child. Set to `null`
+    *   to clear the last focused child.
     * @public
     */
     this.setLastFocusedChild = function(oSender, oChild) {
+        if (oChild === null) {
+            oSender._spotlight.lastFocusedChild = null;
+            return;
+        }
         if (!Spotlight.isSpottable(oChild)) {
             oChild = Spotlight.getFirstChild(oChild);
         }
