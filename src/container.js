@@ -276,7 +276,7 @@ module.exports = function (Spotlight) {
                     continue;
                 }
                 position = dom.compareDocumentPosition(to, from.hasNode());
-                if(position & 8) {  // 8 == 'contains'
+                if(from == focusedControl || (position & 8)) {  // 8 == 'contains'
                     Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
                         commonAncestor: from
                     }, blurredControl);
