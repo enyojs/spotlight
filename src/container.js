@@ -77,7 +77,7 @@ module.exports = function (Spotlight) {
                     oEvent.spotSentFromContainer = true;
                     break;
                 case 'onSpotlightContainerEnter':
-                    if(oEvent.last && oEvent.last.isDescendantOf(oSender)) {
+                    if(oEvent.last && oEvent.last !== oSender && oEvent.last.isDescendantOf(oSender)) {
                         return true;
                     }
                     break;
@@ -276,7 +276,7 @@ module.exports = function (Spotlight) {
                     continue;
                 }
                 position = dom.compareDocumentPosition(to, from.hasNode());
-                if(position & 8) {  // 8 == 'contains'
+                if(from == focusedControl || (position & 8)) {  // 8 == 'contains'
                     Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
                         commonAncestor: from
                     }, blurredControl);
