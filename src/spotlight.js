@@ -495,7 +495,7 @@ var Spotlight = module.exports = new function () {
                     return oTarget;
                 } else {
                     oTarget = _oThis.getFirstChild(oTarget);
-                    if (oTarget && _oThis.isSpottable(oTarget)) { 
+                    if (oTarget && _oThis.isSpottable(oTarget)) {
                         return oTarget;
                     }
                 }
@@ -1311,8 +1311,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocused = function(oEvent) {
-        var c = oEvent.originator,
-            Spotlight = this;
+        var c = oEvent.originator;
 
         // Accessibility - Set focus to read aria label.
         // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is to
@@ -1320,9 +1319,7 @@ var Spotlight = module.exports = new function () {
         if (options.accessibility && !this.getPointerMode()) {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
                 setTimeout(function () {
-                    if (Spotlight.getCurrent() === c) {
-                        c.focus();
-                    }
+                    c.focus();
                 }, 50);
             }
             else if (oEvent.previous) {
