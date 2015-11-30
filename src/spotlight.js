@@ -495,7 +495,7 @@ var Spotlight = module.exports = new function () {
                     return oTarget;
                 } else {
                     oTarget = _oThis.getFirstChild(oTarget);
-                    if (oTarget && _oThis.isSpottable(oTarget)) { 
+                    if (oTarget && _oThis.isSpottable(oTarget)) {
                         return oTarget;
                     }
                 }
@@ -843,6 +843,10 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+
+                        // Stop any hold/holdpulses that may currently be active
+                        gesture.drag.endHold();
+
                         this.mute('window.focus');
                     }
                     break;
