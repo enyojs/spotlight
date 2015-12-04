@@ -1406,10 +1406,10 @@ var Spotlight = module.exports = new function () {
         }
     };
 
-	/**
-	* Gets the current pointer mode
+    /**
+    * Gets the current pointer mode
     * @return {Boolean} `true` if pointer mode
-	*/
+    */
     this.getPointerMode = function() {
         return _bPointerMode;
     };
@@ -1583,7 +1583,9 @@ var Spotlight = module.exports = new function () {
     };
 
     /**
-    * Dispatches focus event to the control or its first spottable child.
+    * Dispatches focus event to the control or its first spottable child. This method has no effect if
+    * Spotlight is [frozen]{@link module:spotlight#isFrozen} or
+    * [pointer mode]{@link module:spotlight#getPointerMode} is true.
     *
     * @param {module:enyo/Control~Control} oControl - The control to be focused.
     * @param {Object} info - Information about the nature of the focus operation.
@@ -1790,11 +1792,11 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.freeze = function() {
-		if (this.hasCurrent()) {
-			_bFrozen = true;
-		} else {
-			_warn('Can not enter frozen mode until something is spotted');
-		}
+        if (this.hasCurrent()) {
+            _bFrozen = true;
+        } else {
+            _warn('Can not enter frozen mode until something is spotted');
+        }
     };
 
     /**
@@ -1802,9 +1804,9 @@ var Spotlight = module.exports = new function () {
     *
     * @public
     */
-    this.unfreeze = function() {
-		_bFrozen = false;
-	};
+    this.unfreeze = function() { 
+        _bFrozen = false;
+    };
 
     /**
     * Determines whether frozen mode is currently enabled.
@@ -1907,16 +1909,16 @@ Component.create = function () {
 };
 
 // Spotlight.bench = new function() {
-// 	var _oBench = null;
+//     var _oBench = null;
 //
-// 	this.start = function() {
-// 		if (!_oBench) {
-// 			_oBench = enyo.dev.bench({name: 'bench1', average: true});
-// 		}
-// 		_oBench.start();
-// 	}
+//     this.start = function() {
+//         if (!_oBench) {
+//             _oBench = enyo.dev.bench({name: 'bench1', average: true});
+//         }
+//         _oBench.start();
+//     }
 //
-// 	this.stop = function() {
-// 		_oBench.stop();
-// 	}
+//     this.stop = function() {
+//         _oBench.stop();
+//     }
 // }
