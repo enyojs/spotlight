@@ -7,6 +7,7 @@ var
     platform = require('enyo/platform'),
     roots = require('enyo/roots'),
     utils = require('enyo/utils'),
+    Component = require('enyo/Component'),
     Control = require('enyo/Control'),
     Signals = require('enyo/Signals');
 
@@ -238,7 +239,16 @@ var Spotlight = module.exports = new function () {
         * @default 0
         * @private
         */
-        _nIgnoredKeyDown = 0;
+        _nIgnoredKeyDown = 0,
+
+        /**
+        * Timeout ID for observeDisappearance used to ensure only 1 timeout is scheduled at a time
+        *
+        * @type {Number}
+        * @default 0
+        * @private
+        */
+        _disappearTimeout = 0;
 
         /**
         * @constant
@@ -287,15 +297,15 @@ var Spotlight = module.exports = new function () {
 
         /**
         * Gets control specified in `defaultSpotlightDisappear` property
-        * of `_oCurrent`. Gotta get it before it disappears :)
+        * of the specified control. Gotta get it before it disappears :)
         *
         * @param {Object} oControl
         * @private
         */
-        _setDefaultDisappearControl = function() {
+        _setDefaultDisappearControl = function(oControl) {
             _oDefaultDisappear = _oThis.Util.getDefaultDirectionControl(
                 'disappear',
-                _oCurrent
+                oControl
             );
         },
 
@@ -330,8 +340,8 @@ var Spotlight = module.exports = new function () {
             // Nothing is set in defaultSpotlightDisappear
             if (!oControl || !_oThis.isSpottable(oControl)) {
 
-                // Find first spottable in the app
-                oControl = _oThis.getFirstChild(_oRoot);
+                // Find spottable parent or first spottable in the app as a fallback
+                oControl = _oThis.getParent() || _oThis.getFirstChild(_oRoot);
                 if (!oControl) {
                     _unhighlight(_oLastControl);
                     _oLastControl = null;
@@ -372,7 +382,14 @@ var Spotlight = module.exports = new function () {
                     _onDisappear.isOff = false;
 
                     // Capture defaultSpotlightDisappear control
-                    _setDefaultDisappearControl();
+                    _setDefaultDisappearControl(oControl);
+
+                    // since this is called asynchronously, the control could have been made
+                    // unspottable after but within the same frame as the spot()
+                    if (oControl.disabled || oControl.destroyed || !oControl.spotlight || !oControl.generated) {
+                        _onDisappear();
+                        return;
+                    }
                 }
 
                 // Enough to check in _oCurrent only, no ancestors
@@ -386,6 +403,12 @@ var Spotlight = module.exports = new function () {
 
                 // Enough to check in _oCurrent only, no ancestors
                 oControl[sMethod]('generated', _onDisappear);
+            }
+
+            // ensure the original control is still visible and spottable
+            if (bObserve && !oControl.showing) {
+                _onDisappear();
+                return;
             }
 
             // Have to add-remove hadler to all ancestors for showing
@@ -407,7 +430,8 @@ var Spotlight = module.exports = new function () {
                 throw 'Attempting to spot not-spottable control: ' + oControl.toString();
             }
 
-            var oExCurrent = _oCurrent;
+            var oExCurrent = _oCurrent,
+                oPrevious = _oLastControl;
 
             // Remove spotlight class and Blur
             _oThis.unspot(oControl);
@@ -417,11 +441,13 @@ var Spotlight = module.exports = new function () {
 
             _oCurrent = oControl;
 
-            // Set observers asynchronously to allow painti to happen faster
-            setTimeout(function() {
-                _observeDisappearance(false, oExCurrent);
+            // Set observers asynchronously to allow painting to happen faster. Only schedule the
+            // job if there isn't a pending timeout (when _disappearTimeout would be 0)
+            _disappearTimeout = _disappearTimeout || setTimeout(utils.bind(_oThis, function (was) {
+                _disappearTimeout = 0;
+                _observeDisappearance(false, was);
                 _observeDisappearance(true, _oCurrent);
-            }, 1);
+            }, oExCurrent), 1);
 
             _oThis.Container.fireContainerEvents(oExCurrent || _oLastControl, _oCurrent);
 
@@ -434,7 +460,7 @@ var Spotlight = module.exports = new function () {
                 _oLastControl = oControl;
             }
 
-            _dispatchEvent('onSpotlightFocused');
+            _dispatchEvent('onSpotlightFocused', {previous: oPrevious});
 
             _oThis.TestMode.highlight();
 
@@ -452,6 +478,33 @@ var Spotlight = module.exports = new function () {
         },
 
         /**
+        * Get the default 5-way move target (if any) when moving in a
+        * given direction from a given control
+        *
+        * @private
+        */
+        _getDefault5WayMoveTarget = function(sDirection, oControl) {
+            var oTarget;
+
+            sDirection = sDirection.toUpperCase();
+            oControl = oControl || _oThis.getCurrent();
+
+            oTarget = _oThis.Util.getDefaultDirectionControl(sDirection, oControl);
+            if (oTarget) {
+                if (_oThis.isSpottable(oTarget)) {
+                    return oTarget;
+                } else {
+                    oTarget = _oThis.getFirstChild(oTarget);
+                    if (oTarget && _oThis.isSpottable(oTarget)) { 
+                        return oTarget;
+                    }
+                }
+            }
+
+            return null;
+        },
+
+        /**
         * Moves to nearest neighbor based on 5-way Spotlight event.
         *
         * @param {Object} oEvent - The current 5-way event.
@@ -460,8 +513,18 @@ var Spotlight = module.exports = new function () {
         _5WayMove = function(oEvent) {
             var sDirection = oEvent.type.replace('onSpotlight', '').toUpperCase(),
                 leave = oEvent.requestLeaveContainer,
-                oControl = !leave && _oThis.NearestNeighbor.getNearestNeighbor(sDirection);
+                oControl =
+                    // If we've been asked to exit the current container,
+                    // no need to look for a target. Setting `oControl` to `null`
+                    // will land us in the `else` block below and force the event
+                    // to propagate up the container chain.
+                    leave ? null : (
+                        // If there's a default target specified, use that...
+                        _getDefault5WayMoveTarget(sDirection) ||
+                        // Otherwise, find one using the nearest-neighbor algorithm
+                        _oThis.NearestNeighbor.getNearestNeighbor(sDirection)
 
+                    );
 
             // If oEvent.allowDomDefault() was not called
             // this will preventDefault on dom keydown event
@@ -478,7 +541,7 @@ var Spotlight = module.exports = new function () {
 
                     // Reached the end of spottable world
                     if (!oParent || oParent.spotlightModal) {
-                        _spotLastControl();
+                        _spotLastControl({focusType: '5-way bounce'});
                     } else {
                         _oThis.spot(oParent, {direction: sDirection});
                     }
@@ -543,7 +606,7 @@ var Spotlight = module.exports = new function () {
 
         /**
         * If originator is container, delegates processing of event
-        * to `enyo.Spotlight.Container.onSpotlight*`. If delegate method is
+        * to `spotlight/container.onSpotlight*`. If delegate method is
         * found, its return value is returned; otherwise, `true` is returned.
         *
         * @param {Object} oEvent - The current 5-way event.
@@ -674,9 +737,11 @@ var Spotlight = module.exports = new function () {
         *
         * @private
         */
-        _spotLastControl = function() {
+        _spotLastControl = function(info) {
+            var focusType = (info && info.focusType) || 'default';
+
             if (_oThis.isSpottable(_oLastControl)) {
-                return _oThis.spot(_oLastControl, {focusType: 'default'});
+                return _oThis.spot(_oLastControl, {focusType: focusType});
             } else {
                 return _spotFirstChild();
             }
@@ -742,8 +807,29 @@ var Spotlight = module.exports = new function () {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'keyboardStateChange':
+                    // webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+                        if (!oEvent.detail.visibility) {
+                            this.unmute('window.focus');
+                        }
+                    }
+                    break;
+                case 'webOSMouse':
+                    // webOSMouse event comes only when pointer mode
+                    if (oEvent && oEvent.detail) {
+                        if (oEvent.detail.type == 'Leave') {
+                            this.unspot();
+                            this.mute('window.focus');
+                        }
+                        if (oEvent.detail.type == 'Enter') {
+                            this.unmute('window.focus');
+                        }
+                    }
+                    break;
                 case 'focus':
                     if (oEvent.target === window) {
+                        this.unmute('window.focus');
                         // Update pointer mode from cursor visibility platform API
                         if (window.PalmSystem && window.PalmSystem.cursor) {
                             this.setPointerMode( window.PalmSystem.cursor.visibility );
@@ -757,6 +843,7 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+                        this.mute('window.focus');
                     }
                     break;
                 case 'move':
@@ -1077,7 +1164,7 @@ var Spotlight = module.exports = new function () {
             // Spot first available control on bootstrap
             if (!this.isSpottable(this.getCurrent()) ||
                 // Or does this immediately follow KEY_POINTER_HIDE
-                (!_isTimestampExpired() && !_oLastMouseMoveTarget) || 
+                (!_isTimestampExpired() && !_oLastMouseMoveTarget) ||
                 // Or spot last 5-way control, only if there's not already focus on screen
                 (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen())) {
 
@@ -1106,7 +1193,7 @@ var Spotlight = module.exports = new function () {
 
         if (_bSuppressSelectOnNextKeyUp) {
             _bSuppressSelectOnNextKeyUp = false;
-            return true;
+            return false;
         }
 
         this.Accelerator.processKey(oEvent, this.onAcceleratedKey, this);
@@ -1224,13 +1311,22 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocused = function(oEvent) {
-        // Accessibility - Set webkit focus to read aria label.
-        if (options.accessibility && oEvent.originator) {
-            if (oEvent.originator.accessibilityDisabled || this.getPointerMode()) {
-                oEvent.originator.setAttribute("tabindex", null);
-            } else {
-                oEvent.originator.setAttribute("tabindex", 0);
-                oEvent.originator.focus();
+        var c = oEvent.originator,
+            Spotlight = this;
+
+        // Accessibility - Set focus to read aria label.
+        // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is to
+        // transfer focus to its internal input.
+        if (options.accessibility && !this.getPointerMode()) {
+            if (c && !c.accessibilityDisabled && c.tag != 'label') {
+                setTimeout(function () {
+                    if (Spotlight.getCurrent() === c) {
+                        c.focus();
+                    }
+                }, 50);
+            }
+            else if (oEvent.previous) {
+                oEvent.previous.blur();
             }
         }
     };
@@ -1512,6 +1608,8 @@ var Spotlight = module.exports = new function () {
 
         info = info || {};
 
+        info.previous = _oLastControl;
+
         if (info.direction) {
             info.focusType = '5-way';
             // Support legacy 'dir' property
@@ -1533,7 +1631,7 @@ var Spotlight = module.exports = new function () {
             return false;
         }
 
-        // Can only spot enyo.Controls
+        // Can only spot enyo/Controls
         if (!(oControl instanceof Control)) {
             _warn('argument is not enyo.Control');
             return false;
@@ -1782,6 +1880,33 @@ roots.rendered(function(oRoot) {
     Spotlight.initialize(oRoot);
 });
 
+/*
+Using the hack below to ensure that statically declared Spotlight containers are
+initialized upon creation. Our previous pass at this used enyo/Control.extend(),
+which meant it failed to work for Control subkinds whose constructors were created
+immediately (vs. being deferred). Unfortunately, this caused big problems in webOS,
+where the "container" app systematically disables the deferral of constructor
+creation.
+
+There is some discussion ongoing as to whether we need a nicer mechanism for
+extending functionality in cases like this (see comments in BHV-15323), but in
+the meantime we need to proceed with a quick fix for this issue.
+*/
+
+var originalEnyoComponentCreate = Component.create;
+
+Component.create = function () {
+    var component = originalEnyoComponentCreate.apply(Component, arguments);
+    if (component.spotlight == 'container') {
+        Spotlight.Container.initContainer(component);
+    }
+    // When accessibility is enabled, set the tabindex for any control that is
+    // spottable and doesn't have a valid tabindex.
+    if (component.spotlight === true && options.accessibility && !component.tabIndex && component.tabIndex !== 0) {
+        component.set('tabIndex', '-1');
+    }
+    return component;
+};
 
 // Spotlight.bench = new function() {
 //     var _oBench = null;

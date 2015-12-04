@@ -1,7 +1,6 @@
 var
     dom = require('enyo/dom'),
-    logger = require('enyo/logger'),
-    Component = require('enyo/Component');
+    logger = require('enyo/logger');
 
 /**
 * Provides the Spotlight Container
@@ -78,7 +77,7 @@ module.exports = function (Spotlight) {
                     oEvent.spotSentFromContainer = true;
                     break;
                 case 'onSpotlightContainerEnter':
-                    if(oEvent.last && oEvent.last.isDescendantOf(oSender)) {
+                    if(oEvent.last && oEvent.last !== oSender && oEvent.last.isDescendantOf(oSender)) {
                         return true;
                     }
                     break;
@@ -243,10 +242,15 @@ module.exports = function (Spotlight) {
     * Sets last focused child for the container.
     *
     * @param  {Object} oSender
-    * @param  {Object} oChild - The child to set as the last focused child.
+    * @param  {Object} oChild - The child to set as the last focused child. Set to `null`
+    *   to clear the last focused child.
     * @public
     */
     this.setLastFocusedChild = function(oSender, oChild) {
+        if (oChild === null) {
+            oSender._spotlight.lastFocusedChild = null;
+            return;
+        }
         if (!Spotlight.isSpottable(oChild)) {
             oChild = Spotlight.getFirstChild(oChild);
         }
@@ -272,7 +276,7 @@ module.exports = function (Spotlight) {
                     continue;
                 }
                 position = dom.compareDocumentPosition(to, from.hasNode());
-                if(position & 8) {  // 8 == 'contains'
+                if(from == focusedControl || (position & 8)) {  // 8 == 'contains'
                     Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
                         commonAncestor: from
                     }, blurredControl);
@@ -289,28 +293,5 @@ module.exports = function (Spotlight) {
                 current: focusedControl
             }, focusedControl);
         }
-    };
-
-    /*
-    Using the hack below to ensure that statically declared Spotlight containers are
-    initialized upon creation. Our previous pass at this used enyo/Control.extend(),
-    which meant it failed to work for Control subkinds whose constructors were created
-    immediately (vs. being deferred). Unfortunately, this caused big problems in webOS,
-    where the "container" app systematically disables the deferral of constructor
-    creation.
-
-    There is some discussion ongoing as to whether we need a nicer mechanism for
-    extending functionality in cases like this (see comments in BHV-15323), but in
-    the meantime we need to proceed with a quick fix for this issue.
-    */
-
-    var originalEnyoComponentCreate = Component.create;
-
-    Component.create = function () {
-        var component = originalEnyoComponentCreate.apply(Component, arguments);
-        if (component.spotlight == 'container') {
-            Spotlight.Container.initContainer(component);
-        }
-        return component;
     };
 };
