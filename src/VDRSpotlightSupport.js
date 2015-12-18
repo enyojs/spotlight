@@ -1,6 +1,7 @@
 /**
 * Mixin that provides Spotlight support to {@link module:enyo/VirtualDataRepeater~VirtualDataRepeater}.
 *
+* @wip
 * @module spotlight/VDRSpotlightSupport
 */
 
@@ -22,6 +23,7 @@ var
 * or instance.
 *
 * @mixin
+* @wip
 * @public
 */
 module.exports = {
