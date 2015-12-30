@@ -1,6 +1,7 @@
 /**
 * Mixin that provides Spotlight support to {@link module:enyo/VirtualDataRepeater~VirtualDataRepeater}.
 *
+* @wip
 * @module spotlight/VDRSpotlightSupport
 */
 
@@ -11,7 +12,7 @@ var
 	Spotlight = require('./spotlight');
 
 /**
-* The {@link module:spotlight/VDRSpotlightSupport} [mixin]{@glossary mixin} adds
+* The {@link module:spotlight/VDRSpotlightSupport~VDRSpotlightSupport} [mixin]{@glossary mixin} adds
 * Spotlight support to {@link module:enyo/VirtualDataRepeater~VirtualDataRepeater}.
 * Specifically, it ensures that Spotlight focus is properly removed if the
 * currently focused element is virtualized.
@@ -22,9 +23,10 @@ var
 * or instance.
 *
 * @mixin
+* @wip
 * @public
 */
-module.exports = {
+var VDRSpotlightSupport = {
 	assignChild: kind.inherit(function (sup) {
 		return function (model, index, child) {
 			var cur = Spotlight.getCurrent();
@@ -37,3 +39,5 @@ module.exports = {
 		};
 	})
 };
+
+module.exports = VDRSpotlightSupport;
