@@ -1323,8 +1323,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocused = function(oEvent) {
-        var c = oEvent.originator,
-            Spotlight = this;
+        var c = oEvent.originator;
 
         // Accessibility - Set focus to read aria label.
         // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is to
