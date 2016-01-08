@@ -29,7 +29,7 @@ module.exports = function (Spotlight) {
     this.frequency = [3, 3, 3, 2, 2, 2, 1];
 
     /**
-    * Called from {@link enyo.Spotlight}, with the current keydown event and
+    * Called from {@link module:spotlight}, with the current keydown event and
     * Spotlight's callback, which will be called when the event is allowed
     * through.
     *

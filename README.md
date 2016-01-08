@@ -44,7 +44,7 @@ and back to 5-way mode on `keydown`.
 
 The Spotlight API also provides a way to explicitly perform the switch:
 
-    `Enyo.Spotlight.setPointerMode([BOOLEAN]);`
+    `Spotlight.setPointerMode([BOOLEAN]);`
 
 <a name="3"></a>
 ## 3. NAVIGATION ##
@@ -148,9 +148,9 @@ The following events are dispatched by the main Spotlight module:
 - **onSpotlightFocused**: Dispatched in response to `onSpotlightFocus` event's
     bubbling to app level right after its originator is set as current
 - **onSpotlightScrollUp**: Dispatched when `mousewheel` event delta exceeds
-    `enyo.Spotlight.Scrolling.frequency` (Default: 40)
+    `Spotlight.Scrolling.frequency` (Default: 40)
 - **onSpotlightScrollDown**: Dispatched when `mousewheel` negative event delta exceeds
-    `-enyo.Spotlight.Scrolling.frequency` (Default: 40)
+    `-Spotlight.Scrolling.frequency` (Default: 40)
 
 
 <br />
@@ -235,7 +235,7 @@ application.  The function of the [Spotlight Accelerator](kind.Spotlight.Acceler
 is to distribute events over time (according to its configuration).
 
 Spotlight Accelerator may be configured via its array property,
-`enyo.Spotlight.Accelerator.frequency`.  The default configuration is as
+`Spotlight.Accelerator.frequency`.  The default configuration is as
 follows:
 
     //* Firing configuration. At n-th second use every frequency[n] subsequent keydown event
@@ -264,7 +264,7 @@ The `mousewheel` event has a `wheelDeltaY` property, which translates to a given
 amount of wheel rotation.  [Spotlight Scrolling](kind.Spotlight.Scrolling.js)
 accumulates `wheelDeltaY` values in a given direction of rotation (up or down).
 
-Once the cumulative value exceeds `enyo.Spotlight.Scrolling.frequency`,
+Once the cumulative value exceeds `Spotlight.Scrolling.frequency`,
 `onSpotlightScrollUp` or `onSpotlightScrollDown` is dispatched and the
 cumulative value is reset to 0.
 
