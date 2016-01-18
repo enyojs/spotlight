@@ -77,7 +77,7 @@ module.exports = function (Spotlight) {
                     oEvent.spotSentFromContainer = true;
                     break;
                 case 'onSpotlightContainerEnter':
-                    if(oEvent.last && oEvent.last !== oSender && oEvent.last.isDescendantOf(oSender)) {
+                    if(oEvent.last && oEvent.last.isDescendantOf(oSender)) {
                         return true;
                     }
                     break;
