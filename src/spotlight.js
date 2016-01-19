@@ -4,7 +4,6 @@ var
     logger = require('enyo/logger'),
     master = require('enyo/master'),
     options = require('enyo/options'),
-    platform = require('enyo/platform'),
     roots = require('enyo/roots'),
     utils = require('enyo/utils'),
     Component = require('enyo/Component'),
