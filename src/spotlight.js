@@ -918,70 +918,70 @@ var Spotlight = module.exports = new function () {
             switch (oEvent.type) {
 
                 /**
-                * @event Spotlight#onSpotlightKeyUp
+                * @event module:spotlight#onSpotlightKeyUp
                 * @public
                 */
                 case 'onSpotlightKeyUp':
                     return this.onSpotlightKeyUp(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightKeyDown
+                * @event module:spotlight#onSpotlightKeyDown
                 * @public
                 */
                 case 'onSpotlightKeyDown':
                     return this.onSpotlightKeyDown(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightFocus
+                * @event module:spotlight#onSpotlightFocus
                 * @public
                 */
                 case 'onSpotlightFocus':
                     return this.onSpotlightFocus(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightFocused
+                * @event module:spotlight#onSpotlightFocused
                 * @public
                 */
                 case 'onSpotlightFocused':
                     return this.onSpotlightFocused(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightBlur
+                * @event module:spotlight#onSpotlightBlur
                 * @public
                 */
                 case 'onSpotlightBlur':
                     return this.onSpotlightBlur(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightLeft
+                * @event module:spotlight#onSpotlightLeft
                 * @public
                 */
                 case 'onSpotlightLeft':
                     return this.onSpotlightLeft(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightRight
+                * @event module:spotlight#onSpotlightRight
                 * @public
                 */
                 case 'onSpotlightRight':
                     return this.onSpotlightRight(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightUp
+                * @event module:spotlight#onSpotlightUp
                 * @public
                 */
                 case 'onSpotlightUp':
                     return this.onSpotlightUp(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightDown
+                * @event module:spotlight#onSpotlightDown
                 * @public
                 */
                 case 'onSpotlightDown':
                     return this.onSpotlightDown(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightSelect
+                * @event module:spotlight#onSpotlightSelect
                 * @public
                 */
                 case 'onSpotlightSelect':
