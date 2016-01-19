@@ -1396,7 +1396,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.setPointerMode = function(bPointerMode) {
-        if ((_bPointerMode != bPointerMode) && (!platform.touch)) {
+        if (_bPointerMode != bPointerMode) {
             _bPointerMode = bPointerMode;
             _log('Pointer mode', _bPointerMode);
             _nMouseMoveCount = 0;
