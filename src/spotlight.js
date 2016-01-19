@@ -637,15 +637,21 @@ var Spotlight = module.exports = new function () {
         },
 
         /**
-        * Gets spottable target by id for pointer events.
+        * Gets spottable target for pointer events.
         *
-        * @param {String} sId - String ID of target.
+        * @param {Object} oDomTarget - The target node to start from.
         * @return {Object} - The spottable target.
         * @private
         */
-        _getTarget = function(sId) {
-            var oTarget = dispatcher.$[sId];
-            if (typeof oTarget != 'undefined') {
+        _getSpottableTarget = function(oDomTarget) {
+            var oTarget;
+
+            do {
+                oTarget = oDomTarget && dispatcher.$[oDomTarget.id];
+                oDomTarget = oDomTarget && oDomTarget.parentNode;
+            } while (!oTarget && oDomTarget);
+
+            if (oTarget) {
                 if (_oThis.isSpottable(oTarget)) {
                     return oTarget;
                 } else {
@@ -1035,7 +1041,7 @@ var Spotlight = module.exports = new function () {
         // Preserving explicit setting of mode for future features
         this.setPointerMode(true);
         if (this.getPointerMode()) {
-            var oTarget = _getTarget(oEvent.target.id);
+            var oTarget = _getSpottableTarget(oEvent.target);
             if (oTarget && !this.isContainer(oTarget)) {
 
                 if (
@@ -1066,7 +1072,7 @@ var Spotlight = module.exports = new function () {
         // Logic to exit frozen mode when depressing control other than current
         // And transfer spotlight directly to it
         if (this.isFrozen()) {
-            var oTarget = _getTarget(oEvent.target.id);
+            var oTarget = _getSpottableTarget(oEvent.target);
             if (oTarget != _oCurrent && !oEvent.defaultPrevented) {
                 this.unfreeze();
                 this.unspot();
