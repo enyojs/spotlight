@@ -4,7 +4,6 @@ var
     logger = require('enyo/logger'),
     master = require('enyo/master'),
     options = require('enyo/options'),
-    platform = require('enyo/platform'),
     roots = require('enyo/roots'),
     utils = require('enyo/utils'),
     Component = require('enyo/Component'),
@@ -1433,7 +1432,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.setPointerMode = function(bPointerMode) {
-        if (!this.isPaused() && (_bPointerMode != bPointerMode) && (!platform.touch)) {
+        if (!this.isPaused() && (_bPointerMode != bPointerMode)) {
             _bPointerMode = bPointerMode;
             _log('Pointer mode', _bPointerMode);
             _nMouseMoveCount = 0;
