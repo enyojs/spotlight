@@ -936,7 +936,6 @@ var Spotlight = module.exports = new function () {
                 * @public
                 */
                 case 'onSpotlightFocus':
-                case 'drop':
                     return this.onSpotlightFocus(oEvent);
 
                 /**
