@@ -4,7 +4,6 @@ var
     logger = require('enyo/logger'),
     master = require('enyo/master'),
     options = require('enyo/options'),
-    platform = require('enyo/platform'),
     roots = require('enyo/roots'),
     utils = require('enyo/utils'),
     Component = require('enyo/Component'),
@@ -543,6 +542,14 @@ var Spotlight = module.exports = new function () {
             _preventDomDefault(oEvent);
             _oLast5WayEvent = oEvent;
 
+            // If we have _o5WaySelectTarget, that means we have a Spotlight-managed
+            // hold gesture in progress. We need to end it.
+            if (_o5WaySelectTarget) {
+                gesture.drag.endHold();
+                _oDownEvent = null;
+                _o5WaySelectTarget = null;
+            }
+
             if (oControl) {
                 _oThis.spot(oControl, {direction: sDirection});
             } else {
@@ -637,15 +644,21 @@ var Spotlight = module.exports = new function () {
         },
 
         /**
-        * Gets spottable target by id for pointer events.
+        * Gets spottable target for pointer events.
         *
-        * @param {String} sId - String ID of target.
+        * @param {Object} oDomTarget - The target node to start from.
         * @return {Object} - The spottable target.
         * @private
         */
-        _getTarget = function(sId) {
-            var oTarget = dispatcher.$[sId];
-            if (typeof oTarget != 'undefined') {
+        _getSpottableTarget = function(oDomTarget) {
+            var oTarget;
+
+            do {
+                oTarget = oDomTarget && dispatcher.$[oDomTarget.id];
+                oDomTarget = oDomTarget && oDomTarget.parentNode;
+            } while (!oTarget && oDomTarget);
+
+            if (oTarget) {
                 if (_oThis.isSpottable(oTarget)) {
                     return oTarget;
                 } else {
@@ -855,6 +868,10 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+
+                        // Stop any hold/holdpulses that may currently be active
+                        gesture.drag.endHold();
+
                         this.mute('window.focus');
                     }
                     break;
@@ -870,6 +887,7 @@ var Spotlight = module.exports = new function () {
                     }
                     break;
                 case 'mousedown':
+                case 'touchstart':
                     return this.onMouseDown(oEvent);
                 case 'mouseup':
                     return this.onMouseUp(oEvent);
@@ -930,70 +948,70 @@ var Spotlight = module.exports = new function () {
             switch (oEvent.type) {
 
                 /**
-                * @event Spotlight#onSpotlightKeyUp
+                * @event module:spotlight#onSpotlightKeyUp
                 * @public
                 */
                 case 'onSpotlightKeyUp':
                     return this.onSpotlightKeyUp(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightKeyDown
+                * @event module:spotlight#onSpotlightKeyDown
                 * @public
                 */
                 case 'onSpotlightKeyDown':
                     return this.onSpotlightKeyDown(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightFocus
+                * @event module:spotlight#onSpotlightFocus
                 * @public
                 */
                 case 'onSpotlightFocus':
                     return this.onSpotlightFocus(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightFocused
+                * @event module:spotlight#onSpotlightFocused
                 * @public
                 */
                 case 'onSpotlightFocused':
                     return this.onSpotlightFocused(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightBlur
+                * @event module:spotlight#onSpotlightBlur
                 * @public
                 */
                 case 'onSpotlightBlur':
                     return this.onSpotlightBlur(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightLeft
+                * @event module:spotlight#onSpotlightLeft
                 * @public
                 */
                 case 'onSpotlightLeft':
                     return this.onSpotlightLeft(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightRight
+                * @event module:spotlight#onSpotlightRight
                 * @public
                 */
                 case 'onSpotlightRight':
                     return this.onSpotlightRight(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightUp
+                * @event module:spotlight#onSpotlightUp
                 * @public
                 */
                 case 'onSpotlightUp':
                     return this.onSpotlightUp(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightDown
+                * @event module:spotlight#onSpotlightDown
                 * @public
                 */
                 case 'onSpotlightDown':
                     return this.onSpotlightDown(oEvent);
 
                 /**
-                * @event Spotlight#onSpotlightSelect
+                * @event module:spotlight#onSpotlightSelect
                 * @public
                 */
                 case 'onSpotlightSelect':
@@ -1026,7 +1044,7 @@ var Spotlight = module.exports = new function () {
         // Preserving explicit setting of mode for future features
         this.setPointerMode(true);
         if (this.getPointerMode()) {
-            var oTarget = _getTarget(oEvent.target.id);
+            var oTarget = _getSpottableTarget(oEvent.target);
             if (oTarget && !this.isContainer(oTarget)) {
 
                 if (
@@ -1057,7 +1075,7 @@ var Spotlight = module.exports = new function () {
         // Logic to exit frozen mode when depressing control other than current
         // And transfer spotlight directly to it
         if (this.isFrozen()) {
-            var oTarget = _getTarget(oEvent.target.id);
+            var oTarget = _getSpottableTarget(oEvent.target);
             if (oTarget != _oCurrent && !oEvent.defaultPrevented) {
                 this.unfreeze();
                 this.unspot();
@@ -1403,7 +1421,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.setPointerMode = function(bPointerMode) {
-        if (!this.isPaused() && (_bPointerMode != bPointerMode) && (!platform.touch)) {
+        if (!this.isPaused() && (_bPointerMode != bPointerMode)) {
             _bPointerMode = bPointerMode;
             _log('Pointer mode', _bPointerMode);
             _nMouseMoveCount = 0;
@@ -1818,7 +1836,7 @@ var Spotlight = module.exports = new function () {
     *
     * @public
     */
-    this.unfreeze = function() { 
+    this.unfreeze = function() {
         _bFrozen = false;
     };
 
