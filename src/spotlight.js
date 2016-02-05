@@ -168,6 +168,16 @@ var Spotlight = module.exports = new function () {
         _bFrozen = false,
 
         /**
+        * While paused, Spotlight movement is effectively disabled and the state is locked, so
+        * nothing can be spotted or unspotted.
+        *
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
+        _bPaused = false,
+
+        /**
         * Contains the control specified in `defaultSpotlightDisappear` property of
         * `_oCurrent`.
         * @type {Object}
@@ -276,7 +286,7 @@ var Spotlight = module.exports = new function () {
                 if (_oThis.rootDispatchFunction.apply(master, [sEventName, oEvent, oSender])) {
                     return true;
                 }
-                if (!oEvent.delegate) {
+                if (!oEvent.delegate && !_oThis.isPaused()) {
                     return _oThis.onSpotlightEvent(oEvent);
                 }
             };
@@ -315,6 +325,8 @@ var Spotlight = module.exports = new function () {
         * @private
         */
         _onDisappear = function() {
+
+            if (_oThis.isPaused()) return;
 
             // Only handle disappearance once
             if (_onDisappear.isOff) {
@@ -1329,19 +1341,14 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocused = function(oEvent) {
-        var c = oEvent.originator,
-            Spotlight = this;
+        var c = oEvent.originator;
 
         // Accessibility - Set focus to read aria label.
         // Do not focus labels (e.g. moonstone/InputDecorator) since the default behavior is to
         // transfer focus to its internal input.
         if (options.accessibility && !this.getPointerMode()) {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
-                setTimeout(function () {
-                    if (Spotlight.getCurrent() === c) {
-                        c.focus();
-                    }
-                }, 50);
+                c.focus();
             }
             else if (oEvent.previous) {
                 oEvent.previous.blur();
@@ -1414,7 +1421,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.setPointerMode = function(bPointerMode) {
-        if (_bPointerMode != bPointerMode) {
+        if (!this.isPaused() && (_bPointerMode != bPointerMode)) {
             _bPointerMode = bPointerMode;
             _log('Pointer mode', _bPointerMode);
             _nMouseMoveCount = 0;
@@ -1435,6 +1442,7 @@ var Spotlight = module.exports = new function () {
         return _oCurrent;
     };
     this.setCurrent = function(oControl) {
+        if (this.isPaused()) return false;
         return _setCurrent(oControl);
     };
     this.hasCurrent = function() {
@@ -1452,6 +1460,7 @@ var Spotlight = module.exports = new function () {
 
     // Deprecated; provided for backward-compatibility.
     this.setLast5WayControl = function(oControl) {
+        if (this.isPaused()) return false;
         _oLastControl = oControl;
     };
 
@@ -1615,6 +1624,11 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.spot = function(oControl, info) {
+        if (this.isPaused()) {
+            _warn('can\'t spot in paused mode');
+            return false;
+        }
+
         // Support for legacy 2nd and 3rd arguments (sDirection, bWasPoint)
         if (arguments.length > 2 || typeof arguments[1] === 'string') {
             _warn('Spotlight.spot(): Agruments have changed. See docs.');
@@ -1707,8 +1721,8 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.unspot = function(oNext) {
-        // Current cannot change while in frozen mode
-        if (this.isFrozen()) {
+        // Current cannot change while paused or in frozen mode
+        if (this.isPaused() || this.isFrozen()) {
             return false;
         }
 
@@ -1810,11 +1824,11 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.freeze = function() {
-        if (this.hasCurrent()) {
-            _bFrozen = true;
-        } else {
-            _warn('Can not enter frozen mode until something is spotted');
-        }
+		if (!this.isPaused() && this.hasCurrent()) {
+			_bFrozen = true;
+		} else {
+			_warn('Can not enter frozen mode until something is spotted and/or we are not paused');
+		}
     };
 
     /**
@@ -1834,6 +1848,35 @@ var Spotlight = module.exports = new function () {
     */
     this.isFrozen = function() {
         return _bFrozen;
+    };
+
+    /**
+    * Switches to paused mode (Spotlight movement is effectively disabled and state is locked, so
+    * nothing can be spotted/unspotted).
+    *
+    * @public
+    */
+    this.pause = function() {
+        _bPaused = true;
+    };
+
+    /**
+    * Switches back to normal Spotlight behavior.
+    *
+    * @public
+    */
+    this.resume = function() {
+        _bPaused = false;
+    };
+
+    /**
+    * Determines whether Spotlight is currently paused.
+    *
+    * @return {Boolean} `true` if Spotlight is currently paused; otherwise, `false`.
+    * @public
+    */
+    this.isPaused = function() {
+        return _bPaused;
     };
 
     /**
@@ -1889,7 +1932,7 @@ var Spotlight = module.exports = new function () {
 
 // Event hook to all system events to catch keypress and mouse events.
 dispatcher.features.push(function(oEvent) {
-    return Spotlight.onEvent(oEvent);
+    if (!Spotlight.isPaused()) return Spotlight.onEvent(oEvent);
 });
 
 // Initialization
