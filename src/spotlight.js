@@ -1169,6 +1169,9 @@ var Spotlight = module.exports = new function () {
 
                 // Pointer hidden event; set pointer mode false
             case KEY_POINTER_HIDE:
+
+                this.unmute('window.focus');
+
                 setTimeout(function() {
                     if (this.getPointerMode()) {
                         this.setPointerMode(false);
@@ -1190,6 +1193,8 @@ var Spotlight = module.exports = new function () {
         if (_is5WayKey(oEvent)) {
             var bWasPointerMode = this.getPointerMode();
             this.setPointerMode(false);
+
+            this.unmute('window.focus');
 
             // Spot first available control on bootstrap
             if (!this.isSpottable(this.getCurrent()) ||
