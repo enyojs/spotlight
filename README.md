@@ -31,7 +31,7 @@ computer.
 In addition, Spotlight includes support for Point-and-Click events, so all bases
 are covered.
 
-To add **[Spotlight](kind.Spotlight.js)** to an application, simply include the
+To add **[Spotlight](http://enyojs.com/docs/latest/#/module/spotlight)** to an application, simply include the
 `Spotlight` package in your `package.js` file.
 
 <a name="2"></a>
@@ -49,7 +49,7 @@ The Spotlight API also provides a way to explicitly perform the switch:
 <a name="3"></a>
 ## 3. NAVIGATION ##
 
-**[Spotlight](kind.Spotlight.js)** allows navigation between Enyo controls by
+**[Spotlight](http://enyojs.com/docs/latest/#/module/spotlight)** allows navigation between Enyo controls by
 assigning focus to one control at a time.  When a control is focused, it takes
 on the CSS class `.spotlight`, which allows focused controls to be styled on a
 per-kind basis using `.<kindClass>.spotlight` selectors.
@@ -70,7 +70,7 @@ yet, Spotlight will choose the first spottable control on screen upon the first
 arrow press.
 
 In 5-way mode, Spotlight uses the
-[Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js) to determine
+[Nearest Neighbor Algorithm](http://enyojs.com/docs/latest/#/module/spotlight/neighbor) to determine
 which spottable control is the nearest in the direction of navigation.  The
 coordinates of a spottable control are derived from its actual position on the
 screen.
@@ -79,7 +79,7 @@ It's worth noting that spottable controls may be found on different hierarchical
 levels of an Enyo component tree.  Spotlight facilitates seamless navigation
 between the topmost spottable components found in the tree.
 
-We've created a [demo](samples/ContainerSample.html) to display Nearest Neighbor algorithm behavior.
+We've created a [demo](http://enyojs.com/sampler/latest/spotlight/#TestPage) to display Nearest Neighbor algorithm behavior.
 
 <a name="4"></a>
 ## 4. CONTAINERS ##
@@ -102,7 +102,7 @@ To define a container, set a control's `spotlight` property to `"container"`:
 In a way, containers may be thought of as the branches--and `spotlight:true`
 controls as the leaves--of the Spotlight navigation tree.
 
-We've created a [demo](samples/ContainerSample.html) to display container behavior.
+We've created a [demo](http://enyojs.com/sampler/latest/spotlight/#ContainerSample) to display container behavior.
 
 <a name="5"></a>
 ## 5. NESTING ##
@@ -206,7 +206,7 @@ recognizes its keyCode as one of 5-way key codes, it dispatches an
 the control has, yet again, the option of overriding default behavior.
 
 If `the onSpotlight<5-Way Direction>` event bubbles up to the app level,
-Spotlight employs its [Nearest Neighbor Algorithm](kind.Spotlight.NearestNeighbor.js)
+Spotlight employs its [Nearest Neighbor Algorithm](http://enyojs.com/docs/latest/#/module/spotlight/neighbor)
 to figure out which spottable control is closest in the `<5-Way Direction>`.  It
 then dispatches an `onSpotlightBlur` event to the current control (which also
 has the `.spotlight` CSS class removed), and an `onSpotlightFocus` event to the
@@ -231,7 +231,7 @@ While a key is depressed, the browser dispatches `keydown` events at equal (or
 nearly equal) intervals.
 
 Looking at [Figure B](#B), we can see that not all of these events affect the
-application.  The function of the [Spotlight Accelerator](kind.Spotlight.Accelerator.js)
+application.  The function of the [Spotlight Accelerator](http://enyojs.com/docs/latest/#/module/spotlight/accelerator)
 is to distribute events over time (according to its configuration).
 
 Spotlight Accelerator may be configured via its array property,
@@ -261,7 +261,7 @@ In response to `mousewheel` events from the browser, Spotlight dispatches
 works:
 
 The `mousewheel` event has a `wheelDeltaY` property, which translates to a given
-amount of wheel rotation.  [Spotlight Scrolling](kind.Spotlight.Scrolling.js)
+amount of wheel rotation.  [Spotlight Scrolling](http://enyojs.com/docs/latest/#/module/spotlight/scrolling)
 accumulates `wheelDeltaY` values in a given direction of rotation (up or down).
 
 Once the cumulative value exceeds `Spotlight.Scrolling.frequency`,
