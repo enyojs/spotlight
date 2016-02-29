@@ -247,7 +247,7 @@ module.exports = function (Spotlight) {
     * @public
     */
     this.setLastFocusedChild = function(oSender, oChild) {
-        if (oChild === null) {
+        if (oSender.spotlightRememberFocus === false || oChild === null) {
             oSender._spotlight.lastFocusedChild = null;
             return;
         }
