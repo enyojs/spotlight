@@ -5,7 +5,7 @@
   "styles": [],
   "main": "index.js",
   "moduleDir": "src",
-  "version": "0.0.1",
+  "version": "2.7.0-rc.1",
   "description": "An extensible utility that enables users to navigate Enyo applications using a keyboard or mouse-like device.",
   "directories": {
     "doc": "docs"
