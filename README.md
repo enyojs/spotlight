@@ -6,114 +6,129 @@
 4. [Containers](#4)
 5. [Nesting](#5)
 6. [Events](#6)
-	1. [List of Spotlight Events](#6.1)
-	2. [Preventing/Allowing Default DOM Events](#6.2)
-	3. [Sequence of Spotlight Events](#6.3)
-	4. [Accelerated keydown Events](#6.4)
-	5. [Scroll Events](#6.5)
-	6. [Default 5-way controls](#6.6)
+    1. [List of Spotlight Events](#6.1)
+    2. [Preventing/Allowing Default DOM Events](#6.2)
+    3. [Sequence of Spotlight Events](#6.3)
+    4. [Accelerated keydown Events](#6.4)
+    5. [Scroll Events](#6.5)
+    6. [Default 5-way controls](#6.6)
 7. [Extending Spotlight](#7)
-	1. [Spotlight Decorators](#7.1)
-	2. [Extending Controls](#7.2)
+    1. [Spotlight Decorators](#7.1)
+    2. [Extending Controls](#7.2)
 8. [Control Parameters](#8)
 9. [Samples](#9)
 10. [Copyright and License Information](#10)
 
 <a name="1"></a>
-## 1. WHAT IS SPOTLIGHT? ##
+
+## What Is Spotlight?
 
 Spotlight is an extensible utility that enables users to navigate Enyo
 applications using a keyboard or television remote control.  Responding to input
 from the **UP**, **DOWN**, **LEFT**, **RIGHT**, and **RETURN** keys, Spotlight
-provides a navigation experience that compares favorably to that of a mouse on a
-computer.
+provides a navigation experience that compares favorably to that of a
+computer-with-mouse.
 
-In addition, Spotlight includes support for Point-and-Click events, so all bases
+In addition, Spotlight includes support for point-and-click events, so all bases
 are covered.
 
-To add **[Spotlight](http://enyojs.com/docs/latest/#/module/spotlight)** to an application, simply include the
-`Spotlight` package in your `package.js` file.
+To add **[Spotlight](http://enyojs.com/docs/latest/#/module/spotlight)** to an application, simply require `spotlight` in one of your
+source files:
+
+```javascript
+    var Spotlight = require('spotlight');
+```
 
 <a name="2"></a>
-## 2. MODES ##
+
+## Modes
 
 Spotlight operates in two mutually exclusive modes: **5-way mode** and **Pointer
-mode**.  By default, it is configured to switch between these modes whenever
-suitable input is received--i.e., it switches to pointer mode on `mousemove`,
-and back to 5-way mode on `keydown`.
+mode**.  By default, Spotlight is configured to switch between these modes
+whenever suitable input is received--i.e., it switches to pointer mode on
+`mousemove` and back to 5-way mode on `keydown`.
 
-The Spotlight API also provides a way to explicitly perform the switch:
+The Spotlight API also provides a way to make the switch explicitly:
 
-    `Spotlight.setPointerMode([BOOLEAN]);`
+```javascript
+    Spotlight.setPointerMode(<Boolean>);
+```
 
 <a name="3"></a>
-## 3. NAVIGATION ##
 
-**[Spotlight](http://enyojs.com/docs/latest/#/module/spotlight)** allows navigation between Enyo controls by
-assigning focus to one control at a time.  When a control is focused, it takes
-on the CSS class `.spotlight`, which allows focused controls to be styled on a
-per-kind basis using `.<kindClass>.spotlight` selectors.
+## Navigation
 
-In order to make a control focusable (or **"spottable"**) with Spotlight, simply
-set its `spotlight` property to `TRUE`, like so:
+Spotlight enables navigation between Enyo controls by assigning focus to one
+control at a time.  When a control is focused, it takes on the CSS class
+`.spotlight`, which allows focused controls to be styled on a per-kind basis
+using `.<kindClass>.spotlight` selectors.
 
+In order to make a control focusable (or "spottable") with Spotlight, simply
+set its `spotlight` property to `true`, like so:
+
+```javascript
     {name: 'mybutton', tag: 'button', spotlight: true}
+```
 
-Note that Enyo UI libraries such as _Moonstone_ are built with default Spotlight
-support, such that any control can be focused using pointer or 5-way keys without
-setting any special flags or configuration.  In general, setting the `spotlight:true`
-flag explicitly is only required when building custom UI controls or libraries.
+When the application loads, Spotlight will initially spot the first spottable
+control. If a control has been programmatically spotted via `Spotlight.spot(control)`
+before render, that control will be spotted instead.
 
-When the application loads, there will generally be no focused control on screen
-until the user moves the mouse or presses an arrow key.  If no control has been focused
-yet, Spotlight will choose the first spottable control on screen upon the first
-arrow press.
-
-In 5-way mode, Spotlight uses the
-[Nearest Neighbor Algorithm](http://enyojs.com/docs/latest/#/module/spotlight/neighbor) to determine
-which spottable control is the nearest in the direction of navigation.  The
-coordinates of a spottable control are derived from its actual position on the
-screen.
+In 5-way mode, Spotlight uses the [Nearest Neighbor Algorithm](http://enyojs.com/docs/latest/#/module/spotlight/neighbor)
+to determine which spottable control is the nearest one in the direction of
+navigation.  The coordinates of a spottable control are derived from its actual
+position on the screen.
 
 It's worth noting that spottable controls may be found on different hierarchical
 levels of an Enyo component tree.  Spotlight facilitates seamless navigation
-between the topmost spottable components found in the tree.
+among the topmost spottable components found in the tree.
 
-We've created a [demo](http://enyojs.com/sampler/latest/spotlight/#TestPage) to display Nearest Neighbor algorithm behavior.
+For a demonstration of the Nearest Neighbor algorithm's behavior, see
+"TestPage" in the [Enyo Sampler](http://enyojs.com/sampler/latest/spotlight/#TestPage).
 
 <a name="4"></a>
-## 4. CONTAINERS ##
+## Containers
 
 In order to organize controls into navigation groups, we have created Spotlight
-containers.
+containers. 
 
-A good example use case for containers is a set of radio buttons that must be
-navigable separate from the rest of the app's controls.
+A good example of how containers should be used is a set of radio buttons that
+must be navigable separately from the rest of the app's controls.
 
 When a Spotlight container is focused, it passes the focus to its own hierarchy
-of spottable child controls--namely, to the last spottable child to hold focus
-before the focus moved outside of the container.  If the container in question
-has never been focused, it passes focus to its first spottable child.
+of spottable child controls--specifically, to the last spottable child to hold
+focus before the focus moved outside of the container.  If the container in
+question has never been focused, it passes focus to its first spottable child.
 
 To define a container, set a control's `spotlight` property to `"container"`:
 
-    {name: 'mycontainer', spotlight: 'container', components: [<A LIST OF spotlight:true CONTROLS>]}
+```javascript
+    {
+        name: 'mycontainer',
+        spotlight: 'container',
+        components: [<A list of controls with `spotlight:true`>]
+    }
+```
 
-In a way, containers may be thought of as the branches--and `spotlight:true`
-controls as the leaves--of the Spotlight navigation tree.
+In a way, containers may be thought of as the branches--and spottable controls
+as the leaves--of the Spotlight navigation tree.
 
-We've created a [demo](http://enyojs.com/sampler/latest/spotlight/#ContainerSample) to display container behavior.
+For a demonstration of container behavior, see "ContainerSample" in the
+[Enyo sampler](http://enyojs.com/sampler/latest/spotlight/#ContainerSample).
 
 <a name="5"></a>
-## 5. NESTING ##
+
+
+## Nesting
 
 Spotlight containers may be nested.  The inner containers may be remembered as
-"last focused children" of the outer ones; they act as conduits of focus passed
-by the outer containers.
+"last focused children" of the outer ones thereby passing focus to descendant
+`spotlight: true` controls.
 
-We have not found it useful to nest `spotlight:true` controls.  For now, these
-controls act as the leaves of the spottable tree and do not conduct focus;
-however, this behavior may be overridden on a per-control basis.
+We do not recommend placing `spotlight: true` controls within other `spotlight: true`
+controls because the user will be unable to navigate to them using 5-way controls.
+Instead, the outer controls should generally be set to `spotlight: 'container'` to
+allow the focus to cascade to the contained controls.
 
 <a name="6"></a>
 ## 6. EVENTS ##
@@ -173,9 +188,11 @@ For such cases, we have included an **Allow DOM Default** feature.  The events
 `onSpotlightDown` and `onSpotlightSelect` pass their handlers an event object
 with an added `allowDomDefault` method:
 
-    onSpotlightKeyDown: function(oSender, oEvent) {
-        oEvent.allowDomDefault();
+```javascript
+    onSpotlightKeyDown: function(sender, event) {
+        event.allowDomDefault();
     }
+```
 
 In the above handler, if the Spotlight event is allowed to propagate, it will
 allow the original DOM `keydown` to trigger default browser behavior. (See
@@ -294,9 +311,10 @@ For cases like that Spotlight has convenience properties:
 Simply add them to your control, and if corresponding events is allowed to bubble,
 Spotlight will move focus to control, which name is specified in the property:
 
-	{name: 'control1', spotlight: true, defaultSpotlightRight: 'control2'},
-	{name: 'control2', spotlight: true, defaultSpotlightRight: 'control1'}
-
+```javascript
+    {name: 'control1', spotlight: true, defaultSpotlightRight: 'control2'},
+    {name: 'control2', spotlight: true, defaultSpotlightRight: 'control1'}
+```
 In this example, focus will be passed back and forth between both controls with every right arrow button press.
 
 <a name="7"></a>
