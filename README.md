@@ -70,9 +70,9 @@ set its `spotlight` property to `true`, like so:
     {name: 'mybutton', tag: 'button', spotlight: true}
 ```
 
-When the application loads, Spotlight searches for a control with the name
-specified in its `defaultControl` property; if `defaultControl` is not
-specified, Spotlight assigns focus to the first available spottable control.
+When the application loads, Spotlight will initially spot the first spottable
+control. If a control has been programmatically spotted via `Spotlight.spot(control)`
+before render, that control will be spotted instead.
 
 In 5-way mode, Spotlight uses the [Nearest Neighbor Algorithm](http://enyojs.com/docs/latest/#/module/spotlight/neighbor)
 to determine which spottable control is the nearest one in the direction of
@@ -122,12 +122,13 @@ For a demonstration of container behavior, see "ContainerSample" in the
 ## Nesting
 
 Spotlight containers may be nested.  The inner containers may be remembered as
-"last focused children" of the outer ones, thus acting as conduits of focus
-passed by the outer containers.
+"last focused children" of the outer ones thereby passing focus to descendant
+`spotlight: true` controls.
 
-We have not found it useful to nest spottable controls.  For now, these controls
-act as the leaves of the spottable tree and do not conduct focus; however, this
-behavior may be overridden on a per-control basis.
+We do not recommend placing `spotlight: true` controls within other `spotlight: true`
+controls because the user will be unable to navigate to them using 5-way controls.
+Instead, the outer controls should generally be set to `spotlight: 'container'` to
+allow the focus to cascade to the contained controls.
 
 <a name="6"></a>
 ## 6. EVENTS ##
