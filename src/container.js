@@ -1,5 +1,4 @@
 var
-    dom = require('enyo/dom'),
     logger = require('enyo/logger');
 
 /**
@@ -275,8 +274,8 @@ module.exports = function (Spotlight) {
                     from = from.parent;
                     continue;
                 }
-                position = dom.compareDocumentPosition(to, from.hasNode());
-                if(from == focusedControl || (position & 8)) {  // 8 == 'contains'
+                position = to.compareDocumentPosition(from.hasNode());
+                if(from == focusedControl || (position & Node.DOCUMENT_POSITION_CONTAINS)) {
                     Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
                         commonAncestor: from
                     }, blurredControl);
