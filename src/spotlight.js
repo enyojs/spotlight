@@ -871,6 +871,11 @@ var Spotlight = module.exports = new function () {
 
                         // Stop any hold/holdpulses that may currently be active
                         gesture.drag.endHold();
+                        // the "downEvent" property is a private implementation detail of gesture,
+                        // but making the fix here as it is by far the simplest and least impactful
+                        if (gesture.downEvent) {
+                            gesture.up(gesture.downEvent);
+                        }
 
                         this.mute('window.focus');
                     }
