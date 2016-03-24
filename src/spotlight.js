@@ -855,6 +855,15 @@ var Spotlight = module.exports = new function () {
                         // Whenever app goes to background, unspot focus
                         this.unspot();
                         this.setPointerMode(false);
+
+                        // Stop any hold/holdpulses that may currently be active
+                        gesture.drag.endHold();
+                        // the "downEvent" property is a private implementation detail of gesture,
+                        // but making the fix here as it is by far the simplest and least impactful
+                        if (gesture.downEvent) {
+                            gesture.up(gesture.downEvent);
+                        }
+
                         this.mute('window.focus');
                     }
                     break;
