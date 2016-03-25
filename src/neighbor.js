@@ -369,6 +369,7 @@ module.exports = function (Spotlight) {
     */
     this.getNearestNeighbor = function(sDirection, oControl, oOpts) {
         var oRoot = oOpts && oOpts.root,
+            oExtraCandidates = oOpts && oOpts.extraCandidates,
             oCandidates,
             oBounds;
 
@@ -380,6 +381,10 @@ module.exports = function (Spotlight) {
         oCandidates = oRoot ?
             Spotlight.getChildren(oRoot) :
             Spotlight.getSiblings(oControl).siblings;
+
+        // Add extra candidates if exists
+        oCandidates = oExtraCandidates ? 
+            oCandidates.concat(Spotlight.getSiblings(oExtraCandidates).siblings) : oCandidates;
 
         // If the control is container, the nearest neighbor is calculated based on the bounds
         // of last focused child of container.
