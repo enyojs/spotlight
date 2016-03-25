@@ -7,6 +7,18 @@
 * @module spotlight/neighbor
 * @public
 */
+
+/**
+* The configurable options used by {@link module:spotlight/neighbor~neighbor} when performing
+* nearest-neighbor calculations.
+*
+* @typedef {Object} spotlight/neighbor~neighbor~NeighborOptions
+* @property {Object} [root] - The optional root control whose children will be considered as
+*   candidates for nearest-neighbor calculations.
+* @property {Object} [extraCandidates] - The optional set of additional candidates (whose siblings
+*   will also be included) that should be considered for nearest-neighbor calculations.
+*/
+
 module.exports = function (Spotlight) {
 
     /**
@@ -330,7 +342,7 @@ module.exports = function (Spotlight) {
     //         * Create a single unified API for finding the neighbor of an arbitrary
     //           Control, the currently focused Control, the location of the pointer,
     //           an arbitrary point, etc.
-    //         
+    //
     //         * Remove Spotlight dependency from NearestNeighbor module, keeping
     //           NearestNeighbor focused on the basic algorithm and decoupled from
     //           details like container vs. not, the existence of 'last focused
@@ -364,11 +376,14 @@ module.exports = function (Spotlight) {
     * @param  {String} sDirection - The direction in which to spot the next control.
     * @param  {Object} oControl - The control whose nearest neighbor is to be
     * determined.
+    * @param  {module:spotlight/neighbor~NeighborOptions} [oOpts] - Additional options to be used
+    *   when determining the nearest neighbor.
     * @returns {Object} The nearest neighbor of the control.
     * @public
     */
     this.getNearestNeighbor = function(sDirection, oControl, oOpts) {
         var oRoot = oOpts && oOpts.root,
+            oExtraCandidates = oOpts && oOpts.extraCandidates,
             oCandidates,
             oNonContainer,
             oBounds;
@@ -381,6 +396,10 @@ module.exports = function (Spotlight) {
         oCandidates = oRoot ?
             Spotlight.getChildren(oRoot) :
             Spotlight.getSiblings(oControl).siblings;
+
+        // Add extra candidates if exists
+        oCandidates = oExtraCandidates ?
+            oCandidates.concat(Spotlight.getSiblings(oExtraCandidates).siblings) : oCandidates;
 
         // If the control is container, the nearest neighbor is calculated based on the bounds
         // of last focused child of container.
