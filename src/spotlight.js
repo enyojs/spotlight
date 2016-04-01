@@ -1362,7 +1362,7 @@ var Spotlight = module.exports = new function () {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
                 if (c.focusType == 'explicit' || c.focusType == 'default') {
                     var aLabel = this.getAccessibilityCustomLabel(c);
-                    if (c._accessibilityLabel == undefined && aLabel && aLabel.length>0) {
+                    if (c._accessibilityLabel === undefined && aLabel && aLabel.length>0) {
                         var aOrgLabel = c.get("accessibilityLabel");
                         var aNewLabel = aLabel + ( aOrgLabel || c.get("caption") || c.get("content") );
 
@@ -1372,7 +1372,7 @@ var Spotlight = module.exports = new function () {
 
                         setTimeout(function(cTarget) {
                             cTarget.set("accessibilityLabel", cTarget._accessibilityLabel);
-                            cTarget._accessibilityLabel =  undefined;
+                            cTarget._accessibilityLabel = undefined;
                         }.bind(this), 100, c);
                     }
                 }
