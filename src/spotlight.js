@@ -1341,7 +1341,7 @@ var Spotlight = module.exports = new function () {
     */
     this.onSpotlightFocus = function(oEvent) {
         var c = oEvent.originator;
-        c.focusType = oEvent.focusType
+        c.focusType = oEvent.focusType;
         _setCurrent(c);
     };
 
@@ -1360,17 +1360,19 @@ var Spotlight = module.exports = new function () {
         // transfer focus to its internal input.
         if (options.accessibility && !this.getPointerMode()) {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
-                if(c.focusType == 'explicit' || c.focusType == 'default'){
+                if (c.focusType == 'explicit' || c.focusType == 'default') {
                     var aLabel = this.getAccessibilityCustomLabel(c);
-                    if(aLabel && aLabel.length>0){
+                    if (c._accessibilityLabel == undefined && aLabel && aLabel.length>0) {
                         var aOrgLabel = c.get("accessibilityLabel");
-                        var aNewLabel = aLabel + ( aOrgLabel || c.get("content") );
+                        var aNewLabel = aLabel + ( aOrgLabel || c.get("caption") || c.get("content") );
 
-                        c.accessibilityCustomLabel = aOrgLabel;
+                        c._accessibilityLabel = aOrgLabel;
+
                         c.set("accessibilityLabel", aNewLabel);
 
                         setTimeout(function(cTarget) {
-                            cTarget.set("accessibilityLabel", cTarget.accessibilityCustomLabel);
+                            cTarget.set("accessibilityLabel", cTarget._accessibilityLabel);
+                            cTarget._accessibilityLabel =  undefined;
                         }.bind(this), 100, c);
                     }
                 }
@@ -1397,13 +1399,13 @@ var Spotlight = module.exports = new function () {
         var aCustomLabel = '';
         do {
             if (oControl.accessibilityCustomLabel) {
-                if(oControl.owner && typeof oControl.owner[oControl.accessibilityCustomLabel] == 'function'){
+                if(typeof oControl.accessibilityCustomLabel == 'function' && oControl.owner && oControl.owner[oControl.accessibilityCustomLabel]) {
                     aCustomLabel = oControl.owner[oControl.accessibilityCustomLabel](oControl) + aCustomLabel;
                 } else {
                     aCustomLabel = oControl.accessibilityCustomLabel + aCustomLabel;
                 }
             }
-            if (oControl.accessibilityCustomLabelBound){
+            if (oControl.accessibilityCustomLabelBound) {
                 break;
             }
             oControl = oControl.parent;
