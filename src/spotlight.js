@@ -1340,7 +1340,9 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocus = function(oEvent) {
-        _setCurrent(oEvent.originator);
+        var c = oEvent.originator;
+        c.focusType = oEvent.focusType;
+        _setCurrent(c);
     };
 
     /**
@@ -1358,12 +1360,57 @@ var Spotlight = module.exports = new function () {
         // transfer focus to its internal input.
         if (options.accessibility && !this.getPointerMode()) {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
+                if (c.focusType == 'explicit' || c.focusType == 'default') {
+                    var aLabel = this.getAccessibilityCustomLabel(c);
+                    if (c._accessibilityLabel === undefined && aLabel && aLabel.length>0) {
+                        var aOrgLabel = c.get("accessibilityLabel");
+                        var aNewLabel = aLabel + ( aOrgLabel || c.get("caption") || c.get("content") );
+
+                        c._accessibilityLabel = aOrgLabel;
+
+                        c.set("accessibilityLabel", aNewLabel);
+
+                        setTimeout(function(cTarget) {
+                            cTarget.set("accessibilityLabel", cTarget._accessibilityLabel);
+                            cTarget._accessibilityLabel = undefined;
+                        }.bind(this), 100, c);
+                    }
+                }
                 c.focus();
             }
             else if (oEvent.previous) {
                 oEvent.previous.blur();
             }
         }
+    };
+
+    /**
+    * Search parent and add accessibilityCustomLabel text when reach accessibilityCustomLabelBound property
+    *
+    * @method
+    * @param {oControl} oControl - The focused control.
+    * @public
+    */
+    this.getAccessibilityCustomLabel = function(oControl) {
+        oControl = oControl || this.getCurrent();
+        if (!oControl) {
+            return;
+        }
+        var aCustomLabel = '';
+        do {
+            if (oControl.accessibilityCustomLabel) {
+                if(typeof oControl.accessibilityCustomLabel == 'function' && oControl.owner && oControl.owner[oControl.accessibilityCustomLabel]) {
+                    aCustomLabel = oControl.owner[oControl.accessibilityCustomLabel](oControl) + aCustomLabel;
+                } else {
+                    aCustomLabel = oControl.accessibilityCustomLabel + aCustomLabel;
+                }
+            }
+            if (oControl.accessibilityCustomLabelBound) {
+                break;
+            }
+            oControl = oControl.parent;
+        } while (oControl);
+        return aCustomLabel;
     };
 
     /**
