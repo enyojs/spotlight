@@ -1,13 +1,25 @@
 /**
-* {@link enyo.Spotlight.NearestNeighbor} contains logic to identify the nearest
-* neighboring object for the object that currently has focus.
+* Logic to identify the nearest neighboring object for the object that currently has focus.
 *
-* @typedef {Object} enyo.Spotlight.NearestNeighbor definition
+* Returns a generator function that accepts the [Spotlight]{@link module:spotlight}
+* instance as an argument.
 *
-* @class enyo.Spotlight.NearestNeighbor
+* @module spotlight/neighbor
 * @public
 */
-enyo.Spotlight.NearestNeighbor = new function() {
+
+/**
+* The configurable options used by {@link module:spotlight/neighbor~neighbor} when performing
+* nearest-neighbor calculations.
+*
+* @typedef {Object} spotlight/neighbor~neighbor~NeighborOptions
+* @property {Object} [root] - The optional root control whose children will be considered as
+*   candidates for nearest-neighbor calculations.
+* @property {Object} [extraCandidates] - The optional set of additional candidates (whose siblings
+*   will also be included) that should be considered for nearest-neighbor calculations.
+*/
+
+module.exports = function (Spotlight) {
 
     /**
     * Determines whether a control overlaps multiple planes.
@@ -282,7 +294,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
                 oSibling = null,
                 oBestMatch = null,
                 nBestMatch = 0,
-                nBestDistance = 0,
+                nBestDistance = sDirection ? 0 : Infinity,
                 nLen = o.length;
 
             for (n = 0; n < nLen; n++) {
@@ -293,26 +305,48 @@ enyo.Spotlight.NearestNeighbor = new function() {
 
                 oBounds2 = oSibling.getAbsoluteBounds();
 
-                // If control is in half plane specified by direction
-                if (_isInHalfPlane(sDirection, oBounds1, oBounds2)) {
-                    // Find control with highest precedence to the direction
-                    nPrecedence = _getAdjacentControlPrecedence(sDirection, oBounds1, oBounds2);
-                    if (nPrecedence > nBestMatch) {
-                        nBestMatch = nPrecedence;
-                        oBestMatch = oSibling;
-                        nBestDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
-                    } else if (nPrecedence == nBestMatch) {
-                        nDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
-                        if (nBestDistance > nDistance) {
+                if (sDirection) {
+                    // If control is in half plane specified by direction
+                    if (_isInHalfPlane(sDirection, oBounds1, oBounds2)) {
+                        // Find control with highest precedence to the direction
+                        nPrecedence = _getAdjacentControlPrecedence(sDirection, oBounds1, oBounds2);
+                        if (nPrecedence > nBestMatch) {
                             nBestMatch = nPrecedence;
                             oBestMatch = oSibling;
-                            nBestDistance = nDistance;
+                            nBestDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
+                        } else if (nPrecedence == nBestMatch) {
+                            nDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
+                            if (nBestDistance > nDistance) {
+                                nBestMatch = nPrecedence;
+                                oBestMatch = oSibling;
+                                nBestDistance = nDistance;
+                            }
                         }
                     }
                 }
+                else {
+                    nDistance = _getCenterToCenterDistance(oBounds1, oBounds2);
+                    if (nDistance < nBestDistance) {
+                        nBestDistance = nDistance;
+                        oBestMatch = oSibling;
+                    }
+                }
+
             }
             return oBestMatch;
         };
+
+    // TODO: Deprecate both `getNearestPointerNeighbor()` and `getNearestNeighbor()`
+    //       and replace with a new `getNearestNeighbor()` in Spotlight. Motivation:
+    //
+    //         * Create a single unified API for finding the neighbor of an arbitrary
+    //           Control, the currently focused Control, the location of the pointer,
+    //           an arbitrary point, etc.
+    //
+    //         * Remove Spotlight dependency from NearestNeighbor module, keeping
+    //           NearestNeighbor focused on the basic algorithm and decoupled from
+    //           details like container vs. not, the existence of 'last focused
+    //           child', etc.
 
     /**
     * Gets the nearest neighbor of the pointer.
@@ -331,7 +365,7 @@ enyo.Spotlight.NearestNeighbor = new function() {
                 width: 1,
                 height: 1
             },
-            o = enyo.Spotlight.getChildren(oRoot, true);
+            o = Spotlight.getChildren(oRoot, true);
 
         return _calculateNearestNeighbor(o, sDirection, oBounds);
     };
@@ -342,39 +376,41 @@ enyo.Spotlight.NearestNeighbor = new function() {
     * @param  {String} sDirection - The direction in which to spot the next control.
     * @param  {Object} oControl - The control whose nearest neighbor is to be
     * determined.
+    * @param  {module:spotlight/neighbor~NeighborOptions} [oOpts] - Additional options to be used
+    *   when determining the nearest neighbor.
     * @returns {Object} The nearest neighbor of the control.
     * @public
     */
-    this.getNearestNeighbor = function(sDirection, oControl) {
-        sDirection = sDirection.toUpperCase();
-        oControl = oControl || enyo.Spotlight.getCurrent();
-
-        // Check to see if default direction is specified
-        var oNeighbor = enyo.Spotlight.Util.getDefaultDirectionControl(sDirection, oControl);
-		if (oNeighbor) {
-			if (enyo.Spotlight.isSpottable(oNeighbor)) {
-				return oNeighbor;
-			} else {
-				oNeighbor = enyo.Spotlight.getFirstChild(oNeighbor);
-				if (oNeighbor && enyo.Spotlight.isSpottable(oNeighbor)) { 
-					return oNeighbor;
-				}
-			}
-		}
-
-        // If default control in the direction of navigation is not specified, calculate it
-
-        var o = enyo.Spotlight.getSiblings(oControl),
+    this.getNearestNeighbor = function(sDirection, oControl, oOpts) {
+        var oRoot = oOpts && oOpts.root,
+            oExtraCandidates = oOpts && oOpts.extraCandidates,
+            oCandidates,
+            oNonContainer,
             oBounds;
+
+        sDirection = sDirection.toUpperCase();
+        oControl = oControl || Spotlight.getCurrent();
+
+        // If we've been passed a root, find the best match among its children;
+        // otherwise, find the best match among siblings of the reference control
+        oCandidates = oRoot ?
+            Spotlight.getChildren(oRoot) :
+            Spotlight.getSiblings(oControl).siblings;
+
+        // Add extra candidates if exists
+        oCandidates = oExtraCandidates ?
+            oCandidates.concat(Spotlight.getSiblings(oExtraCandidates).siblings) : oCandidates;
 
         // If the control is container, the nearest neighbor is calculated based on the bounds
         // of last focused child of container.
-        if (enyo.Spotlight.isContainer(oControl)) {
-            oControl = enyo.Spotlight.Container.getLastFocusedChild(oControl) || oControl;
+        oNonContainer = oControl;
+        while (Spotlight.isContainer(oNonContainer)) {
+            oNonContainer = Spotlight.Container.getLastFocusedChild(oNonContainer);
         }
+        oControl = oNonContainer || oControl;
 
         oBounds = oControl.getAbsoluteBounds();
 
-        return _calculateNearestNeighbor(o.siblings, sDirection, oBounds, oControl);
+        return _calculateNearestNeighbor(oCandidates, sDirection, oBounds, oControl);
     };
 };

@@ -1,13 +1,13 @@
 /**
-* {@link enyo.Spotlight.Accelerator} provides logic for accelerating and
-* throttling cursor movement.
+* Accelerator provides logic for accelerating and throttling cursor movement.
 *
-* @typedef {Object} enyo.Spotlight.Accelerator
+* Returns a generator function that accepts the [Spotlight]{@link module:spotlight}
+* instance as an argument.
 *
-* @class enyo.Spotlight.Accelerator
+* @module spotlight/accelerator
 * @public
 */
-enyo.Spotlight.Accelerator = new function() {
+module.exports = function (Spotlight) {
 
     //* @protected
     /*************************************************************/
@@ -29,7 +29,7 @@ enyo.Spotlight.Accelerator = new function() {
     this.frequency = [3, 3, 3, 2, 2, 2, 1];
 
     /**
-    * Called from {@link enyo.Spotlight}, with the current keydown event and
+    * Called from {@link module:spotlight}, with the current keydown event and
     * Spotlight's callback, which will be called when the event is allowed
     * through.
     *

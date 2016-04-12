@@ -1,1 +1,0 @@
-enyo.Spotlight.initialize(enyo.roots[0]);

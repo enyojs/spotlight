@@ -1,0 +1,32 @@
+{
+  "name": "spotlight",
+  "assets": [],
+  "devAssets": [],
+  "styles": [],
+  "main": "index.js",
+  "moduleDir": "src",
+  "version": "2.7.0",
+  "description": "An extensible utility that enables users to navigate Enyo applications using a keyboard or mouse-like device.",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/enyojs/spotlight.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/enyojs/spotlight/issues"
+  },
+  "homepage": "https://github.com/enyojs/spotlight",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^2.0.0",
+    "jshint": "^2.9.1",
+    "jshint-stylish": "^2.1.0"
+  }
+}

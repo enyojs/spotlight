@@ -1,15 +1,15 @@
 /**
-* {@link enyo.Spotlight.Muter} provides methods for working with muted controls.
-* By default, when a control is muted, it does not have the `'spotlight'` CSS class
-* applied to its DOM node, and does not appear as highlighted when it has Spotlight
-* focus.
+* Methods for working with muted controls. By default, when a control is muted, it does not have the
+* `'spotlight'` CSS class applied to its DOM node, and does not appear as highlighted when it has
+* Spotlight focus.
 *
-* @typedef {Object} enyo.Spotlight.Muter definition
+* Returns a generator function that accepts the [Spotlight]{@link module:spotlight}
+* instance as an argument.
 *
-* @class enyo.Spotlight.Muter
+* @module spotlight/muter
 * @public
 */
-enyo.Spotlight.Muter = new function() {
+module.exports = function (Spotlight) {
     var _oMutes = {},
         _nMutes = 0;
 
@@ -20,18 +20,17 @@ enyo.Spotlight.Muter = new function() {
     * @public
     */
     this.addMuteReason = function(oSender) {
-        if (typeof _oMutes[oSender.id] != 'undefined') {
-            return;
-        }
+        var id = typeof oSender == 'string' ? oSender : oSender.id;
+        if (_oMutes[id]) return;
 
         if (_nMutes === 0) {
-            var oCurrent = enyo.Spotlight.getCurrent();
+            var oCurrent = Spotlight.getCurrent();
             if (oCurrent) {
-                enyo.Spotlight.unhighlight(oCurrent);
+                Spotlight.unhighlight(oCurrent);
             }
         }
 
-        _oMutes[oSender.id] = 1;
+        _oMutes[id] = true;
         _nMutes++;
     };
 
@@ -42,17 +41,16 @@ enyo.Spotlight.Muter = new function() {
     * @public
     */
     this.removeMuteReason = function(oSender) {
-        if (typeof _oMutes[oSender.id] == 'undefined') {
-            return;
-        }
+        var id = typeof oSender == 'string' ? oSender : oSender.id;
+        if (!_oMutes[id]) return;
 
-        delete _oMutes[oSender.id];
+        _oMutes[id] = null;
         _nMutes--;
 
         if (_nMutes === 0) {
-            var oCurrent = enyo.Spotlight.getCurrent();
+            var oCurrent = Spotlight.getCurrent();
             if (oCurrent) {
-                enyo.Spotlight.highlight(oCurrent, true);
+                Spotlight.highlight(oCurrent, true);
             }
         }
     };

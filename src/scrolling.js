@@ -1,13 +1,13 @@
 /**
- * {@link enyo.Spotlight.Scrolling} contains logic relating to mousewheel events.
- *
- * @typedef {Object} enyo.Spotlight.Scrolling definition
- *
- * @class enyo.Spotlight.Scrolling
- * @public
- */
-
-enyo.Spotlight.Scrolling = new function() {
+* Logic relating to mousewheel events.
+*
+* Returns a generator function that accepts the [Spotlight]{@link module:spotlight}
+* instance as an argument.
+*
+* @module spotlight/scrolling
+* @public
+*/
+module.exports = function (Spotlight) {
     //* @protected
     /*************************************************************/
 

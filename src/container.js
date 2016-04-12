@@ -1,12 +1,16 @@
+var
+    logger = require('enyo/logger');
+
 /**
-* {@link enyo.Spotlight.Container}
+* Provides the Spotlight Container
 *
-* @typedef {Object} enyo.Spotlight.Container definition
+* Returns a generator function that accepts the [Spotlight]{@link module:spotlight}
+* instance as an argument.
 *
-* @class enyo.Spotlight.Container
+* @module spotlight/container
 * @public
 */
-enyo.Spotlight.Container = new function() {
+module.exports = function (Spotlight) {
 
     //* @protected
     /************************************************************/
@@ -31,7 +35,7 @@ enyo.Spotlight.Container = new function() {
                         throw 'Invalid default spotlight control specified in ' + oSender.name;
                     }
                 } else {
-                    oLastFocusedChild = enyo.Spotlight.getFirstChild(oSender);
+                    oLastFocusedChild = Spotlight.getFirstChild(oSender);
                 }
 
                 if (oLastFocusedChild && oLastFocusedChild.isDescendantOf(oSender)) {
@@ -72,7 +76,7 @@ enyo.Spotlight.Container = new function() {
                     oEvent.spotSentFromContainer = true;
                     break;
                 case 'onSpotlightContainerEnter':
-                    if(oEvent.last && oEvent.last.isDescendantOf(oSender)) {
+                    if(oEvent.last && oEvent.last !== oSender && oEvent.last.isDescendantOf(oSender)) {
                         return true;
                     }
                     break;
@@ -92,14 +96,14 @@ enyo.Spotlight.Container = new function() {
         * @private
         */
         _hadFocus = function(oSender) {
-            var oLastControl = enyo.Spotlight.getLastControl();
+            var oLastControl = Spotlight.getLastControl();
             if (oSender._spotlight.bEnorceOutsideIn) {
                 return false;
             } // Programmatically spotted containers are always treated as not having focus
-            if (!enyo.Spotlight.isSpottable(oLastControl)) {
+            if (!Spotlight.isSpottable(oLastControl)) {
                 return false;
             } // Because oLastControl might have been DHD'd
-            return enyo.Spotlight.Util.isChild(oSender, oLastControl);
+            return Spotlight.Util.isChild(oSender, oLastControl);
         };
 
     /**
@@ -113,7 +117,7 @@ enyo.Spotlight.Container = new function() {
         if (!control._spotlight || (control._spotlight && !control._spotlight.interceptEvents)) {
             control._spotlight = control._spotlight || {};
             control._spotlight.interceptEvents = true;
-            enyo.Spotlight.Util.interceptEvents(control, _handleEvent);
+            Spotlight.Util.interceptEvents(control, _handleEvent);
         }
     };
 
@@ -138,21 +142,41 @@ enyo.Spotlight.Container = new function() {
     * @public
     */
     this.onSpotlightFocused = function(oSender, oEvent) {
-        if (enyo.Spotlight.isInitialized() && enyo.Spotlight.getPointerMode()) {
+        var o5WayEvent,
+            s5WayEventType,
+            s5WayEventDir,
+            o5WayEventOriginator,
+            oChildToFocus;
+
+        if (Spotlight.isInitialized() && Spotlight.getPointerMode()) {
             return true;
         }
         _initComponent(oSender);
 
-        var s5WayEventType = enyo.Spotlight.getLast5WayEvent() ? enyo.Spotlight.getLast5WayEvent().type : '';
+        // Extract info from the 5-way event that got us here. We
+        // may need this info to focus the proper child, or to
+        // redispatch the event for procssing by other containers
+        o5WayEvent = Spotlight.getLast5WayEvent();
+        if (o5WayEvent) {
+            s5WayEventType = o5WayEvent.type;
+            s5WayEventDir = s5WayEventType.replace('onSpotlight', '').toUpperCase();
+            // Containers with `spotlightRememberFocus: false` need to know about
+            // the 'original' (non-container) originator of the event, so we pass
+            // it around using the `_originator` property
+            o5WayEventOriginator = o5WayEvent._originator ?
+                o5WayEvent._originator :
+                o5WayEvent.originator;
+        }
 
         // Focus came from inside AND this was a 5-way move
         if (_hadFocus(oSender)) {
             if (s5WayEventType) {
 
                 // Re-dispatch 5 way event
-                enyo.Spotlight.Util.dispatchEvent(
+                Spotlight.Util.dispatchEvent(
                     s5WayEventType, {
-                        spotSentFromContainer: true
+                        spotSentFromContainer: true,
+                        _originator: o5WayEventOriginator
                     },
                     oSender
                 );
@@ -160,16 +184,33 @@ enyo.Spotlight.Container = new function() {
 
             // Focus came from outside or this was a programmatic spot
         } else {
-            var oLastFocusedChild = this.getLastFocusedChild(oSender);
-            if (oLastFocusedChild) {
-                enyo.Spotlight.spot(oLastFocusedChild);
+            // Default container behavior is to refocus the last-focused child, but
+            // some containers may prefer to focus the child nearest the originator
+            // of the 5-way event
+            if (o5WayEvent && oSender.spotlightRememberFocus === false) {
+                oChildToFocus = Spotlight.NearestNeighbor.getNearestNeighbor(
+                    // 5-way direction
+                    s5WayEventDir,
+                    // The true (non-container) originator of the 5-way event
+                    o5WayEventOriginator,
+                    // To scope our search to children of the container, we
+                    // designate it as the root
+                    {root: oSender}
+                );
+            }
+            if (!oChildToFocus) {
+                oChildToFocus = this.getLastFocusedChild(oSender);
+            }
+            if (oChildToFocus) {
+                Spotlight.spot(oChildToFocus, {direction: s5WayEventDir});
             } else {
                 if (s5WayEventType) {
 
                     // Re-dispatch 5 way event
-                    enyo.Spotlight.Util.dispatchEvent(
+                    Spotlight.Util.dispatchEvent(
                         s5WayEventType, {
-                            spotSentFromContainer: true
+                            spotSentFromContainer: true,
+                            _originator: o5WayEventOriginator
                         },
                         oSender
                     );
@@ -190,8 +231,8 @@ enyo.Spotlight.Container = new function() {
     */
     this.getLastFocusedChild = function(oSender) {
         oSender._spotlight = oSender._spotlight || {};
-        if (!oSender._spotlight.lastFocusedChild || !enyo.Spotlight.isSpottable(oSender._spotlight.lastFocusedChild)) {
-            oSender._spotlight.lastFocusedChild = enyo.Spotlight.getChildren(oSender)[0];
+        if (!oSender._spotlight.lastFocusedChild || !Spotlight.isSpottable(oSender._spotlight.lastFocusedChild)) {
+            oSender._spotlight.lastFocusedChild = Spotlight.getChildren(oSender)[0];
         }
         return oSender._spotlight.lastFocusedChild;
     };
@@ -200,32 +241,42 @@ enyo.Spotlight.Container = new function() {
     * Sets last focused child for the container.
     *
     * @param  {Object} oSender
-    * @param  {Object} oChild - The child to set as the last focused child.
+    * @param  {Object} oChild - The child to set as the last focused child. Set to `null`
+    *   to clear the last focused child.
     * @public
     */
     this.setLastFocusedChild = function(oSender, oChild) {
-        if (!enyo.Spotlight.isSpottable(oChild)) {
-            oChild = enyo.Spotlight.getFirstChild(oChild);
+        if (oSender.spotlightRememberFocus === false || oChild === null) {
+            oSender._spotlight.lastFocusedChild = null;
+            return;
+        }
+        if (!Spotlight.isSpottable(oChild)) {
+            oChild = Spotlight.getFirstChild(oChild);
         }
         if (oChild) {
             oSender._spotlight = oSender._spotlight || {};
             oSender._spotlight.lastFocusedChild = oChild;
         } else {
-            enyo.warn('Spotlight Container attempting to set non-spottable lastFocusedChild');
+            logger.warn('Spotlight Container attempting to set non-spottable lastFocusedChild');
         }
     };
 
     this.fireContainerEvents = function (blurredControl, focusedControl) {
-        if(blurredControl) {
+        if(blurredControl && blurredControl.hasNode()) {
             var to = focusedControl.hasNode(),
                 from = blurredControl,
                 position = 0;
 
             // find common ancestor
             do {
-                position = enyo.dom.compareDocumentPosition(to, from.hasNode());
-                if(position & 8) {  // 8 == 'contains'
-                    enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
+                // skip over tagless Controls (e.g. enyo/ScrollStrategy)
+                if (!from.hasNode()) {
+                    from = from.parent;
+                    continue;
+                }
+                position = to.compareDocumentPosition(from.hasNode());
+                if(from == focusedControl || (position & Node.DOCUMENT_POSITION_CONTAINS)) {
+                    Spotlight.Util.dispatchEvent('onSpotlightContainerLeave', {
                         commonAncestor: from
                     }, blurredControl);
                     break;
@@ -236,34 +287,10 @@ enyo.Spotlight.Container = new function() {
         }
 
         if(focusedControl) {
-            enyo.Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {
+            Spotlight.Util.dispatchEvent('onSpotlightContainerEnter', {
                 last: blurredControl,
                 current: focusedControl
             }, focusedControl);
         }
     };
 };
-
-/*
-Using the hack below to ensure that statically declared Spotlight containers are
-initialized upon creation. Our previous pass at this used enyo.Control.extend(),
-which meant it failed to work for Control subkinds whose constructors were created
-immediately (vs. being deferred). Unfortunately, this caused big problems in webOS,
-where the "container" app systematically disables the deferral of constructor
-creation.
-
-There is some discussion ongoing as to whether we need a nicer mechanism for
-extending functionality in cases like this (see comments in BHV-15323), but in
-the meantime we need to proceed with a quick fix for this issue.
-*/
-
-var originalEnyoComponentCreate = enyo.Component.create;
-
-enyo.Component.create = function () {
-    var component = originalEnyoComponentCreate.apply(enyo.Component, arguments);
-    if (component.spotlight == 'container') {
-        enyo.Spotlight.Container.initContainer(component);
-    }
-    return component;
-};
-
