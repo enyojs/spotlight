@@ -57,6 +57,11 @@ module.exports = function (Spotlight) {
             }
         },
 
+        _isContain = function(oBounds1, oBounds2) {
+            return (oBounds1.top <= oBounds2.top) && (oBounds1.top + oBounds1.height >= oBounds2.top + oBounds2.height) &&
+                (oBounds1.left <= oBounds2.left) && (oBounds1.left + oBounds1.width >= oBounds2.left + oBounds2.width);
+        },
+
         /**
         * Checks to see which control has higher precedence for spottability.
         *
@@ -321,6 +326,12 @@ module.exports = function (Spotlight) {
                                 oBestMatch = oSibling;
                                 nBestDistance = nDistance;
                             }
+                        }
+                    } else {
+                        // Short sircuit for getNearestPointerNeighbor
+                        if (!oControl && _isContain(oBounds2, oBounds1)) {
+                            oBestMatch = oSibling;
+                            break;
                         }
                     }
                 }
