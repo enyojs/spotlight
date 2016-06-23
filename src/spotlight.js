@@ -435,7 +435,7 @@ var Spotlight = module.exports = new function () {
         * @param {Object} oControl - The control to be spotted.
         * @private
         */
-        _setCurrent = function(oControl) {
+        _setCurrent = function(oControl, oEvent) {
             _initializeControl(oControl);
 
             if (!_oThis.isSpottable(oControl)) {
@@ -472,7 +472,8 @@ var Spotlight = module.exports = new function () {
                 _oLastControl = oControl;
             }
 
-            _dispatchEvent('onSpotlightFocused', {previous: oPrevious});
+            oEvent = oEvent ? (oEvent.previous = oPrevious, oEvent) : {previous: oPrevious};
+            _dispatchEvent('onSpotlightFocused', oEvent);
 
             _oThis.TestMode.highlight();
 
@@ -1326,7 +1327,7 @@ var Spotlight = module.exports = new function () {
     * @public
     */
     this.onSpotlightFocus = function(oEvent) {
-        _setCurrent(oEvent.originator);
+        _setCurrent(oEvent.originator, oEvent);
     };
 
     /**
