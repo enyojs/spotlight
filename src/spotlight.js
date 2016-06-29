@@ -1726,7 +1726,7 @@ var Spotlight = module.exports = new function () {
             _oLastMouseMoveTarget = null;
             _dispatchEvent('onSpotlightBlur', {next: oNext}, _oCurrent);
             _observeDisappearance(false, _oCurrent);
-            if(_oCurrent.hasNode()){
+            if (_oCurrent.hasNode()) {
                 _oCurrent.node.blur();
             }
             _oCurrent = null;
