@@ -1,6 +1,6 @@
 var
 	Spotlight = require('./src/spotlight');
 
-Spotlight.version = '2.6.3-rc.7.1';
+Spotlight.version = '2.6.3-rc.8';
 
 module.exports = Spotlight;
