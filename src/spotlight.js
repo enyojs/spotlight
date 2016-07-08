@@ -879,7 +879,6 @@ var Spotlight = module.exports = new function () {
                     }
                     break;
                 case 'mousedown':
-                case 'touchstart':
                     return this.onMouseDown(oEvent);
                 case 'mouseup':
                     return this.onMouseUp(oEvent);
