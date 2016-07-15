@@ -1763,10 +1763,8 @@ var Spotlight = module.exports = new function () {
             _nPrevClientY !== oEvent.clientY
         );
 
-        if (this.getPointerMode()) {
-            _nPrevClientX = oEvent.clientX;
-            _nPrevClientY = oEvent.clientY;
-        }
+        _nPrevClientX = oEvent.clientX;
+        _nPrevClientY = oEvent.clientY;
 
         return bChanged;
     };
