@@ -547,11 +547,14 @@ var Spotlight = module.exports = new function () {
             if (oControl) {
                 _oThis.spot(oControl, {direction: sDirection});
             } else {
-                if (_oThis.Accelerator.isAccelerating()) {
+                var oParent = _oThis.getParent(),
+                    oCurrent = _oThis.getCurrent();
+                if (_oThis.Accelerator.isAccelerating() && oParent && !oParent.spotlightPreserveAcceleration) {
                     _oThis.Accelerator.cancel();
+                    if (oCurrent && oCurrent.spotlight === 'container') {
+                        _spotLastControl({focusType: '5-way bounce'});
+                    }
                 } else {
-                    var oParent = _oThis.getParent();
-
                     // Reached the end of spottable world
                     if (!oParent || oParent.spotlightModal) {
                         _spotLastControl({focusType: '5-way bounce'});
