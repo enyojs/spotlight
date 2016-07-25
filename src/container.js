@@ -86,8 +86,8 @@ module.exports = function (Spotlight) {
                         return true;
                     }
                     break;
-                case 'requestClearLastFocus':
-                    _oThis.setLastFocusedChild(oSender, null);
+                case 'onRequestSetLastFocusedChild':
+                    _oThis.setLastFocusedChild(oSender, oEvent.last);
                     break;
             }
         },
