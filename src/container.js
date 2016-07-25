@@ -86,6 +86,9 @@ module.exports = function (Spotlight) {
                         return true;
                     }
                     break;
+                case 'onRequestSetLastFocusedChild':
+                    _oThis.setLastFocusedChild(oSender, oEvent.last);
+                    break;
             }
         },
 
@@ -248,7 +251,7 @@ module.exports = function (Spotlight) {
     * @public
     */
     this.setLastFocusedChild = function(oSender, oChild) {
-        if (oSender.spotlightRememberFocus === false || oChild === null) {
+        if (oChild === null) {
             oSender._spotlight.lastFocusedChild = null;
             return;
         }
