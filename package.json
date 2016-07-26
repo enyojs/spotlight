@@ -5,7 +5,7 @@
   "styles": [],
   "main": "index.js",
   "moduleDir": "src",
-  "version": "2.6.4-rc.6",
+  "version": "2.6.4-rc.6.1",
   "description": "1. [What Is Spotlight?](#1) 2. [Modes](#2) 3. [Navigation](#3) 4. [Containers](#4) 5. [Nesting](#5) 6. [Events](#6) \t1. [List of Spotlight Events](#6.1) \t2. [Preventing/Allowing Default DOM Events](#6.2) \t3. [Sequence of Spotlight Events](#6.3) \t4. [Accelerated keydown Events](#6.4) \t5. [Scroll Events](#6.5) \t6. [Default 5-way controls](#6.6) 7. [Extending Spotlight](#7) \t1. [Spotlight Decorators](#7.1) \t2. [Extending Controls](#7.2) 8. [Control Parameters](#8) 9. [Copyright and License Information](#9)",
   "directories": {
     "doc": "docs"
