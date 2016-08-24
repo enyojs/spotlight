@@ -1727,8 +1727,8 @@ var Spotlight = module.exports = new function () {
             return false;
         }
 
-        if (this.hasCurrent() && _bFocusOnScreen) {
-            _unhighlight(_oCurrent);
+        if (this.hasCurrent()) {
+            _bFocusOnScreen && _unhighlight(_oCurrent);
             _oLastMouseMoveTarget = null;
             _dispatchEvent('onSpotlightBlur', {next: oNext}, _oCurrent);
             _observeDisappearance(false, _oCurrent);
