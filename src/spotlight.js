@@ -891,10 +891,11 @@ var Spotlight = module.exports = new function () {
                     }
                     break;
                 case 'mousedown':
-                case 'touchstart':
                     return this.onMouseDown(oEvent);
                 case 'mouseup':
                     return this.onMouseUp(oEvent);
+                case 'touchstart':
+                    return this.onMouseMove(oEvent);
                 case 'click':
                 case 'tap':
                 case 'ontap':
