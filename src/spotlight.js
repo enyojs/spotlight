@@ -891,7 +891,9 @@ var Spotlight = module.exports = new function () {
                 case 'touchstart':
                     return this.onMouseMove(oEvent);
                 case 'touchend':
-                    // Delay because synthetic tap handler will cause a focus event
+                    // Delay because synthetic tap handler will cause a focus event, which we don't
+                    // want in touch mode.  Because we can never unhover in touch mode, we need to
+                    // clear the focus after the tap event.
                     setTimeout(function() {
                         this.unspot();
                         this.setPointerMode(false);
