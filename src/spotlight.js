@@ -890,6 +890,12 @@ var Spotlight = module.exports = new function () {
                     return this.onMouseUp(oEvent);
                 case 'touchstart':
                     return this.onMouseMove(oEvent);
+                case 'touchend':
+                    setTimeout(function() {
+                        this.unspot();
+                        this.setPointerMode(false);
+                    }.bind(this), 30);
+                    break;
                 case 'click':
                 case 'tap':
                 case 'ontap':
