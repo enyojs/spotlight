@@ -891,6 +891,7 @@ var Spotlight = module.exports = new function () {
                 case 'touchstart':
                     return this.onMouseMove(oEvent);
                 case 'touchend':
+                    // Delay because synthetic tap handler will cause a focus event
                     setTimeout(function() {
                         this.unspot();
                         this.setPointerMode(false);
