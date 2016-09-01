@@ -355,15 +355,12 @@ var Spotlight = module.exports = new function () {
                 // Find spottable parent or first spottable in the app as a fallback
                 oControl = _oThis.getParent() || _oThis.getFirstChild(_oRoot);
                 if (!oControl) {
-                    _unhighlight(_oCurrent);
-                    _dispatchEvent('onSpotlightBlur', {}, _oCurrent);
+                    _unhighlight(_oLastControl);
+                    _oLastControl = null;
+
                     _observeDisappearance(false, _oCurrent);
-                    if (_oCurrent.hasNode()) {
-                        _oCurrent.node.blur();
-                    }
                     // NULL CASE :(, just like when no spottable children found on init
                     _oCurrent = null;
-                    _oLastControl = null;
                     return;
                 }
             }
