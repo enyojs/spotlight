@@ -179,6 +179,15 @@ var Spotlight = module.exports = new function () {
         _bPaused = false,
 
         /**
+        * When true, recover focus on key press while current is not focusable.
+        *
+        * @type {Boolean}
+        * @default true
+        * @private
+        */
+        _bRecoverNoFocus = true,
+
+        /**
         * Contains the control specified in `defaultSpotlightDisappear` property of
         * `_oCurrent`.
         * @type {Object}
@@ -1201,7 +1210,10 @@ var Spotlight = module.exports = new function () {
                 // Or spot last 5-way control, only if there's not already focus on screen
                 (bWasPointerMode && !_oLastMouseMoveTarget && !this.isFrozen())) {
 
-                _spotNearestToPointer(oEvent);
+                if (this.isRecoverNoFocus()) {
+                    _spotNearestToPointer(oEvent);
+                }
+
                 _bSuppressSelectOnNextKeyUp = oEvent.keyCode == 13;
                 return false;
             }
@@ -1879,6 +1891,26 @@ var Spotlight = module.exports = new function () {
     */
     this.isPaused = function() {
         return _bPaused;
+    };
+
+    /**
+    * Sets recover nearest focus on key press mode.
+    *
+    * @param {Boolean} bFlag - `true` if Spotlight is currently recover no focus; otherwise, `false`.
+    * @private
+    */
+    this.setRecoverNoFocus = function(bFlag) {
+        _bRecoverNoFocus = bFlag;
+    };
+
+    /**
+    * Determines whether recover focus at nearest to pointer on key press.
+    *
+    * @return {Boolean} `true` if Spotlight is currently recover no focus; otherwise, `false`.
+    * @private
+    */
+    this.isRecoverNoFocus = function() {
+        return _bRecoverNoFocus;
     };
 
     /**
