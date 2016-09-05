@@ -272,7 +272,15 @@ var Spotlight = module.exports = new function () {
         * @type {Number}
         * @default 1537
         */
-        KEY_POINTER_HIDE = 1537;
+        KEY_POINTER_HIDE = 1537,
+
+        /**
+        * Caching keyboard visibility status on keyboardStateChange event.
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
+        _keyboardVisibility = 'hi';//false;
 
 
     var
@@ -812,6 +820,20 @@ var Spotlight = module.exports = new function () {
                 case 40:
                     return "DOWN";
             }
+        },
+
+        /**
+        * @private
+        */
+        _getKeyboardVisibility = function() {
+            return _oThis._keyboardVisibility;
+        },
+
+        /**
+        * @private
+        */
+        _setKeyboardVisibility = function(keyboardVisibility) {
+            _oThis._keyboardVisibility = keyboardVisibility;
         };
 
     //* Generic event handlers
@@ -823,9 +845,19 @@ var Spotlight = module.exports = new function () {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'cursorStateChange':
+                    // This event comes for all the BG/FG apps
+                    if (oEvent && oEvent.detail) {
+                        console.log('cursor.visibility', oEvent.detail.visibility, _getKeyboardVisibility())
+                        if (!oEvent.detail.visibility) {
+                            //this.unmute('window.focus');
+                        }
+                    }
+                    break;
                 case 'keyboardStateChange':
                     // webOSMouse event comes only when pointer mode
                     if (oEvent && oEvent.detail) {
+                        console.log('keyboardStateChange', _getKeyboardVisibility());
                         if (!oEvent.detail.visibility) {
                             this.unmute('window.focus');
                         }
