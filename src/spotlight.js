@@ -272,7 +272,15 @@ var Spotlight = module.exports = new function () {
         * @type {Number}
         * @default 1537
         */
-        KEY_POINTER_HIDE = 1537;
+        KEY_POINTER_HIDE = 1537,
+
+        /**
+        * Caching keyboard visibility status on keyboardStateChange event.
+        * @type {Boolean}
+        * @default false
+        * @private
+        */
+        _keyboardVisibility = false;
 
 
     var
@@ -812,6 +820,20 @@ var Spotlight = module.exports = new function () {
                 case 40:
                     return "DOWN";
             }
+        },
+
+        /**
+        * @private
+        */
+        _getKeyboardVisibility = function() {
+            return _keyboardVisibility;
+        },
+
+        /**
+        * @private
+        */
+        _setKeyboardVisibility = function(keyboardVisibility) {
+            return _keyboardVisibility = keyboardVisibility;
         };
 
     //* Generic event handlers
@@ -823,9 +845,32 @@ var Spotlight = module.exports = new function () {
         // Events only processed when Spotlight initialized with a root
         if (this.isInitialized()) {
             switch (oEvent.type) {
+                case 'cursorStateChange':
+                    if (oEvent && oEvent.detail) {
+                        // Cursor hide while VKB open on active app
+                        if (this.hasCurrent() &&
+                            window.PalmSystem &&
+                            window.PalmSystem.isActivated &&        // active app
+                            !window.PalmSystem.cursor.visibility && // cursor hide
+                            _getKeyboardVisibility()) {             // keyboard showing
+
+                            this.setPointerMode(false);             // update pointer mode
+
+                            var cur = this.getCurrent();
+                            // current is not focused inputDecorator
+                            if ((cur.kindName !== 'moon.InputDecorator') || 
+                                (cur.kindName == 'moon.InputDecorator' && !cur.focused)) {
+                                var input = dispatcher.findDispatchTarget(document.activeElement);
+                                this.spot(input.container);
+                            }
+                        }
+                    }
+                    break;
                 case 'keyboardStateChange':
                     // webOSMouse event comes only when pointer mode
                     if (oEvent && oEvent.detail) {
+                        // Cache keyboard visibility
+                        _setKeyboardVisibility(oEvent.detail.visibility);
                         if (!oEvent.detail.visibility) {
                             this.unmute('window.focus');
                         }
