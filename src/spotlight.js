@@ -833,7 +833,7 @@ var Spotlight = module.exports = new function () {
         * @private
         */
         _setKeyboardVisibility = function(keyboardVisibility) {
-            return _keyboardVisibility = keyboardVisibility;
+            _keyboardVisibility = keyboardVisibility;
         };
 
     //* Generic event handlers
