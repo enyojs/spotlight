@@ -1348,9 +1348,14 @@ var Spotlight = module.exports = new function () {
         // transfer focus to its internal input.
         if (options.accessibility && !this.getPointerMode()) {
             if (c && !c.accessibilityDisabled && c.tag != 'label') {
-                c.focus();
-            }
-            else if (oEvent.previous) {
+                if (c == oEvent.previous) {
+                    if (oEvent.focusType == 'default') {
+                        c.focus();
+                    }
+                } else {
+                    c.focus();
+                }
+            } else if (oEvent.previous) {
                 oEvent.previous.blur();
             }
         }
