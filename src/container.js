@@ -237,7 +237,11 @@ module.exports = function (Spotlight) {
     this.getLastFocusedChild = function(oSender) {
         oSender._spotlight = oSender._spotlight || {};
         if (!oSender._spotlight.lastFocusedChild || !Spotlight.isSpottable(oSender._spotlight.lastFocusedChild)) {
-            oSender._spotlight.lastFocusedChild = Spotlight.getChildren(oSender)[0];
+            var oChild = Spotlight.getFirstChild(oSender);
+            if (oChild && oChild.skipLastFocusUpdate) {
+                return null;
+            }
+            oSender._spotlight.lastFocusedChild = oChild;
         }
         return oSender._spotlight.lastFocusedChild;
     };
@@ -257,6 +261,9 @@ module.exports = function (Spotlight) {
         }
         if (!Spotlight.isSpottable(oChild)) {
             oChild = Spotlight.getFirstChild(oChild);
+        }
+        if (oChild && oChild.skipLastFocusUpdate) {
+            return;
         }
         if (oChild) {
             oSender._spotlight = oSender._spotlight || {};
