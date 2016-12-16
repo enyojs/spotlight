@@ -866,6 +866,8 @@ var Spotlight = module.exports = new function () {
                 case 'blur':
                     if (oEvent.target === window) {
                         // Whenever app goes to background, unspot focus
+                        var t = this.getCurrent() && this.getCurrent().hasNode();
+                        if(t) t.blur && t.blur();
                         this.unspot();
                         this.setPointerMode(false);
 
@@ -1741,9 +1743,6 @@ var Spotlight = module.exports = new function () {
             _oLastMouseMoveTarget = null;
             _dispatchEvent('onSpotlightBlur', {next: oNext}, _oCurrent);
             _observeDisappearance(false, _oCurrent);
-            if (_oCurrent.hasNode()) {
-                _oCurrent.node.blur();
-            }
             _oCurrent = null;
             return true;
         }
