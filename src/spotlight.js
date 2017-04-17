@@ -1412,6 +1412,23 @@ var Spotlight = module.exports = new function () {
     };
 
     /**
+    * Called when pointer move between floating style apps.
+    *
+    * @method
+    * @param {Object} oEvent - The current event.
+    * @public
+    */
+	this.onwebOSMouse = function(oEvent) {
+		if (!oEvent || !oEvent.detail) return;
+		if (oEvent.detail.type == 'Leave') {
+			// webOSMouse event comes only when pointer mode
+			this.setPointerMode(false);
+			this.unspot();
+			this.setPointerMode(true);
+		}
+	};
+
+    /**
     * Determines whether Spotlight has been initialized (i.e., it has `_oCurrent` and
     * `last5waycontrol`).
     *
