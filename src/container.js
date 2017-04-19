@@ -188,7 +188,8 @@ module.exports = function (Spotlight) {
             // Default container behavior is to refocus the last-focused child, but
             // some containers may prefer to focus the child nearest the originator
             // of the 5-way event
-            if (o5WayEvent && oSender.spotlightRememberFocus === false) {
+            if (o5WayEvent && oSender.spotlightRememberFocus === false && 
+                o5WayEventOriginator && o5WayEventOriginator.getAbsoluteShowing()) {
                 oChildToFocus = Spotlight.NearestNeighbor.getNearestNeighbor(
                     // 5-way direction
                     s5WayEventDir,
