@@ -866,8 +866,11 @@ var Spotlight = module.exports = new function () {
                 case 'blur':
                     if (oEvent.target === window) {
                         // Whenever app goes to background, unspot focus
-                        var t = this.getCurrent() && this.getCurrent().hasNode();
-                        if(t) t.blur && t.blur();
+			var c = this.getCurrent();
+                        var t = c && c.hasNode();
+                        if (t) {
+				t.blur && t.blur();
+			}
                         this.unspot();
                         this.setPointerMode(false);
 
